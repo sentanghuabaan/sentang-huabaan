@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Gallery Management - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item"><iconify-icon icon="teenyicons:otp-solid"
+                        class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item active"><iconify-icon
+                        icon="material-symbols:topic" class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="ค้นหาด้วยรหัสประวัติ หรือ ID" id="imgSearch"
+                        onkeyup="searchGalleryTable()">
+                </div>
+                <div class="action-controls">
+                    <button class="add-btn" onclick="openGalleryModal()">
+                        <iconify-icon icon="mdi:add-bold"></iconify-icon> Add Image
+                    </button>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <div class="scroll-container">
+                    <table id="imageTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Gallery ID</th>
+                                <th>History ID</th>
+                                <th>Image URL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="galleryData"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        function searchGalleryTable() {
+            let input = document.getElementById("imgSearch").value.toLowerCase();
+            let rows = document.querySelectorAll("#galleryData tr");
+            rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none"; });
+        }
+
+        async function fetchGallery() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/history-gallery`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const data = await response.json();
+                const tbody = document.getElementById('galleryData');
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td class="action-cell">
+                            <button class="edit-btn-sm" onclick="openGalleryModal('${item.gallery_id}')"><iconify-icon icon="material-symbols:edit"></iconify-icon> Edit</button>
+                            <button class="delete-btn-sm" onclick="deleteGallery('${item.gallery_id}')"><iconify-icon icon="material-symbols:delete"></iconify-icon> Delete</button>
+                        </td>
+                        <td>${item.gallery_id}</td>
+                        <td>${item.history_id}</td>
+                        <td class="url-text">${item.image_url}</td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error("Error fetching gallery:", err); }
+        }
+
+        async function openGalleryModal(id = null) {
+            const isEdit = id !== null;
+            let imgData = {};
+
+            const hisRes = await fetch(`${API_BASE_URL}/api/history`, {
+                headers: { 'Authorization': `Bearer ${adminToken}` }
+            });
+            const historyList = await hisRes.json();
+            let options = historyList.map(h => `<option value="${h.history_id}">${h.title} (${h.history_id})</option>`).join('');
+
+            if (isEdit) {
+                const res = await fetch(`${API_BASE_URL}/api/history-gallery/${id}`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                imgData = await res.json();
+            } else {
+                const res = await fetch(`${API_BASE_URL}/api/history-gallery/next-id`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const result = await res.json();
+                imgData.gallery_id = result.next_id;
+            }
+
+            await Swal.fire({
+                title: isEdit ? '✏️ แก้ไขรูปภาพประวัติ' : '🖼️ เพิ่มรูปภาพประวัติ',
+                width: '700px',
+                customClass: { popup: 'cute-modal-style', title: 'cute-modal-title', confirmButton: 'cute-modal-button', cancelButton: 'cute-modal-button-cancel' },
+                buttonsStyling: false,
+                html: `
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; padding: 20px;">
+                        <div class="form-group" style="display: flex; flex-direction: column;"><label>Gallery ID</label><input type="text" id="swal-gal-id" class="cute-edit-input" value="${imgData.gallery_id}" readonly></div>
+                        <div></div>
+                        <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;"><label>History ID</label><select id="swal-his-id" class="cute-edit-input">${options}</select></div>
+                        
+                        <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;">
+                            <label>Upload Image (เลือกไฟล์รูปภาพประวัติศาสตร์)</label>
+                            <input type="file" id="swal-file" class="cute-edit-input" accept="image/*" style="padding: 8px;">
+                        </div>
+                    </div>
+                `,
+                didOpen: () => { if (isEdit) document.getElementById('swal-his-id').value = imgData.history_id; },
+                confirmButtonText: isEdit ? 'UPDATE' : 'ADD',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const fileInput = document.getElementById('swal-file');
+                    return {
+                        gallery_id: document.getElementById('swal-gal-id').value,
+                        history_id: document.getElementById('swal-his-id').value,
+                        history_image: fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null
+                    }
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const method = isEdit ? 'PUT' : 'POST';
+                    const url = isEdit ? `${API_BASE_URL}/api/history-gallery/${id}` : `${API_BASE_URL}/api/history-gallery`;
+                    
+                    const formDataToSend = new FormData();
+                    formDataToSend.append('gallery_id', result.value.gallery_id);
+                    formDataToSend.append('history_id', result.value.history_id);
+                    
+                    if (result.value.history_image) {
+                        formDataToSend.append('image', result.value.history_image); 
+                    }
+                    formDataToSend.append('admin_id', localStorage.getItem('adminId') || '1');
+
+                    const response = await fetch(url, {
+                        method,
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`
+                        },
+                        body: formDataToSend
+                    });
+
+                    if (response.ok) { 
+                        Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', confirmButtonColor: '#BF7E46' }); 
+                        fetchGallery(); 
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'บันทึกไม่สำเร็จ', text: 'โปรดตรวจสอบสิทธิ์หลังบ้านแอดมิน หรือขนาดไฟล์รูปภาพ' });
+                    }
+                }
+            });
+        }
+
+        async function deleteGallery(id) {
+            const adminId = localStorage.getItem('adminId');
+
+            Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: `ต้องการลบรูปภาพประวัติรหัส ${id} ใช่หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ลบเลย!',
+                confirmButtonColor: '#FF9A9A'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/history-gallery/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ admin_id: adminId })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire('สำเร็จ', 'ข้อมูลถูกย้ายไปถังขยะแล้ว', 'success');
+                            fetchGallery();
+                        } else {
+                            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถดำเนินการลบข้อมูลได้', 'error');
+                        }
+                    } catch (err) { console.error("Delete Error:", err); }
+                }
+            });
+        }
+
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminName');
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+        window.onload = fetchGallery;
+    </script>
+</body>
+
+</html>

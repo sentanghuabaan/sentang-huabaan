@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Map - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item active"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2 class="page-title">MAP PIN MANAGEMENT</h2>
+
+            <div style="margin-bottom: 20px;">
+                <button id="toggle-add-btn" class="view-btn btn-off" onclick="toggleAddMode()">เพิ่มหมุด: ปิด</button>
+            </div>
+
+            <div id="map-container" style="position:relative; display:inline-block; cursor: crosshair;">
+                <img src="../image/Map.png" style="width:100%; height:auto; display:block;"
+                    onclick="handleMapClick(event)">
+                <div id="pins-layer"></div>
+            </div>
+        </main>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            // เก็บข้อมูลสถานที่ที่ดึงมา
+            let locations = [];
+
+            let isAddMode = false;
+
+            function toggleAddMode() {
+                isAddMode = !isAddMode;
+                const btn = document.getElementById('toggle-add-btn');
+
+                // สลับคลาส
+                btn.className = isAddMode ? "view-btn btn-on" : "view-btn btn-off";
+                btn.textContent = isAddMode ? "เพิ่มหมุด: เปิด" : "เพิ่มหมุด: ปิด";
+
+                document.getElementById('map-container').style.cursor = isAddMode ? "crosshair" : "default";
+            }
+            function handleMapClick(event) {
+                if (isAddMode) {
+                    addPin(event);
+                }
+            }
+
+            // ฟังก์ชันสร้างหมุดพร้อมดูรายละเอียด
+            function createPinElement(pin) {
+                const pinEl = document.createElement('div');
+                pinEl.style.position = 'absolute';
+                pinEl.style.left = pin.position_x + '%';
+                pinEl.style.top = pin.position_y + '%';
+                pinEl.style.zIndex = '10';
+                pinEl.style.cursor = 'pointer';
+
+                // แสดงหมุดพร้อมเลข ID
+                pinEl.innerHTML = `
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <iconify-icon icon="mdi:map-marker" style="color:red; font-size:28px;"></iconify-icon>
+                        <span style="background:white; font-size:10px; padding:2px; border-radius:3px; border:1px solid #ccc;">${pin.map_id}</span>
+                    </div>`;
+
+                pinEl.onclick = () => {
+                    if (!isAddMode) {
+                        let iconName = 'mdi:map-marker';
+                        try {
+                            const icons = JSON.parse(pin.pin_icon.replace(/'/g, '"'));
+                            iconName = icons[0];
+                        } catch (e) { }
+
+                        Swal.fire({
+                            title: `🏠 หมุด ${pin.map_id}`,
+                            html: `
+                                <div class="cute-modal-content-wrapper">
+                                    ${pin.thumbnail_image ?
+                                    (() => {
+                                        const cleanImgPath = pin.thumbnail_image.trim();
+                                        let imgSrc = "../image/placeholder.png";
+
+                                        if (cleanImgPath.startsWith('http')) {
+                                            imgSrc = cleanImgPath;
+                                        }
+                                        else if (cleanImgPath.startsWith('huabaan_')) {
+                                            imgSrc = `https://res.cloudinary.com/dqxwognri/image/upload/${cleanImgPath}`;
+                                        }
+                                        else if (cleanImgPath.includes('backend/')) {
+                                            const finalFile = cleanImgPath.split('/').pop();
+                                            imgSrc = `${API_BASE_URL}/uploads/${finalFile}`;
+                                        } else {
+                                            imgSrc = cleanImgPath.startsWith('pic_map/')
+                                                ? `${API_BASE_URL}/uploads/${cleanImgPath.replace('pic_map/', '')}`
+                                                : `${API_BASE_URL}/uploads/${cleanImgPath}`;
+                                        }
+
+                                        return `<img src="${imgSrc}" class="cute-modal-img" onerror="this.src='../image/placeholder.png';">`;
+                                    })()
+                                    : '<div class="no-img">ไม่มีรูปภาพ</div>'
+                                }
+                                    <div style="margin-top: 10px;">
+                                        <p><span class="cute-info-label">📍 สถานที่:</span> <span class="cute-info-value">${pin.location_name || 'ไม่ได้ระบุ'}</span></p>
+                                        <p><span class="cute-info-label">🏷️ หมวดหมู่:</span> <span class="cute-info-value">${pin.category || '-'}</span></p>
+                                        <p><span class="cute-info-label">✨ ไอคอน:</span> 
+                                        <iconify-icon icon="${iconName}" style="font-size: 24px; vertical-align: middle; color: #BF7E46;"></iconify-icon>
+                                        </p>
+                                        <p><span class="cute-info-label">🔢 ตำแหน่ง:</span> <span class="cute-info-value">X: ${pin.position_x}, Y: ${pin.position_y}</span></p>
+                                        <p><span class="cute-info-label">🌐 พิกัดจริง:</span> <span class="cute-info-value">${pin.latitude || '-'}, ${pin.longitude || '-'}</span></p>
+                                    </div>
+                                </div>
+                            `,
+                            customClass: {
+                                popup: 'cute-modal-style',
+                                title: 'cute-modal-title',
+                                htmlContainer: 'cute-modal-content',
+                                confirmButton: 'cute-modal-button',
+                                denyButton: 'cute-modal-button-deny',
+                                cancelButton: 'cute-modal-button-cancel'
+                            },
+                            showCancelButton: true,
+                            showDenyButton: true,
+                            confirmButtonText: 'แก้ไขข้อมูล',
+                            denyButtonText: 'ลบหมุดนี้',
+                            cancelButtonText: 'ปิด',
+                            denyButtonColor: '#FF9A9A',
+                            buttonsStyling: false,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                editPin(pin);
+                            } else if (result.isDenied) {
+                                deletePin(pin.map_id);
+                            }
+                        });
+                    }
+                };
+                return pinEl;
+            }
+
+            async function loadExistingPins() {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/map/pins`, {
+                        method: 'GET',
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+
+                    const pins = await res.json();
+                    const layer = document.getElementById('pins-layer');
+                    layer.innerHTML = '';
+
+                    pins.forEach(pin => {
+                        const pinEl = createPinElement(pin);
+                        layer.appendChild(pinEl);
+                    });
+                } catch (err) {
+                    console.error("Error loading pins:", err);
+                }
+            }
+
+            // ฟังก์ชันโหลดข้อมูลสถานที่ตอนเริ่มหน้าจอ
+            async function fetchLocations() {
+                const res = await fetch(`${API_BASE_URL}/api/locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                locations = await res.json();
+            }
+
+            async function addPin(event) {
+                const container = document.getElementById('map-container');
+                const rect = container.getBoundingClientRect();
+                const x = ((event.clientX - rect.left) / container.offsetWidth) * 100;
+                const y = ((event.clientY - rect.top) / container.offsetHeight) * 100;
+
+                const iconOptions = [
+                    'mingcute:pavilion-fill',
+                    'game-icons:coffee-cup',
+                    'ion:bed-sharp',
+                    'maki:museum',
+                    'fluent-emoji-high-contrast:shinto-shrine',
+                    'material-symbols:fork-spoon',
+                    'fluent:image-search-20-filled'
+                ];
+
+                let iconSelectionHtml = '<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; justify-content: center;">';
+                iconOptions.forEach((iconName, index) => {
+                    const isSelected = index === 0;
+                    iconSelectionHtml += `
+                        <div class="icon-option add-mode-icon" onclick="selectIconForAdd(event, '${iconName}')"
+                            style="cursor: pointer; padding: 10px; border-radius: 10px; border: ${isSelected ? '2px solid #BF7E46' : '1px solid #F3E5DC'}; background-color: ${isSelected ? '#FFF8F0' : 'white'};">
+                            <iconify-icon icon="${iconName}" style="font-size: 24px; color: ${isSelected ? '#BF7E46' : '#8C6F5E'};"></iconify-icon>
+                        </div>
+                    `;
+                });
+                iconSelectionHtml += '</div>';
+
+                // สร้างตัวเลือกสถานที่
+                let options = '<option value="">-- เลือกสถานที่ --</option>';
+                locations.forEach(loc => {
+                    options += `<option value="${loc.location_id}">${loc.location_name}</option>`;
+                });
+
+                // แสดง Modal เพิ่มหมุด
+                const { value: formValues } = await Swal.fire({
+                    title: '📍 เพิ่มหมุดใหม่',
+                    html: `
+                        <div class="cute-modal-content-wrapper">
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🏢 เลือกสถานที่:</label>
+                                <select id="swal-location" class="swal2-select cute-edit-input">${options}</select>
+                            </div>
+                            
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🏷️ หมวดหมู่:</label>
+                                <input id="swal-category" class="swal2-input cute-edit-input" placeholder="เช่น คาเฟ่, ร้านอาหาร">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🎨 เลือกไอคอน:</label>
+                                ${iconSelectionHtml}
+                                <input type="hidden" id="swal-icon" value="${iconOptions[0]}">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label class="cute-edit-label">🌐 ละติจูด:</label>
+                                    <input id="swal-lat" class="swal2-input cute-edit-input" placeholder="เช่น 11.8123">
+                                </div>
+                                <div>
+                                    <label class="cute-edit-label">🌐 ลองจิจูด:</label>
+                                    <input id="swal-lng" class="swal2-input cute-edit-input" placeholder="เช่น 99.7923">
+                                </div>
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">📸 อัปโหลดรูปภาพ:</label>
+                                <input type="file" id="swal-file" class="swal2-file cute-edit-input">
+                            </div>
+                            
+                            <div class="cute-edit-field-wrapper" style="font-size: 12px; color: #8C6F5E; text-align: center; margin-top: 15px;">
+                                ตำแหน่งที่คลิก: X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: 'cute-modal-style',
+                        title: 'cute-modal-title',
+                        htmlContainer: 'cute-modal-content',
+                        confirmButton: 'cute-modal-button'
+                    },
+                    confirmButtonText: 'เพิ่มหมุด',
+                    preConfirm: () => {
+                        return {
+                            location_id: document.getElementById('swal-location').value,
+                            category: document.getElementById('swal-category').value,
+                            pin_icon: document.getElementById('swal-icon').value,
+                            latitude: document.getElementById('swal-lat').value,
+                            longitude: document.getElementById('swal-lng').value,
+                            file: document.getElementById('swal-file').files[0]
+                        }
+                    }
+                });
+
+                if (formValues) {
+                    // ส่วนการบันทึกข้อมูล
+                    const formData = new FormData();
+                    formData.append('position_x', x.toFixed(2));
+                    formData.append('position_y', y.toFixed(2));
+                    formData.append('location_id', formValues.location_id);
+                    formData.append('category', formValues.category);
+                    formData.append('pin_icon', JSON.stringify([formValues.pin_icon]));
+                    formData.append('latitude', formValues.latitude);
+                    formData.append('longitude', formValues.longitude);
+                    if (formValues.file) formData.append('image', formValues.file);
+
+                    const res = await fetch(`${API_BASE_URL}/api/map/save`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${adminToken}` },
+                        body: formData
+                    });
+                    const result = await res.json();
+
+                    if (res.ok && result.success) {
+                        Swal.fire({
+                            icon: 'success', title: 'สำเร็จแล้ว!', text: 'เพิ่มหมุดใหม่เรียบร้อย',
+                            customClass: { popup: 'cute-modal-style', title: 'cute-modal-title', confirmButton: 'cute-modal-button' },
+                            buttonsStyling: false, confirmButtonColor: '#BF7E46'
+                        });
+
+                    } else {
+                        Swal.fire('เกิดข้อผิดพลาด', result.message || 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+                    }
+
+                    loadExistingPins();
+                }
+            }
+
+            async function editPin(pin) {
+                const iconOptions = [
+                    'mingcute:pavilion-fill',
+                    'game-icons:coffee-cup',
+                    'ion:bed-sharp',
+                    'maki:museum',
+                    'fluent-emoji-high-contrast:shinto-shrine',
+                    'material-symbols:fork-spoon',
+                    'fluent:image-search-20-filled'
+                ];
+
+                let currentIconName = '';
+                try {
+                    const icons = JSON.parse(pin.pin_icon.replace(/'/g, '"'));
+                    currentIconName = icons[0];
+                } catch (e) {
+                    currentIconName = 'mdi:map-marker';
+                }
+
+                let iconSelectionHtml = '<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">';
+                iconOptions.forEach(iconName => {
+                    const isSelected = iconName === currentIconName;
+                    iconSelectionHtml += `
+                        <div class="icon-option" onclick="selectIcon(event, '${iconName}')"
+                            style="cursor: pointer; padding: 10px; border-radius: 10px; border: ${isSelected ? '2px solid #BF7E46' : '1px solid #F3E5DC'}; background-color: ${isSelected ? '#FFF8F0' : 'white'};">
+                            <iconify-icon icon="${iconName}" style="font-size: 24px; color: ${isSelected ? '#BF7E46' : '#8C6F5E'};"></iconify-icon>
+                        </div>
+                    `;
+                });
+                iconSelectionHtml += '</div>';
+
+                let locationOptionsHtml = `<option value="" ${!pin.location_id ? 'selected' : ''}>-- ไม่ระบุสถานที่ / Street Art --</option>`;
+                locations.forEach(loc => {
+                    locationOptionsHtml += `<option value="${loc.location_id}" ${loc.location_id === pin.location_id ? 'selected' : ''}>${loc.location_name}</option>`;
+                });
+
+                const { value: formValues } = await Swal.fire({
+                    title: `✏️ แก้ไขข้อมูลหมุด ${pin.map_id}`,
+                    html: `
+                        <div class="cute-modal-content-wrapper">
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">📍 สถานที่:</label>
+                                <select id="edit-location" class="swal2-select cute-edit-input">${locationOptionsHtml}</select>
+                            </div>
+                            
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🏷️ หมวดหมู่:</label>
+                                <input id="edit-category" class="swal2-input cute-edit-input" value="${pin.category || ''}" placeholder="หมวดหมู่">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🎨 เลือกไอคอนใหม่:</label>
+                                ${iconSelectionHtml}
+                                <input type="hidden" id="edit-icon" value="${currentIconName}">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label class="cute-edit-label">🌐 ละติจูด:</label>
+                                    <input id="edit-lat" class="swal2-input cute-edit-input" value="${pin.latitude || ''}">
+                                </div>
+                                <div>
+                                    <label class="cute-edit-label">🌐 ลองจิจูด:</label>
+                                    <input id="edit-lng" class="swal2-input cute-edit-input" value="${pin.longitude || ''}">
+                                </div>
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">📸 อัปโหลดรูปภาพใหม่ (ถ้าต้องการเปลี่ยน):</label>
+                                <input type="file" id="edit-file" class="swal2-file cute-edit-input">
+                            </div>
+                        </div>
+                    `,
+                    customClass: {
+                        popup: 'cute-modal-style', title: 'cute-modal-title', htmlContainer: 'cute-modal-content', confirmButton: 'cute-modal-button', cancelButton: 'cute-modal-button-cancel'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึก',
+                    cancelButtonText: 'ยกเลิก',
+                    buttonsStyling: false,
+                    preConfirm: () => {
+                        return {
+                            location_id: document.getElementById('edit-location').value,
+                            category: document.getElementById('edit-category').value,
+                            pin_icon: document.getElementById('edit-icon').value,
+                            latitude: document.getElementById('edit-lat').value,
+                            longitude: document.getElementById('edit-lng').value,
+                            file: document.getElementById('edit-file').files[0]
+                        }
+                    }
+                });
+
+                if (formValues) {
+                    const formData = new FormData();
+                    formData.append('map_id', pin.map_id);
+                    formData.append('admin_id', localStorage.getItem('adminId'));
+                    formData.append('location_id', formValues.location_id);
+                    formData.append('category', formValues.category);
+                    formData.append('pin_icon', JSON.stringify([formValues.pin_icon]));
+                    formData.append('latitude', formValues.latitude);
+                    formData.append('longitude', formValues.longitude);
+
+                    if (formValues.file) formData.append('image', formValues.file);
+
+                    const res = await fetch(`${API_BASE_URL}/api/map/update`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${adminToken}` },
+                        body: formData
+                    });
+
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: 'success', title: 'สำเร็จ!', text: 'อัปเดตข้อมูลเรียบร้อยแล้ว',
+                            customClass: { popup: 'cute-modal-style', title: 'cute-modal-title', confirmButton: 'cute-modal-button' },
+                            buttonsStyling: false, confirmButtonColor: '#BF7E46'
+                        });
+                        loadExistingPins();
+                    }
+                }
+            }
+
+            // ฟังก์ชันสำหรับการเลือกไอคอน
+            function selectIcon(event, iconName) {
+                event.preventDefault();
+
+                document.getElementById('edit-icon').value = iconName;
+
+                const iconOptions = document.querySelectorAll('.icon-option');
+                iconOptions.forEach(option => {
+                    option.style.border = '1px solid #F3E5DC';
+                    option.style.backgroundColor = 'white';
+                    option.querySelector('iconify-icon').style.color = '#8C6F5E';
+                });
+
+                const selectedOption = event.currentTarget;
+                selectedOption.style.border = '2px solid #BF7E46';
+                selectedOption.style.backgroundColor = '#FFF8F0';
+                selectedOption.querySelector('iconify-icon').style.color = '#BF7E46';
+            }
+
+            function selectIconForAdd(event, iconName) {
+                event.preventDefault();
+
+                // เก็บค่าลงใน hidden input
+                document.getElementById('swal-icon').value = iconName;
+
+                const iconOptions = document.querySelectorAll('.add-mode-icon');
+                iconOptions.forEach(option => {
+                    option.style.border = '1px solid #F3E5DC';
+                    option.style.backgroundColor = 'white';
+                    option.querySelector('iconify-icon').style.color = '#8C6F5E';
+                });
+
+                const selectedOption = event.currentTarget;
+                selectedOption.style.border = '2px solid #BF7E46';
+                selectedOption.style.backgroundColor = '#FFF8F0';
+                selectedOption.querySelector('iconify-icon').style.color = '#BF7E46';
+            }
+
+            async function deletePin(id) {
+                const adminId = localStorage.getItem('adminId');
+
+                const confirm = await Swal.fire({
+                    title: 'ยืนยันการลบหมุด?',
+                    text: "หมุดนี้จะถูกย้ายไปที่ถังขยะ",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF9A9A',
+                    confirmButtonText: 'ลบเลย',
+                    cancelButtonText: 'ยกเลิก'
+                });
+
+                if (confirm.isConfirmed) {
+                    const res = await fetch(`${API_BASE_URL}/api/map/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ admin_id: adminId })
+                    });
+
+                    if (res.ok) {
+                        Swal.fire('ลบแล้ว!', 'หมุดถูกย้ายไปถังขยะแล้ว', 'success');
+                        loadExistingPins();
+                    }
+                }
+            }
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = () => { fetchLocations(); loadExistingPins(); };
+
+            window.addEventListener("DOMContentLoaded", () => {
+                // หาเมนูตัวที่มีคลาส active อยู่
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    // สั่งให้เลื่อนมาแสดงตรงกลางแถบ Sidebar 
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+
+</body>
+
+</html>

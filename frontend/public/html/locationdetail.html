@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายละเอียดสถานที่ - เส้นทางหัวบ้าน</title>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/styledetail.css">
+    <link rel="stylesheet" href="../css/stylefooter.css">
+    <link rel="stylesheet" href="../css/responsive-nav.css">
+</head>
+
+<body class="mobile-container">
+    <header class="home-header">
+        <img src="../image/logohuabaan.png" alt="logo" class="home-logo">
+
+        <nav class="nav-menu-desktop">
+            <ul>
+                <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+                <li><a href="history.html" class="menu-item">ประวัติ</a></li>
+                <li><a href="location.html" class="menu-item active">สถานที่</a></li>
+                <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+                <li><a href="trip-planner.html" class="menu-item">วางแผนการเดินทาง</a></li>
+                <li><a href="map-recommend.html" class="menu-item">แผนที่แนะนำ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-profile-header" id="user-auth-section">
+            <a href="login.html" class="login-trigger" id="user-link">
+                <img id="header-user-avatar" src="" alt="Profile"
+                    style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #BF7E46;">
+
+                <iconify-icon id="default-user-icon" icon="mdi:user-circle"></iconify-icon>
+            </a>
+        </div>
+        <a href="menu.html" class="menu-trigger">
+            <iconify-icon icon="material-symbols:menu-rounded"></iconify-icon>
+        </a>
+    </header>
+
+    <div class="gallery-container">
+        <div class="gallery">
+            <div class="item-big" onclick="openModal(0)">
+                <img id="location_img" src="" alt="location 1">
+            </div>
+            <div class="item-big" onclick="openModal(1)">
+                <img id="location_img_1" src="" alt="location 2">
+            </div>
+
+            <div class="item-small" onclick="openModal(2)">
+                <img id="location_img_2" src="" alt="location 3">
+            </div>
+            <div class="item-small" onclick="openModal(3)">
+                <img id="location_img_3" src="" alt="location 4">
+            </div>
+            <div class="item-small more-overlay" onclick="openModal(4)">
+                <img id="location_img_4" src="" alt="location 5">
+                <div class="view-more-text"><span>ดูเพิ่มเติม</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal-gallery">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <button class="modal-prev" onclick="changeSlide(-1)">&#10094;</button>
+        <div class="modal-image-container">
+            <img id="modalImg" src="">
+        </div>
+        <button class="modal-next" onclick="changeSlide(1)">&#10095;</button>
+    </div>
+
+
+
+    <div class="detail-card">
+        <div class="info-header" id="location_name"></div>
+
+        <div id="ar-support-banner" style="display: none;"></div>
+
+        <div class="opening-time">
+            <iconify-icon icon="mdi:clock"
+                style="vertical-align: middle; margin-bottom: 5px; margin-right: 5px; color: #BF7E46;"></iconify-icon>
+            <span id="operating_hours"></span>
+        </div>
+
+        <div class="description" id="location_details"></div>
+    </div>
+
+    <div class="review-section">
+        <h3 class="review-title"><span id="review_count">0</span> รีวิว</h3>
+
+        <div class="input-container-box">
+            <div class="rating-instruction">ให้คะแนนสถานที่นี้</div>
+            <div class="star-container" id="star_rating_block">
+                <span class="iconify star-icon" data-icon="ph:star-fill" data-value="1"></span>
+                <span class="iconify star-icon" data-icon="ph:star-fill" data-value="2"></span>
+                <span class="iconify star-icon" data-icon="ph:star-fill" data-value="3"></span>
+                <span class="iconify star-icon" data-icon="ph:star-fill" data-value="4"></span>
+                <span class="iconify star-icon" data-icon="ph:star-fill" data-value="5"></span>
+            </div>
+
+            <textarea id="review_text_input" placeholder="เขียนอะไรสักหน่อย..."></textarea>
+
+            <div class="upload-container">
+                <label for="review_file_input" class="upload-label">
+                    <iconify-icon icon="ph:image-square-bold"></iconify-icon>
+                    <span>เพิ่มรูปภาพ</span>
+                </label>
+                <input type="file" id="review_file_input" accept="image/*" multiple style="display: none;"
+                    onchange="previewImages()">
+                <div id="image_preview_container" class="preview-list"></div>
+            </div>
+        </div>
+
+        <div class="submit-wrapper">
+            <button class="btn-submit" onclick="handleSendReview()">ส่ง</button>
+        </div>
+
+        <div class="scroll-wrapper" id="review_scroll_wrapper" style="display: none !important;">
+            <div id="review_list_container" class="review-scroll-container"></div>
+            <div class="custom-scrollbar-bg">
+                <div id="scroll_indicator" class="custom-scrollbar-thumb"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal-content">
+            <p id="alert-message"></p>
+            <button onclick="closeAlert()" class="modal-btn">ตกลง</button>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReportModal()">&times;</span>
+            <h3 style="margin-bottom: 15px;">รายงาน</h3>
+            <form id="reportForm">
+                <input type="hidden" id="reportedUserId">
+                <div class="reason-option" style="text-align: left; margin-bottom: 15px;">
+                    <label><input type="checkbox" class="report-reason" value="ใช้คำพูดไม่เหมาะสม/หยาบคาย">
+                        ใช้คำพูดไม่เหมาะสม/หยาบคาย</label><br>
+                    <label><input type="checkbox" class="report-reason" value="รูปโปรไฟล์ไม่เหมาะสม">
+                        รูปโปรไฟล์ไม่เหมาะสม</label><br>
+                    <label><input type="checkbox" class="report-reason" value="พฤติกรรมสแปม (Spam)"> พฤติกรรมสแปม
+                        (Spam)</label><br>
+                    <label><input type="checkbox" class="report-reason" value="แอบอ้างเป็นบุคคลอื่น">
+                        แอบอ้างเป็นบุคคลอื่น</label><br>
+                    <label><input type="checkbox" class="report-reason" value="อื่นๆ"> อื่นๆ</label>
+                </div>
+                <textarea id="additionalDetail" placeholder=" ระบุรายละเอียดเพิ่มเติม..."
+                    style="width: 100%; height: 60px; padding: 5px; border-radius: 5px; border: 1px solid #ddd;"></textarea>
+                <div class="modal-footer" style="margin-top: 15px; text-align: right;">
+                    <button type="button" onclick="closeReportModal()"
+                        style="padding: 8px 15px; border: none; background: #eee; border-radius: 5px; cursor: pointer;">ยกเลิก</button>
+                    <button type="button" onclick="submitReportData()"
+                        style="padding: 8px 15px; border: none; background: #d9534f; color: white; border-radius: 5px; cursor: pointer; margin-left: 5px;">ส่งรายงาน</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="success-alert" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <div class="success-icon">
+                <iconify-icon icon="ep:circle-check-filled" style="color: #A0522D; font-size: 60px;"></iconify-icon>
+            </div>
+            <h3>ส่งรายงานสำเร็จ</h3>
+            <p>ขอบคุณที่ช่วยแจ้งข้อมูลให้เราทราบ</p>
+            <button onclick="closeSuccessAlert()" class="btn-alert-ok">ตกลง</button>
+        </div>
+    </div>
+    <div id="validation-alert" class="custom-alert-overlay">
+        <div class="custom-alert-box validation-style">
+            <div class="alert-icon-wrapper">
+                <iconify-icon icon="ph:warning-circle-fill" style="color: #D2691E; font-size: 65px;"></iconify-icon>
+            </div>
+            <h3>แจ้งเตือน</h3>
+            <p>กรุณาเลือกเหตุผลอย่างน้อย 1 อย่าง</p>
+            <div class="alert-footer">
+                <button onclick="closeValidationAlert()" class="btn-alert-ok">ตกลง</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        const API_BASE = `${API_BASE_URL}/api`;
+
+        let allImages = [];
+        let currentSlide = 0;
+        let selectedStars = 0;
+        let currentLocationId = null;
+        let shouldRedirect = false;
+
+        function updateUserProfileHeader() {
+            const userStr = localStorage.getItem('user');
+            const userLink = document.getElementById('user-link');
+            const userAvatar = document.getElementById('header-user-avatar');
+            const defaultIcon = document.getElementById('default-user-icon');
+
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                userLink.href = "profile.html";
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    if (userAvatar) {
+                        userAvatar.src = imgUrl;
+                        userAvatar.style.display = 'block';
+                    }
+                    if (defaultIcon) defaultIcon.style.display = 'none';
+                } else {
+                    if (userAvatar) userAvatar.style.display = 'none';
+                    if (defaultIcon) defaultIcon.style.display = 'block';
+                }
+            } else {
+                if (userLink) userLink.href = "login.html";
+                if (userAvatar) userAvatar.style.display = 'none';
+                if (defaultIcon) defaultIcon.style.display = 'block';
+            }
+        }
+
+        function getCurrentUser() {
+            const user = localStorage.getItem('user');
+            return user ? JSON.parse(user) : null;
+        }
+
+        function getLocationId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function showAlert(message, redirect = false) {
+            const modal = document.getElementById('custom-alert');
+            const msgEl = document.getElementById('alert-message');
+            if (!modal || !msgEl) return;
+
+            msgEl.innerText = message;
+            modal.style.display = 'flex';
+            shouldRedirect = redirect;
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+            if (shouldRedirect) window.location.href = 'login.html';
+        }
+
+        async function loadPageContent() {
+            const id = getLocationId();
+            if (!id) return;
+            currentLocationId = id;
+
+            const arBanner = document.getElementById('ar-support-banner');
+            const excludedIds = ['LOC-011', 'LOC-012', 'LOC-013', 'LOC-016', 'LOC-017'];
+
+            if (arBanner && !excludedIds.includes(id)) {
+                arBanner.style.display = 'block';
+
+                window.handleARDetailClick = function () {
+                    const user = localStorage.getItem('user');
+                    if (!user) {
+                        showAlert("กรุณาเข้าสู่ระบบก่อนใช้งานฟีเจอร์ AR", true);
+                    } else {
+                        location.href = 'ar-camera.html';
+                    }
+                };
+
+                arBanner.innerHTML = `
+                    <div class="ar-badge-container" onclick="handleARDetailClick()" style="cursor: pointer;">
+                        <iconify-icon icon="lucide:scan-eye"></iconify-icon>
+                        <div class="ar-badge-text">
+                            สถานที่นี้รองรับการแสกน AR
+                            <span>แตะที่นี่เพื่อเปิดกล้อง หรือรอแสกนเมื่อถึงที่จริง</span>
+                        </div>
+                        <iconify-icon icon="material-symbols:arrow-forward-ios-rounded" style="font-size: 18px; margin-left: auto; opacity: 0.8;"></iconify-icon>
+                    </div>
+                `;
+            } else if (arBanner) {
+                arBanner.style.display = 'none';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/locations/${id}`);
+                const data = await response.json();
+
+                document.getElementById('location_name').innerText = data.location_name || "ไม่พบชื่อสถานที่";
+                document.getElementById('location_details').innerText = data.location_details || "ไม่มีรายละเอียด";
+
+                const mainImgPath = data.location_url || "";
+                document.getElementById('location_img').src = mainImgPath ?
+                    (mainImgPath.trim().startsWith('http') ? mainImgPath.trim() : `${API_BASE_URL}/${mainImgPath.trim()}`) :
+                    'https://via.placeholder.com/400x250?text=No+Image';
+
+                try {
+                    const imgResponse = await fetch(`${API_BASE}/locations/${id}/images`);
+                    if (imgResponse.ok) {
+                        allImages = await imgResponse.json();
+                    }
+                } catch (imgErr) {
+                    allImages = [];
+                }
+
+                if ((!allImages || allImages.length === 0) && mainImgPath) {
+                    allImages = [
+                        { image_url: mainImgPath },
+                        { image_url: mainImgPath },
+                        { image_url: mainImgPath },
+                        { image_url: mainImgPath },
+                        { image_url: mainImgPath }
+                    ];
+                }
+
+                // ลูปแสดงรูป 5 ช่อง (0 ถึง 4)
+                for (let i = 0; i < 5; i++) {
+                    const imgEl = document.getElementById(`location_img_${i}`);
+                    if (imgEl) {
+                        if (allImages && allImages[i] && allImages[i].image_url) {
+                            const path = allImages[i].image_url.trim();
+                            imgEl.src = path.startsWith('http') ? path : `${API_BASE_URL}/${path}`;
+                        } else {
+                            imgEl.src = mainImgPath ?
+                                (mainImgPath.trim().startsWith('http') ? mainImgPath.trim() : `${API_BASE_URL}/${mainImgPath.trim()}`) :
+                                'https://via.placeholder.com/150?text=No+Image';
+                        }
+                    }
+                }
+
+                const start = data.opening_time ? data.opening_time.substring(0, 5) : "--:--";
+                const end = data.closing_time ? data.closing_time.substring(0, 5) : "--:--";
+
+                let days = data.operating_days || "ทุกวัน";
+                if (days.includes("ยกเว้น")) {
+                    const dayOff = days.replace("ยกเว้น", "ปิด");
+                    days = `ทุกวัน (${dayOff})`;
+                }
+
+                document.getElementById('operating_hours').innerText = `เปิด ${days} เวลา ${start} - ${end} น.`;
+
+                renderReviews(currentLocationId);
+            } catch (error) {
+                console.error("Load failed:", error);
+            }
+        }
+
+        // ระบบดาว
+        function initStarRating() {
+            const stars = document.querySelectorAll('.star-icon');
+            stars.forEach(star => {
+                star.replaceWith(star.cloneNode(true));
+            });
+
+            const freshStars = document.querySelectorAll('.star-icon');
+            freshStars.forEach((star, index) => {
+                star.addEventListener('mouseover', () => updateStarUI(index + 1, 'hovered'));
+                star.addEventListener('mouseout', () => {
+                    freshStars.forEach(s => s.classList.remove('hovered'));
+                    updateStarUI(selectedStars, 'active');
+                });
+                star.addEventListener('click', () => {
+                    if (!getCurrentUser()) {
+                        showAlert("กรุณาเข้าสู่ระบบก่อนให้คะแนน", true);
+                        return;
+                    }
+                    selectedStars = index + 1;
+                    updateStarUI(selectedStars, 'active');
+                });
+            });
+        }
+
+        function updateStarUI(count, className) {
+            const freshStars = document.querySelectorAll('.star-icon');
+            freshStars.forEach((s, i) => {
+                if (i < count) s.classList.add(className);
+                else s.classList.remove(className);
+            });
+        }
+
+        function previewImages() {
+            const container = document.getElementById('image_preview_container');
+            const files = document.getElementById('review_file_input').files;
+            if (!container || !files) return;
+            container.innerHTML = '';
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-item');
+                    container.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return "";
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('th-TH', options);
+        }
+
+        async function renderReviews(locId) {
+            try {
+                const response = await fetch(`${API_BASE}/reviews?loc_id=${locId}`);
+                const reviews = await response.json();
+
+                const count = Array.isArray(reviews) ? reviews.length : 0;
+                const countEl = document.getElementById('review_count');
+                if (countEl) countEl.innerText = count;
+
+                const container = document.getElementById('review_list_container');
+                const wrapper = document.getElementById('review_scroll_wrapper');
+                const bar = document.querySelector('.custom-scrollbar-bg');
+
+                if (count === 0) {
+                    if (container) container.innerHTML = "<p style='color:#666; padding: 20px; text-align:center;'>ยังไม่มีรีวิวสำหรับสถานที่นี้</p>";
+                    if (wrapper) wrapper.style.setProperty('display', 'none', 'important');
+                    return;
+                }
+
+                if (wrapper) wrapper.style.setProperty('display', 'block', 'important');
+                if (bar) bar.style.display = count < 2 ? 'none' : 'block';
+
+                if (container) {
+                    container.innerHTML = reviews.map(rev => {
+                        const images = rev.review_image_url ? rev.review_image_url.split(',') : [];
+
+                        const imagesHTML = images.map(img => {
+                            const t = img.trim();
+                            if (!t) return '';
+
+                            //  รองรับ URL คลาวด์ และพาธ Local ดั้งเดิม
+                            let src = t.startsWith('http') ? t : `${API_BASE_URL}/${t}`;
+                            return `<img src="${src}" class="rev-img" onerror="this.style.display='none'">`;
+                        }).join('');
+
+                        let profilePicHtml = "";
+                        if (rev.profile_img) {
+                            const imgUrl = rev.profile_img.startsWith('http')
+                                ? rev.profile_img
+                                : `${API_BASE_URL}/${rev.profile_img}`;
+                            profilePicHtml = `<img src="${imgUrl}" class="avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`;
+                        } else {
+                            const initial = rev.username ? rev.username.charAt(0).toUpperCase() : 'U';
+                            const avatarUrl = `https://ui-avatars.com/api/?name=${initial}&background=CCCCCC&color=666666&size=128`;
+                            profilePicHtml = `<img src="${avatarUrl}" class="avatar" style="width:40px; height:40px; border-radius:50%;">`;
+                        }
+
+                        return `
+                        <div class="review-box" style="position: relative; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #fff;">
+                            <div class="report-dropdown" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                <button class="dropbtn" onclick="toggleReportMenu(event)" style="background:none; border:none; font-size:22px; cursor:pointer; color:#888; padding: 5px;">:</button>
+                                <div class="dropdown-content" style="display:none; position:absolute; right:0; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; min-width:130px; border: 1px solid #eee;">
+                                    <a href="javascript:void(0)" onclick="openReportModal(${rev.user_id})" style="color:#d9534f; text-decoration:none; display:block; padding:12px; font-size:14px; font-weight: bold;">รายงานบัญชีนี้</a>
+                                </div>
+                            </div>
+                            <div class="user-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    ${profilePicHtml}
+                                    <div>
+                                        <b class="username">${rev.username || 'นักท่องเที่ยว'}</b>
+                                        <div style="font-size: 11px; color: #999; margin-top: 2px;">
+                                            ${formatDate(rev.created_at)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stars-static-center">
+                                ${'<iconify-icon icon="ph:star-fill" style="color:#FFC107; font-size:24px;"></iconify-icon>'.repeat(Math.floor(rev.rating))}
+                            </div>
+                            ${imagesHTML ? `<div class="review-images">${imagesHTML}</div>` : ''}
+                            <div class="description rev-text">${rev.review_text}</div>
+                        </div>`;
+                    }).join('');
+                }
+                initScrollIndicator();
+            } catch (e) {
+                console.error("Render reviews error:", e);
+            }
+        }
+
+        function initScrollIndicator() {
+            const container = document.getElementById('review_list_container');
+            const thumb = document.getElementById('scroll_indicator');
+            const bar = document.querySelector('.custom-scrollbar-bg');
+            if (!container || !thumb || !bar || bar.style.display === 'none') return;
+
+            container.addEventListener('scroll', () => {
+                const scrollWidth = container.scrollWidth - container.clientWidth;
+                if (scrollWidth > 0) {
+                    const moveX = (container.scrollLeft / scrollWidth) * (120 - 35);
+                    thumb.style.left = `${moveX}px`;
+                }
+            });
+        }
+
+        // ฟังก์ชันส่งข้อมูลรีวิว
+        async function handleSendReview() {
+            const user = getCurrentUser();
+            if (!user || !user.user_id) {
+                showAlert("พบข้อผิดพลาดเกี่ยวกับข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่", true);
+                return;
+            }
+
+            const text = document.getElementById('review_text_input').value;
+            const fileInput = document.getElementById('review_file_input');
+            if (selectedStars === 0 || !text.trim()) { 
+                showAlert("กรุณาให้ดาวและพิมพ์ข้อความก่อนส่งรีวิว"); 
+                return; 
+            }
+
+            const submitBtn = document.querySelector('.btn-submit');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.backgroundColor = '#B1A396'; 
+                submitBtn.style.cursor = 'not-allowed';
+                submitBtn.innerText = 'กำลังส่ง...';
+            }
+
+            Swal.fire({
+                title: 'กำลังบันทึกรีวิว...',
+                html: 'ระบบกำลังนำส่งข้อมูลและรูปภาพ<br>ความคิดเห็นของคุณ โปรดรอสักครู่',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                background: '#FBEDD6',
+                color: '#5C4033',
+                didOpen: () => {
+                    Swal.showLoading();
+                    const loader = document.querySelector('.swal2-loader');
+                    if (loader) {
+                        loader.style.borderTopColor = '#B08968'; 
+                    }
+                }
+            });
+
+            const formData = new FormData();
+            formData.append('user_id', user.user_id);
+            formData.append('rating', selectedStars);
+            formData.append('review_text', text);
+            formData.append('location_id', currentLocationId);
+
+            if (fileInput && fileInput.files) {
+                Array.from(fileInput.files).forEach(file => formData.append('review_images', file));
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/save_review`, { method: 'POST', body: formData });
+                
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ขอบคุณสำหรับการรีวิวสถานที่!',
+                        html: 'ส่งความคิดเห็นเรียบร้อย! <br> ขอบคุณที่ร่วมแชร์ประสบการณ์',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#B08968',
+                        background: '#FBEDD6',
+                        color: '#5C4033',
+                        iconColor: '#A2EB4F'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.backgroundColor = '#BF7E46';
+                        submitBtn.style.cursor = 'pointer';
+                        submitBtn.innerText = 'ส่ง';
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'ไม่สามารถบันทึกข้อมูลรีวิวได้ในขณะนี้',
+                        confirmButtonText: 'รับทราบ',
+                        confirmButtonColor: '#d9534f',
+                        background: '#FBEDD6',
+                        color: '#5C4033'
+                    });
+                }
+            } catch (err) { 
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.backgroundColor = '#BF7E46';
+                    submitBtn.style.cursor = 'pointer';
+                    submitBtn.innerText = 'ส่ง';
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เชื่อมต่อล้มเหลว',
+                    text: 'เกิดข้อผิดพลาดในการส่งข้อมูลเชื่อมต่อเซิร์ฟเวอร์',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#d9534f',
+                    background: '#FBEDD6',
+                    color: '#5C4033'
+                });
+            }
+        }
+
+        function loadFooter() {
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    if (footerPlaceholder) {
+                        footerPlaceholder.innerHTML = data;
+                        const footerLogo = footerPlaceholder.querySelector('.footer-logo');
+                        if (footerLogo) footerLogo.src = '../image/logohuabaan2.png';
+                    }
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+
+        window.onload = async () => { 
+            await loadPageContent();
+            initStarRating();  
+            loadFooter(); 
+            updateUserProfileHeader(); 
+        };
+
+        function openModal(index) {
+            if (allImages.length === 0) return;
+            currentSlide = index;
+            const m = document.getElementById("imageModal");
+            if (m) m.style.display = "flex";
+            updateModalImage();
+        }
+
+        function closeModal() {
+            const m = document.getElementById("imageModal");
+            if (m) m.style.display = "none";
+        }
+
+        function changeSlide(step) {
+            currentSlide += step;
+            if (currentSlide >= allImages.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = allImages.length - 1;
+            updateModalImage();
+        }
+
+        function updateModalImage() {
+            const modalImg = document.getElementById("modalImg");
+            if (modalImg && allImages[currentSlide]) {
+                const path = allImages[currentSlide].image_url.trim();
+                modalImg.src = path.startsWith('http') ? path : `${API_BASE_URL}/${path}`;
+            }
+        }
+
+        function toggleReportMenu(event) {
+            event.stopPropagation();
+            const dropdown = event.target.nextElementSibling;
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if (d !== dropdown) d.style.display = 'none';
+            });
+            if (dropdown) dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function openReportModal(userId) {
+            const u = document.getElementById('reportedUserId');
+            const m = document.getElementById('reportModal');
+            if (u) u.value = userId;
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            const m = document.getElementById('reportModal');
+            const f = document.getElementById('reportForm');
+            if (m) m.style.display = 'none';
+            if (f) f.reset();
+        }
+
+        async function submitReportData() {
+            const targetId = document.getElementById('reportedUserId').value;
+            const desc = document.getElementById('additionalDetail').value;
+            const currentUser = getCurrentUser();
+            const checkboxes = document.querySelectorAll('.report-reason:checked');
+            if (checkboxes.length === 0) {
+                showValidationAlert();
+                return;
+            }
+            const selectedReasons = Array.from(checkboxes).map(cb => cb.value);
+            const finalReason = selectedReasons.join(', ');
+
+            try {
+                const response = await fetch(`${API_BASE}/report-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reporter_id: currentUser.user_id,
+                        reported_user_id: targetId,
+                        reason_type: finalReason,
+                        description: desc
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    closeReportModal();
+                    showSuccessAlert();
+                    checkboxes.forEach(cb => cb.checked = false);
+                    document.getElementById('additionalDetail').value = '';
+                } else {
+                    alert(result.message || "เกิดข้อผิดพลาด");
+                }
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการส่งรายงาน");
+            }
+        }
+
+        function showSuccessAlert() { const s = document.getElementById('success-alert'); if (s) s.style.display = 'flex'; }
+        function closeSuccessAlert() { const s = document.getElementById('success-alert'); if (s) s.style.display = 'none'; }
+        function showValidationAlert() { const v = document.getElementById('validation-alert'); if (v) v.style.display = 'flex'; }
+        function closeValidationAlert() { const v = document.getElementById('validation-alert'); if (v) v.style.display = 'none'; }
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-content').forEach(d => d.style.display = 'none');
+        });
+
+        window.addEventListener('click', function (event) {
+            const customAlert = document.getElementById('custom-alert');
+            const reportModal = document.getElementById('reportModal');
+            const imageModal = document.getElementById('imageModal');
+            const successAlert = document.getElementById('success-alert');
+            const validationAlert = document.getElementById('validation-alert');
+
+            if (event.target === customAlert) {
+                shouldRedirect = false;
+                customAlert.style.display = 'none';
+                closeAlert();
+            }
+            if (event.target === reportModal) closeReportModal();
+            if (event.target === imageModal) closeModal();
+            if (event.target === successAlert) closeSuccessAlert();
+            if (event.target === validationAlert) closeValidationAlert();
+        });
+    </script>
+</body>
+
+</html>

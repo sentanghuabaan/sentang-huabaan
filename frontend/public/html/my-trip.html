@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการวางแผนการเดินทาง - เส้นทางหัวบ้าน</title>
+    <link rel="stylesheet" href="../css/style-mytrip.css">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="history.back()">
+            <iconify-icon icon="ion:chevron-back-outline"></iconify-icon>
+        </button>
+
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+
+        <div class="header-divider"></div>
+    </header>
+
+    <main class="review-content">
+        <h2 class="review-title">การแสดงประวัติการวางแผนการเดินทาง</h2>
+
+        <div class="review-container">
+            <div class="review-filter-section">
+                <div class="custom-select-wrapper" id="customSelect">
+                    <div class="select-trigger">
+                        <span id="selectedOption">ล่าสุด</span>
+                        <iconify-icon icon="mingcute:down-fill"></iconify-icon>
+                    </div>
+                    <div class="select-options">
+                        <div class="option" data-value="newest">ล่าสุด</div>
+                        <div class="option" data-value="oldest">เก่าที่สุด</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tripList" class="trip-grid-container">
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        async function fetchTrips(sortBy = 'newest') {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const listElement = document.getElementById('tripList');
+            listElement.innerHTML = '<p style="text-align:center; margin-top:20px;">กำลังโหลดแผนการเดินทาง...</p>';
+
+            try {
+                console.log("UserData ทั้งหมด:", userData);
+                const userId = userData.user_id || userData.id;
+                console.log("เรากำลังส่ง ID นี้ไปหา DB:", userId);
+
+                const response = await fetch(`${API_BASE_URL}/api/my-trips/${userId}?sort=${sortBy}`);
+                const data = await response.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    listElement.innerHTML = '<p style="text-align:center; margin-top:50px;">ยังไม่มีประวัติการวางแผน</p>';
+                    return;
+                }
+
+                if (data.length === 0) {
+                    listElement.innerHTML = '<p style="text-align:center; margin-top:50px;">ยังไม่มีประวัติการวางแผน</p>';
+                    return;
+                }
+                listElement.innerHTML = data.map(trip => {
+                    const formattedDate = new Date(trip.created_at).toLocaleDateString('th-TH', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    return `
+                        <div class="trip-card" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                            <div class="trip-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                <div class="trip-main-title" style="font-weight: bold; color: #333; font-size: 16px;">${trip.trip_name}</div>
+                                <div class="trip-created-date" style="font-size: 11px; color: #888;">สร้างเมื่อ ${formattedDate}</div>
+                        </div>
+
+                        <div class="timeline-container">
+                            ${trip.locations.map((loc, index) => {
+
+                        let srcUrl = "";
+                        if (loc.image) {
+                            srcUrl = loc.image.trim().startsWith('http')
+                                ? loc.image.trim()
+                                : `${API_BASE_URL}/${loc.image.trim()}`;
+                        }
+
+                        return `
+                                    <div class="timeline-item">
+                                        <div class="time-column">
+                                            <span class="time-text">${loc.time ? loc.time.substring(0, 5) : '--:--'}</span>
+                                            <div class="dot"></div>
+                                            ${index < trip.locations.length - 1 ? '<div class="line"></div>' : ''}
+                                        </div>
+                                        
+                                        <div class="info-column">
+                                            <p class="location-name">${loc.name || 'ไม่ทราบชื่อสถานที่'}</p>
+                                            
+                                            ${loc.image ? `
+                                                <div class="review-images-grid">
+                                                    <img src="${srcUrl}" 
+                                                        class="trip-preview-img" 
+                                                        onerror="this.src='../image/placeholder.png'">
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                    }).join('')}
+                        </div>
+
+                        <div class="view-detail-text" onclick="location.href='trip-summary.html?id=${trip.trip_id}'" 
+                            style="text-align: center; color: #BF7E46; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px;">
+                            ดูรายละเอียดเต็มรูปแบบ ❯
+                        </div>
+                    </div>
+                `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                listElement.innerHTML = '<p style="text-align:center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchTrips('newest');
+
+            const customSelect = document.getElementById('customSelect');
+            const trigger = customSelect.querySelector('.select-trigger');
+            const options = customSelect.querySelectorAll('.option');
+            const selectedText = document.getElementById('selectedOption');
+
+            trigger.addEventListener('click', () => customSelect.classList.toggle('open'));
+
+            options.forEach(option => {
+                option.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    selectedText.textContent = this.textContent;
+                    customSelect.classList.remove('open');
+                    fetchTrips(value);
+                });
+            });
+
+            window.addEventListener('click', (e) => {
+                if (customSelect && !customSelect.contains(e.target)) {
+                    customSelect.classList.remove('open');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

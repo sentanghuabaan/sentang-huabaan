@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>วางแผนการเดินทาง - เส้นทางหัวบ้าน</title>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="../css/styleplantrip.css">
+    <link rel="stylesheet" href="../css/stylefooter.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/responsive-nav.css">
+</head>
+
+<body class="mobile-container">
+    <header class="home-header">
+        <img src="../image/logohuabaan.png" alt="logo" class="home-logo">
+
+        <nav class="nav-menu-desktop">
+            <ul>
+                <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+                <li><a href="history.html" class="menu-item">ประวัติ</a></li>
+                <li><a href="location.html" class="menu-item">สถานที่</a></li>
+                <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+                <li><a href="trip-planner.html" class="menu-item active">วางแผนการเดินทาง</a></li>
+                <li><a href="map-recommend.html" class="menu-item">แผนที่แนะนำ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-profile-header" id="user-auth-section">
+            <a href="login.html" class="login-trigger" id="user-link">
+                <img id="header-user-avatar" src="" alt="Profile"
+                    style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #BF7E46;">
+
+                <iconify-icon id="default-user-icon" icon="mdi:user-circle"></iconify-icon>
+            </a>
+        </div>
+        <a href="menu.html" class="menu-trigger">
+            <iconify-icon icon="material-symbols:menu-rounded"></iconify-icon>
+        </a>
+    </header>
+
+    <main class="planner-wrapper">
+        <h2>วางแผนการเดินทาง</h2>
+        <p>ONE DAY</p>
+
+        <div class="date-picker-zone">
+            <label for="trip_date">วันที่ต้องการเดินทาง:</label>
+            <div class="input-with-icon">
+                <iconify-icon icon="uis:calender"></iconify-icon>
+                <input type="text" id="trip_date" placeholder="เลือกวันที่เดินทาง" readonly inputmode="none">
+            </div>
+        </div>
+
+        <div id="map-container" class="map-container">
+            <img src="../image/Map.png" alt="Map Background" class="map-bg">
+            <div id="pin-layer"></div>
+        </div>
+
+        <div class="action-zone">
+            <input type="text" id="trip_name" placeholder="กรอกชื่อแผนการเดินทางของคุณ">
+            <button id="btn-create-trip" class="btn-primary">สร้างการเดินทางของคุณ</button>
+        </div>
+    </main>
+
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal-content">
+            <p id="alert-message"></p>
+            <button onclick="closeAlert()" class="modal-btn">ตกลง</button>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/th.js"></script>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        let shouldRedirect = false;
+        let selectedPlaces = [];
+
+        function updateUserProfileHeader() {
+            const userStr = localStorage.getItem('user');
+            const userLink = document.getElementById('user-link');
+            const userAvatar = document.getElementById('header-user-avatar');
+            const defaultIcon = document.getElementById('default-user-icon');
+
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                if (userLink) userLink.href = "profile.html";
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    userAvatar.src = imgUrl;
+                    userAvatar.style.display = 'block';
+                    defaultIcon.style.display = 'none';
+                } else {
+                    // หากระบบจริงไม่มีรูป ให้ซ่อนรูปภาพและแสดงไอคอนเริ่มต้นแทน
+                    userAvatar.style.display = 'none';
+                    defaultIcon.style.display = 'block';
+                }
+            } else {
+                // กรณีที่ยังไม่ได้ล็อกอิน ให้กลับไปหน้า Login
+                userLink.href = "login.html";
+                userAvatar.style.display = 'none';
+                defaultIcon.style.display = 'block';
+            }
+        }
+
+        // --- Utility Functions ---
+        function getCurrentUser() {
+            const user = localStorage.getItem('user');
+            return user ? JSON.parse(user) : null;
+        }
+
+        function showAlert(message, redirect = false) {
+            const modal = document.getElementById('custom-alert');
+            if (!modal) return;
+            document.getElementById('alert-message').innerText = message;
+            modal.style.display = 'flex';
+            shouldRedirect = redirect;
+        }
+
+        function closeAlert() {
+            document.getElementById('custom-alert').style.display = 'none';
+            if (shouldRedirect) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        function getDayName(dateString) {
+            if (!dateString) return "";
+            const d = new Date(dateString);
+            const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+            return days[d.getDay()];
+        }
+
+        function getLabelDirection(id) {
+            const leftLabels = ['LOC-011', 'LOC-006', 'LOC-007'];
+            const rightLabels = ['LOC-002'];
+            const topLabels = ['LOC-008', 'LOC-010', 'LOC-014', 'LOC-015', 'LOC-017', 'LOC-013', 'LOC-005'];
+            if (leftLabels.includes(id)) return 'direction-left';
+            if (rightLabels.includes(id)) return 'direction-right';
+            if (topLabels.includes(id)) return 'direction-top';
+            return 'direction-bottom';
+        }
+
+        // --- Map & Data Loading ---
+        async function fetchMapData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/map/locations`);
+                const data = await response.json();
+                const pinLayer = document.getElementById('pin-layer');
+                if (!pinLayer) return;
+                pinLayer.innerHTML = '';
+
+                data.forEach(loc => {
+                    const pin = document.createElement('div');
+                    const dirClass = getLabelDirection(loc.location_id);
+
+                    let specialClass = (loc.location_id === 'LOC-012') ? 'special-bee' :
+                        (loc.location_id === 'LOC-005') ? 'special-shrine' : '';
+
+                    pin.style.left = `${loc.position_x}%`;
+                    pin.style.top = `${loc.position_y}%`;
+
+                    const isStreetArt = !loc.location_id || loc.location_id === 'null' ||
+                        (loc.map_id && (loc.map_id.startsWith('MAP-18') || loc.map_id.startsWith('MAP-19') ||
+                            loc.map_id.startsWith('MAP-20') || loc.map_id.startsWith('MAP-21') || loc.map_id.startsWith('MAP-22')));
+
+                    let thumbPath = '../image/logohuabaan.png';
+                    if (loc.thumbnail_image) {
+                        const cleanPath = loc.thumbnail_image.trim();
+                        if (cleanPath.startsWith('http')) {
+                            thumbPath = cleanPath;
+                        } else {
+                            thumbPath = cleanPath.startsWith('pic_map/')
+                                ? `${API_BASE_URL}/uploads/${cleanPath.replace('pic_map/', '')}`
+                                : `${API_BASE_URL}/uploads/${cleanPath}`;
+                        }
+                    }
+
+                    if (isStreetArt) {
+                        pin.className = `location-pin street-art-pin ${dirClass} ${specialClass}`;
+                        pin.innerHTML = `<img src="${thumbPath}" class="location-img" onerror="this.src='../image/logohuabaan.png'">`;
+                    } else {
+                        pin.className = `location-pin ${dirClass} ${specialClass}`;
+                        pin.setAttribute('data-op', loc.operating_days || "ทุกวัน");
+                        pin.setAttribute('data-id', loc.location_id);
+                        pin.setAttribute('data-name', loc.location_name);
+
+                        let iconArray = [];
+                        try {
+                            iconArray = (loc.pin_icon && loc.pin_icon !== 'null') ? JSON.parse(loc.pin_icon) : [];
+                        } catch (e) {
+                            iconArray = [loc.pin_icon];
+                        }
+
+                        let iconsHTML = iconArray.map(icon => `<iconify-icon icon="${icon}"></iconify-icon>`).join('');
+
+                        pin.innerHTML = `
+                            <div class="pin-content">
+                                <img src="${thumbPath}" class="location-img" onerror="this.src='../image/logohuabaan.png'">
+                                <div class="pin-info">
+                                    <div class="icon-group">
+                                        <div class="selection-wrapper">
+                                            <iconify-icon icon="fa6-solid:location-pin" class="pin-default"></iconify-icon>
+                                            <iconify-icon icon="icon-park-solid:correct" class="pin-selected"></iconify-icon>
+                                        </div>
+                                        ${iconsHTML}
+                                    </div>
+                                    <span class="location-name">${loc.location_name}</span>
+                                </div>
+                            </div>
+                        `;
+
+                        pin.addEventListener('click', () => {
+                            const tripDate = document.getElementById('trip_date').value;
+                            if (!tripDate) {
+                                showAlert("กรุณาเลือกวันที่ต้องการเดินทางก่อนเลือกสถานที่");
+                                return;
+                            }
+
+                            const selectedDay = getDayName(tripDate);
+                            const opDays = (pin.getAttribute('data-op') || "ทุกวัน").trim();
+
+                            let isClosed = false;
+                            if (opDays !== "ทุกวัน") {
+                                if (opDays.includes("ยกเว้น") && opDays.includes(selectedDay)) isClosed = true;
+                                else if (opDays.startsWith("ทุกวัน") && !opDays.includes(selectedDay)) isClosed = true;
+                            }
+
+                            if (isClosed) {
+                                showAlert(`ขออภัย ${loc.location_name} ปิดทำการใน${selectedDay}\n(${opDays})`);
+                                return;
+                            }
+
+                            if (pin.classList.contains('selected')) {
+                                pin.classList.remove('selected');
+                                selectedPlaces = selectedPlaces.filter(id => id !== loc.location_id);
+                            } else {
+                                if (selectedPlaces.length >= 5) {
+                                    showAlert("เลือกสถานที่ได้สูงสุด 5 แห่งเท่านั้น");
+                                    return;
+                                }
+                                pin.classList.add('selected');
+                                selectedPlaces.push(loc.location_id);
+                            }
+                            checkInput();
+                        });
+                    }
+                    pinLayer.appendChild(pin);
+                });
+                setTimeout(updatePinStatus, 100);
+            } catch (err) {
+                console.error("Fetch error:", err);
+            }
+        }
+
+        // --- UI Management ---
+        function checkInput() {
+            const nameInput = document.getElementById('trip_name');
+            const dateInput = document.getElementById('trip_date');
+            const btn = document.getElementById('btn-create-trip');
+            if (!nameInput || !dateInput || !btn) return;
+
+            if (nameInput.value.trim().length > 0 && dateInput.value !== "" && selectedPlaces.length > 0) {
+                btn.disabled = false;
+                btn.style.backgroundColor = '#BF7E46';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.disabled = true;
+                btn.style.backgroundColor = '#B1A396';
+                btn.style.cursor = 'not-allowed';
+            }
+        }
+
+        function updatePinStatus() {
+            const dateInput = document.getElementById('trip_date');
+            if (!dateInput || !dateInput.value) return;
+
+            const selectedDay = getDayName(dateInput.value);
+            const allPins = document.querySelectorAll('.location-pin:not(.street-art-pin)');
+
+            allPins.forEach(pinEl => {
+                const opDays = (pinEl.getAttribute('data-op') || "ทุกวัน").trim();
+                let isClosed = false;
+
+                if (opDays === "ทุกวัน") {
+                    isClosed = false;
+                } else if (opDays.includes("ยกเว้น")) {
+                    if (opDays.includes(selectedDay)) isClosed = true;
+                } else if (opDays.startsWith("ทุกวัน")) {
+                    if (!opDays.includes(selectedDay)) isClosed = true;
+                }
+
+                if (isClosed) {
+                    pinEl.classList.add('is-closed');
+
+                    // ถ้าเป็นร้านที่ปิด ให้เอาออกจากรายการที่เลือกไว้
+                    if (pinEl.classList.contains('selected')) {
+                        pinEl.classList.remove('selected');
+                        const locId = pinEl.getAttribute('data-id');
+                        selectedPlaces = selectedPlaces.filter(id => id !== locId);
+                    }
+                } else {
+                    pinEl.classList.remove('is-closed');
+                }
+            });
+            checkInput();
+        }
+
+        function loadFooter() {
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    if (footerPlaceholder) {
+                        footerPlaceholder.innerHTML = data;
+
+                        const footerLogo = footerPlaceholder.querySelector('.footer-logo');
+                        if (footerLogo) {
+                            footerLogo.src = '../image/logohuabaan2.png';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+
+        // --- Event Handlers & Initialization ---
+        window.onload = () => {
+            const user = getCurrentUser();
+            if (!user) {
+                showAlert("กรุณาเข้าสู่ระบบก่อนใช้งานฟีเจอร์วางแผนการเดินทาง", true);
+                return;
+            }
+
+            loadFooter();
+
+            const tripNameInput = document.getElementById('trip_name');
+            const tripDateInput = document.getElementById('trip_date');
+            const btnCreateTrip = document.getElementById('btn-create-trip');
+
+            fetchMapData();
+
+            updateUserProfileHeader();
+
+            flatpickr("#trip_date", {
+                locale: "th",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                defaultDate: "today",
+                disableMobile: true,
+                allowInput: false,
+                position: "below center",
+                onOpen: function (selectedDates, dateStr, instance) {
+                    instance.calendarContainer.style.left = "50%";
+                    instance.calendarContainer.style.marginLeft = "0";
+                },
+                onChange: function () {
+                    updatePinStatus();
+                },
+                onReady: function () {
+                    setTimeout(updatePinStatus, 500);
+                }
+            });
+
+            if (tripNameInput) {
+                tripNameInput.addEventListener('input', checkInput);
+            }
+
+            if (btnCreateTrip) {
+                btnCreateTrip.addEventListener('click', async () => {
+                    const tripData = {
+                        user_id: user.user_id,
+                        trip_name: tripNameInput.value,
+                        trip_date: tripDateInput.value,
+                        locations: selectedPlaces
+                    };
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/map/create-trip`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(tripData)
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            showAlert("สร้างการเดินทางสำเร็จ!");
+                            window.location.href = `trip-summary.html?id=${result.trip_id}`;
+                        }
+                    } catch (err) {
+                        console.error("Save error:", err);
+                        showAlert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+                    }
+                });
+            }
+        };
+
+        window.addEventListener('click', function (event) {
+            const modal = document.getElementById('custom-alert');
+
+            // ถ้าสิ่งที่คลิกคือตัวพื้นหลัง
+            if (event.target === modal) {
+                modal.style.display = 'none';
+
+                if (shouldRedirect) {
+                    // ถ้าเป็นกรณีที่บังคับล็อกอิน แต่ผู้ใช้เลือกคลิกข้างนอกเพื่อปิด
+                    // ให้ส่งเขากลับไปหน้าหลักทันที
+                    window.location.href = '../index.html';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

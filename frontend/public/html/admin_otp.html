@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin OTP - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_user.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../image/logohuabaan2.png" alt="Logo" class="admin-logo">
+            </div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item">
+                    <iconify-icon icon="mage:dashboard-fill" class="menu-icon"></iconify-icon> Dashboard
+                </a>
+                <a href="admin_user.html" class="menu-item">
+                    <iconify-icon icon="basil:user-solid" class="menu-icon"></iconify-icon> User
+                </a>
+                <a href="admin_otp.html" class="menu-item active">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP
+                </a>
+                <a href="admin_location.html" class="menu-item">
+                    <iconify-icon icon="ion:location-sharp" class="menu-icon"></iconify-icon> Location
+                </a>
+                <a href="admin_location_images.html" class="menu-item">
+                    <iconify-icon icon="mdi:image-location" class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item">
+                    <iconify-icon icon="lets-icons:date-fill" class="menu-icon"></iconify-icon> Activity
+                </a>
+                <a href="admin_activity_images.html" class="menu-item">
+                    <iconify-icon icon="material-symbols:imagesmode" class="menu-icon"></iconify-icon> Activity Images
+                </a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon>
+                    History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item">
+                    <iconify-icon icon="tdesign:view-in-ar-filled" class="menu-icon"></iconify-icon> AR Content
+                </a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="search" id="actSearch" onkeyup="searchCommunityTable()">
+                </div>
+            </header>
+
+            <div class="table-container">
+                <div class="scroll-container">
+                    <table id="otpTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Email</th>
+                                <th>OTP Code</th>
+                                <th>Expires At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otpData">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <script>
+                const API_BASE_URL = 'http://localhost:3000';
+
+                const adminToken = localStorage.getItem('adminToken');
+                if (!adminToken) {
+                    window.location.href = 'admin_login.html';
+                }
+
+                function searchCommunityTable() {
+                    let input = document.getElementById("actSearch").value.toLowerCase();
+                    let rows = document.querySelectorAll("#otpData tr");
+
+                    rows.forEach(row => {
+                        let text = row.innerText.toLowerCase();
+                        row.style.display = text.includes(input) ? "" : "none";
+                    });
+                }
+
+                async function fetchOTPs() {
+                    try {
+                        const res = await fetch(`${API_BASE_URL}/api/otp`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (res.status === 401 || res.status === 403) {
+                            localStorage.clear();
+                            window.location.href = 'admin_login.html';
+                            return;
+                        }
+
+                        const data = await res.json();
+                        const tbody = document.getElementById('otpData');
+
+                        tbody.innerHTML = data.map(item => {
+                            const now = new Date();
+                            const expiry = new Date(item.expires_at);
+                            const isExpired = now > expiry; // เช็คว่าหมดอายุหรือยัง
+
+                            return `
+                                <tr style="${isExpired ? 'background-color: #ffe6e6;' : ''}">
+                                    <td class="action-cell">
+                                        <button onclick="deleteOTP(${item.id})" class="delete-btn-sm">
+                                            <iconify-icon icon="material-symbols:delete"></iconify-icon> Delete
+                                        </button>
+                                    </td>
+                                    <td style="font-weight: 500;">${item.email}</td>
+                                    <td style="font-family: monospace; font-size: 1.1em; color: #BF7E46;">${item.otp_code}</td>
+                                    <td style="${isExpired ? 'color: red; font-weight: bold;' : 'color: #555;'}">
+                                        ${isExpired ? 'หมดอายุแล้ว' : expiry.toLocaleString()}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    } catch (err) { console.error("Error fetching OTPs:", err); }
+                }
+
+                async function deleteOTP(id) {
+                    const adminId = localStorage.getItem('adminId');
+
+                    Swal.fire({
+                        title: 'คุณแน่ใจไหม?',
+                        text: `ต้องการลบรายการรหัส ${id} ใช่หรือไม่?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#BF7E46',
+                        cancelButtonColor: '#ccc',
+                        confirmButtonText: 'ใช่, ลบเลย!',
+                        cancelButtonText: 'ยกเลิก',
+                        borderRadius: '20px'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const res = await fetch(`${API_BASE_URL}/api/otp/${id}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'Authorization': `Bearer ${adminToken}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ admin_id: adminId })
+                                });
+
+                                if (res.ok) {
+                                    Swal.fire('ลบสำเร็จ!', 'ข้อมูลถูกลบออกจากระบบแล้ว', 'success');
+                                    fetchOTPs();
+                                } else {
+                                    Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบข้อมูลได้', 'error');
+                                }
+                            } catch (err) {
+                                console.error("Delete Error:", err);
+                            }
+                        }
+                    });
+                }
+
+                function logoutAdmin() {
+                    Swal.fire({
+                        title: 'ออกจากระบบ?',
+                        text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#BF7E46',
+                        cancelButtonColor: '#ccc',
+                        confirmButtonText: 'ตกลง',
+                        cancelButtonText: 'ยกเลิก',
+                        borderRadius: '20px'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            localStorage.removeItem('adminToken');
+                            localStorage.removeItem('adminName');
+                            window.location.href = 'admin_login.html';
+                        }
+                    });
+                }
+
+                window.onload = fetchOTPs;
+            </script>
+
+</body>
+
+</html>

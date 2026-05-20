@@ -1,0 +1,377 @@
+.maintenance-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #5D4037;
+}
+
+.maintenance-icon {
+    font-size: 100px;
+    color: #BF7E46;
+    margin-bottom: 20px;
+    animation: pulse 2s infinite;
+}
+
+.maintenance-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.maintenance-subtitle {
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Header */
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* การจัด Layout หลัก */
+.dashboard-wrapper {
+    padding: 20px;
+}
+
+.dashboard-header {
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+    font-family: 'Noto Serif Thai', serif;
+    color: #333;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-right: 15px;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.stat-icon.user {
+    background: #e3f2fd;
+    color: #2196f3;
+}
+
+.stat-icon.location {
+    background: #f1f8e9;
+    color: #8bc34a;
+}
+
+.stat-icon.activity {
+    background: #f5d9f9;
+    color: #db2bdb;
+}
+
+.stat-icon.trip {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+.stat-icon.review {
+    background: #fce4ec;
+    color: #e91e63;
+}
+
+
+/* Chart & Lists Layout */
+.chart-section {
+    display: grid;
+    grid-template-columns: 95%;
+    gap: 20px;
+}
+
+.dashboard-main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.chart-box,
+.info-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    overflow: hidden;
+}
+
+.chart-placeholder {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fdfdfd;
+    border: 2px dashed #eee;
+    border-radius: 10px;
+}
+
+/* List Styling */
+.activity-list {
+    list-style: none;
+    padding: 0;
+}
+
+.activity-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #ffecb3;
+    color: #856404;
+    margin-right: 5px;
+}
+
+.view-all {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #BF7E46;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.view-all:hover {
+    color: #8b5e34 !important;
+    padding-top: 5px;
+}
+
+/* Chart Layout & Headers */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.chart-year {
+    font-size: 14px;
+    color: #666;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.visitor-chart-size {
+    height: 250px;
+}
+
+.popular-chart-size {
+    height: 300px;
+}
+
+/* Summary Section (Bottom of Chart) */
+.chart-summary {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.month-dropdown {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Noto Serif Thai', serif;
+    cursor: pointer;
+    background-color: #fff;
+    color: #333;
+}
+
+.summary-text {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 16px;
+    color: #555;
+    margin: 0;
+}
+
+#total-view-display {
+    color: #BF7E46;
+    font-size: 20px;
+}
+
+/* Activity Icons & Status in Side Info */
+.activity-list.log li {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-list.log li span {
+    font-size: 0.8rem;
+    color: #888;
+    margin-left: 10px;
+    min-width: fit-content;
+}
+
+.text-success {
+    color: #28a745;
+}
+
+.log-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+}
+
+.log-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.log-timestamp {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    margin-left: 15px;
+    text-align: right;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-quick {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Noto Serif Thai';
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    transition: 0.3s;
+}
+
+.add-loc {
+    background-color: #BF7E46;
+}
+
+.add-act {
+    background-color: #5D4037;
+}
+
+.btn-quick:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
+/* Trash Notification */
+.trash-notification {
+    background: linear-gradient(90deg, #fff5f5 0%, #ffffff 100%);
+    border-left: 5px solid #ff4d4d;
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.trash-text {
+    margin-left: 15px;
+    flex: 1;
+}
+
+.trash-text p {
+    margin: 0;
+    color: #d32f2f;
+}
+
+.btn-go-trash {
+    background-color: #d32f2f;
+    color: white !important;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btn-go-trash:hover {
+    background-color: #b71c1c;
+}
+
+/* AR Chart Size */
+.ar-chart-size {
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.chart-insight {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background-color: #fdfaf5;
+    border-left: 4px solid #BF7E46;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #5D4037;
+}
+
+.chart-insight strong {
+    color: #BF7E46;
+    font-weight: 700;
+}

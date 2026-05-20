@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Community Gallery - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item"><iconify-icon icon="teenyicons:otp-solid"
+                        class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item active"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()"><iconify-icon
+                        icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out</a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="search" id="actSearch" onkeyup="searchCommunityTable()">
+                </div>
+                <div class="action-controls">
+                    <button class="add-btn" onclick="openCommunityModal()">
+                        <iconify-icon icon="mdi:add-bold"></iconify-icon> Add Image
+                    </button>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <div class="scroll-container">
+                    <table id="communityTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Image ID</th>
+                                <th>Image URL</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="communityData"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        function searchCommunityTable() {
+            const input = document.getElementById('actSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#communityData tr');
+            rows.forEach(row => { row.style.display = row.innerText.toLowerCase().includes(input) ? '' : 'none'; });
+        }
+
+        async function fetchCommunity() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/community-gallery`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const data = await response.json();
+                const tbody = document.getElementById('communityData');
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td class="action-cell">
+                            <button class="edit-btn-sm" onclick="openCommunityModal('${item.image_id}')"><iconify-icon icon="material-symbols:edit"></iconify-icon> Edit</button>
+                            <button class="delete-btn-sm" onclick="deleteCommunity('${item.image_id}')"><iconify-icon icon="material-symbols:delete"></iconify-icon> Delete</button>
+                        </td>
+                        <td>${item.image_id}</td>
+                        <td class="url-text">${item.image_url}</td>
+                        <td>${item.display_order}</td>
+                        <td>
+                            <span class="badge ${item.is_active == 1 ? 'active' : 'inactive'}">
+                                ${item.is_active == 1 ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function openCommunityModal(id = null) {
+            const isEdit = id !== null;
+            let data = {};
+            try {
+                if (isEdit) {
+                    const res = await fetch(`${API_BASE_URL}/api/community-gallery/${id}`, {
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+                    data = await res.json();
+                } else {
+                    const res = await fetch(`${API_BASE_URL}/api/community-gallery/next-id`, {
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+                    const result = await res.json();
+                    data.image_id = result.next_id;
+                }
+
+                await Swal.fire({
+                    title: isEdit ? '✏️ แก้ไขรูปภาพ' : '🖼️ เพิ่มรูปภาพ',
+                    width: '700px',
+                    customClass: { popup: 'cute-modal-style', title: 'cute-modal-title', confirmButton: 'cute-modal-button', cancelButton: 'cute-modal-button-cancel' },
+                    buttonsStyling: false,
+                    confirmButtonText: isEdit ? 'UPDATE' : 'ADD',
+                    cancelButtonText: 'CANCEL',
+                    showCancelButton: true,
+                    html: `
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; padding: 20px;">
+                            <div class="form-group" style="display: flex; flex-direction: column;"><label>Image ID</label><input type="text" id="swal-img-id" class="cute-edit-input" value="${data.image_id || ''}" readonly></div>
+                            <div class="form-group" style="display: flex; flex-direction: column;"><label>Order</label><input type="number" id="swal-order" class="cute-edit-input" value="${data.display_order || '1'}"></div>
+                            
+                            <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;">
+                                <label>Upload Image (เลือกไฟล์รูปภาพคอมมูนิตี้)</label>
+                                <input type="file" id="swal-file" class="cute-edit-input" accept="image/*" style="padding: 8px;">
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; align-items: center; gap: 15px; grid-column: span 2;">
+                                <label>Status</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="swal-status" ${data.is_active == 1 ? 'checked' : ''}>
+                                    <span class="slider"></span>
+                                </label>
+                                <span id="swal-status-text">${data.is_active == 1 ? 'Active' : 'Inactive'}</span>
+                            </div>
+                        </div>
+                    `,
+                    didOpen: () => {
+                        document.getElementById('swal-status').onchange = function () {
+                            document.getElementById('swal-status-text').textContent = this.checked ? 'Active' : 'Inactive';
+                        };
+                    },
+                    preConfirm: () => {
+                        const fileInput = document.getElementById('swal-file');
+                        return {
+                            image_id: document.getElementById('swal-img-id').value,
+                            display_order: document.getElementById('swal-order').value,
+                            is_active: document.getElementById('swal-status').checked ? 1 : 0,
+                            community_image: fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null
+                        }
+                    }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const method = isEdit ? 'PUT' : 'POST';
+                        const url = isEdit ? `${API_BASE_URL}/api/community-gallery/${id}` : `${API_BASE_URL}/api/community-gallery`;
+     
+                        const formDataToSend = new FormData();
+                        formDataToSend.append('image_id', result.value.image_id);
+                        formDataToSend.append('display_order', result.value.display_order);
+                        formDataToSend.append('is_active', result.value.is_active);
+                        
+                        if (result.value.community_image) {
+                            formDataToSend.append('image', result.value.community_image);
+                        }
+                        formDataToSend.append('admin_id', localStorage.getItem('adminId') || '1');
+
+                        const res = await fetch(url, {
+                            method,
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`
+                            },
+                            body: formDataToSend
+                        });
+                        
+                        if (res.ok) { 
+                            Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', confirmButtonColor: '#BF7E46' }); 
+                            fetchCommunity(); 
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'บันทึกไม่สำเร็จ', text: 'โปรดตรวจสอบสิทธิ์หลังบ้านแอดมิน หรือขนาดไฟล์รูปภาพ' });
+                        }
+                    }
+                });
+            } catch (err) { console.error("Modal operational failure:", err); }
+        }
+
+        async function deleteCommunity(id) {
+            const adminId = localStorage.getItem('adminId');
+
+            Swal.fire({
+                title: 'ยืนยันการลบ?',
+                text: `ต้องการลบรูปภาพรหัส ${id} ใช่หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ลบเลย!',
+                confirmButtonColor: '#FF9A9A',
+                cancelButtonText: 'ยกเลิก'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const res = await fetch(`${API_BASE_URL}/api/community-gallery/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ admin_id: adminId })
+                    });
+                    if (res.ok) {
+                        Swal.fire({ title: 'สำเร็จ', text: 'ข้อมูลถูกย้ายไปถังขยะแล้ว', icon: 'success', confirmButtonColor: '#BF7E46' });
+                        fetchCommunity();
+                    }
+                }
+            });
+        }
+
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+
+        window.onload = fetchCommunity;
+
+        window.addEventListener("DOMContentLoaded", () => {
+            // หาเมนูตัวที่มีคลาส active อยู่
+            const activeMenu = document.querySelector('.menu-item.active');
+
+            if (activeMenu) {
+                // สั่งให้เลื่อนมาแสดงตรงกลางแถบ Sidebar 
+                activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+
+</html>

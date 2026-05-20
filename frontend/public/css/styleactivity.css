@@ -1,0 +1,244 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Header */
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #FBEDD6;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-logo {
+    display: block;
+    width: 166px;
+    margin-top: 0;
+}
+
+.menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 25px;
+    transition: transform 0.2s;
+}
+
+.menu-trigger iconify-icon {
+    font-size: 45px;
+    color: #BF7E46;
+}
+
+.menu-trigger:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+.container {
+    border-top: 1px solid #B1A396;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.activity-card {
+    background-color: #B29B89;
+    border-radius: 25px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.image-area {
+    width: 100%;
+    height: 180px;
+}
+
+.image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-area {
+    padding: 15px 20px;
+    color: #4B3621;
+}
+
+.activity-name {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.location-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+}
+
+.bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 5px 20px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.status-open {
+    background-color: #E8F5E9;
+    color: #1B5E20;
+}
+
+.status-closed {
+    background-color: #FFEBEE;
+    color: #B71C1C;
+}
+
+.price-text {
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 15px;
+}
+
+@media (min-width: 768px) {
+
+    .mobile-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        background-color: #FBEDD6 !important;
+    }
+
+    .container {
+        padding: 40px 10% !important;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .title {
+        font-size: 36px !important;
+        margin-bottom: 50px !important;
+        color: #4B3621;
+        text-align: center;
+    }
+
+    #card-container.card-list,
+    .activity-list {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 30px !important;
+        align-items: stretch;
+    }
+
+    /* ปรับดีไซน์การ์ด */
+    .activity-card {
+        margin-bottom: 0 !important;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background-color: #FFFFFF !important;
+        border-radius: 25px !important;
+        overflow: hidden;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    }
+
+    .activity-card:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 15px 30px rgba(112, 60, 14, 0.15) !important;
+    }
+
+    /* แก้ปัญหารูปยืด  */
+    .image-area {
+        height: 250px !important;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .image-area img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover !important;
+    }
+
+    /* ปรับส่วนข้อมูลด้านล่าง */
+    .info-area {
+        padding: 25px !important;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .activity-name {
+        font-size: 22px !important;
+        margin-bottom: 15px !important;
+        color: #4B3621;
+    }
+
+    .location-row {
+        color: #8D6E63 !important;
+        font-size: 15px !important;
+        margin-bottom: 15px !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .bottom-row {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .price-text {
+        color: #BF7E46 !important;
+        font-size: 18px !important;
+        font-weight: bold;
+    }
+
+    .status-badge {
+        padding: 6px 15px !important;
+        font-size: 13px !important;
+    }
+}

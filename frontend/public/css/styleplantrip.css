@@ -1,0 +1,735 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: #FBEDD6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Header */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #FBEDD6;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid #B1A396;
+}
+
+.home-logo {
+    display: block;
+    width: 166px;
+    margin-top: 0;
+}
+
+.menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 25px;
+    transition: transform 0.2s;
+}
+
+.menu-trigger iconify-icon {
+    font-size: 45px;
+    color: #BF7E46;
+}
+
+.menu-trigger:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+/* plantrip */
+.planner-wrapper {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-family: 'Noto Serif Thai', sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.planner-wrapper h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 30px;
+}
+
+.planner-wrapper p {
+    font-size: 26px;
+    font-weight: bolder;
+    margin-top: 0;
+    color: #BF7E46;
+}
+
+.map-container {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    display: block;
+}
+
+.map-bg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* สไตล์ของแต่ละจุดสถานที่ */
+.location-pin {
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    transform: none;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+.location-pin:hover {
+    transform: none;
+}
+
+.location-pin img {
+    max-width: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.pin-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: auto;
+}
+
+.pin-info {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+    z-index: 90 !important;
+}
+
+/* กลุ่มไอคอนวงกลม */
+.icon-group {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    margin-top: 0;
+}
+
+.icon-group iconify-icon {
+    background-color: #BF7E46;
+    color: white;
+    border-radius: 50%;
+    border: 1.5px solid white;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ชื่อสถานที่ */
+.location-name {
+    font-size: 10px;
+    padding: 2px 6px 2px 6px;
+    font-weight: bold;
+    color: #4A2C2A;
+    white-space: nowrap;
+    background-color: rgba(251, 237, 214, 0.85);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+}
+
+.location-img {
+    max-width: 80px;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.street-art-pin {
+    cursor: default;
+    pointer-events: none;
+    z-index: 1 !important;
+}
+
+.street-art-pin:hover {
+    transform: none !important;
+}
+
+.street-art-pin.selected .location-img {
+    outline: none !important;
+}
+
+.location-pin:not(.street-art-pin) {
+    cursor: pointer;
+}
+
+.location-pin:not(.street-art-pin):hover,
+.location-pin.selected:not(.street-art-pin) {
+    transform: none !important;
+    z-index: 100 !important;
+}
+
+.street-art-pin .location-img {
+    outline: none;
+    transform: none;
+}
+
+.direction-bottom .pin-info {
+    flex-direction: column;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 2px !important;
+}
+
+.direction-top .pin-info {
+    flex-direction: column;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0px !important;
+}
+
+.direction-left .pin-info {
+    align-items: flex-end;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: -15px !important;
+    margin-top: 5px !important;
+}
+
+.direction-left .icon-group {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 2px;
+    transform: none;
+}
+
+.direction-right .pin-info {
+    flex-direction: column;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 2px !important;
+    margin-top: 0 !important;
+}
+
+/* --- แก้ไขพิเศษสำหรับ Bee & Ploy (LOC-012) --- */
+.location-pin.special-bee .pin-info {
+    position: absolute;
+    top: 60px;
+    left: -15px;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.location-pin.special-bee .icon-group {
+    position: absolute;
+    bottom: 100%;
+    left: 2px;
+    margin-bottom: 5px !important;
+    z-index: 10;
+}
+
+.location-pin.special-bee .location-name {
+    font-size: 10px;
+    margin-top: 0;
+    z-index: 5;
+}
+
+/* --- แก้ไขพิเศษสำหรับ ศาลเล่าปุ่งเถ้ากงม่า (LOC-005) --- */
+.location-pin.special-shrine .pin-info {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    margin-bottom: -10px !important;
+}
+
+.location-pin.special-shrine .icon-group {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0px !important;
+}
+
+.location-pin.special-shrine .location-name {
+    margin-left: 15px;
+    font-size: 10px;
+    z-index: 5;
+}
+
+/* หมุดเลือกสถานที่ */
+.icon-group iconify-icon:not(.pin-default):not(.pin-selected) {
+    background-color: #BF7E46 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    border: 1.5px solid white !important;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.selection-wrapper {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 100;
+}
+
+.pin-default {
+    font-size: 28px !important;
+    color: #FFFFFF !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+    display: block !important;
+}
+
+.location-pin.selected .pin-default {
+    color: #FF3636 !important;
+}
+
+.pin-selected {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-35%) !important;
+    font-size: 14px !important;
+    color: #FFFFFF !important;
+    background: none !important;
+    border: none !important;
+    display: none !important;
+    z-index: 10;
+}
+
+.location-pin.selected .pin-selected {
+    display: block !important;
+    animation: bounceInCorrect 0.3s ease;
+}
+
+/* สไตล์สำหรับหมุดที่ร้านปิด */
+.location-pin.is-closed {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.location-pin.is-closed .location-name {
+    color: #313131;
+    background-color: rgba(200, 200, 200, 0.5);
+}
+
+.location-pin.is-closed.selected {
+    outline: none;
+}
+
+@keyframes bounceInCorrect {
+    0% {
+        transform: translateX(-50%) scale(0);
+        opacity: 0;
+    }
+
+    70% {
+        transform: translateX(-50%) scale(1.2);
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.select-badge {
+    display: none !important;
+}
+
+/* จัดการพื้นที่ปุ่มและช่องกรอกข้อมูลด้านล่าง */
+.action-zone {
+    width: 100%;
+    max-width: 340px;
+    margin: 30px auto 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 0 10px;
+}
+
+#trip_name {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: none;
+    background-color: #B2A396;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-family: 'Noto Serif Thai', serif;
+    text-align: center;
+    outline: none;
+}
+
+#trip_name::placeholder {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* สไตล์ปุ่มสร้างการเดินทาง */
+#btn-create-trip {
+    width: auto;
+    min-width: 200px;
+    align-self: center;
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: none;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Noto Serif Thai', serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#btn-create-trip:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+#btn-create-trip:active {
+    transform: scale(0.95);
+    background-color: #9C8C7E;
+}
+
+/* เลือกวันที่ */
+.date-picker-zone {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.date-picker-zone label {
+    display: block;
+    font-size: 14px;
+    color: #4A2C2A;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* คลุมตัว Input และ Icon */
+.input-with-icon {
+    position: relative;
+    width: 240px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
+/* สไตล์ Input */
+#trip_date {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border-radius: 50px;
+    border: 2px solid #BF7E46;
+    background-color: #FFFFFF;
+    color: #4A2C2A;
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* สไตล์ไอคอนปฏิทิน */
+.input-with-icon iconify-icon {
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #BF7E46;
+    font-size: 22px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#trip_date:focus {
+    box-shadow: 0 0 0 3px rgba(191, 126, 70, 0.2);
+    border-color: #A36A3B;
+}
+
+/* เปลี่ยนสีไอคอนปฏิทิน */
+#trip_date::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(56%) sepia(21%) saturate(1145%) hue-rotate(345deg) brightness(88%) contrast(85%);
+    font-size: 18px;
+}
+
+.flatpickr-calendar {
+    background: #FBEDD6 !important;
+    border: 1px solid #BF7E46 !important;
+    border-radius: 15px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+.flatpickr-day.selected {
+    background: #BF7E46 !important;
+    border-color: #BF7E46 !important;
+}
+
+.flatpickr-months .flatpickr-month {
+    background: #BF7E46 !important;
+    color: #FFF !important;
+    border-radius: 15px 15px 0 0;
+}
+
+/* login ก่อน */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 20000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #FBEDD6;
+    padding: 30px;
+    border-radius: 20px;
+    width: 75%;
+    max-width: 350px;
+    text-align: center;
+    border: 2px solid #BF7E46;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content p {
+    font-size: 16px;
+    color: #4A2C2A;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.modal-btn {
+    background: #BF7E46;
+    color: white;
+    border: none;
+    padding: 10px 38px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+        align-items: center;
+        background-color: #fff;
+    }
+
+    .home-header {
+        max-width: 100%;
+    }
+
+    .home-header img {
+        width: 200px;
+
+    }
+
+    /* คุมขนาดแผนที่ */
+    .map-container,
+    #map-container {
+        max-width: 700px !important;
+        margin: 20px auto 40px !important;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .planner-wrapper h2,
+    .planner-wrapper p {
+        font-size: 30px;
+    }
+
+    .date-picker-zone {
+        margin-bottom: 30px;
+    }
+
+    .date-picker-zone label {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .input-with-icon {
+        width: 260px;
+        margin: 0 auto;
+    }
+
+    #trip_date {
+        padding: 15px 15px 15px 60px;
+        font-size: 22px;
+    }
+
+    .input-with-icon iconify-icon {
+        font-size: 30px;
+    }
+
+    /* ปรับขนาดรูปภาพสถานที่บนแผนที่ */
+    .location-pin img,
+    .location-img {
+        width: 180px !important;
+        height: 110px !important;
+        max-width: none !important;
+    }
+
+    .location-name {
+        font-size: 16px !important;
+        padding: 5px 12px !important;
+        font-weight: bold !important;
+        border-radius: 70px !important;
+    }
+
+    .location-pin .pin-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transform: translateX(55%);
+    }
+
+    /* ขนาด Street Art */
+    .street-art-pin img,
+    .street-art-pin .location-img {
+        width: 120px !important;
+        height: auto !important;
+        opacity: 0.9;
+    }
+
+    /* จัดระเบียบป้ายชื่อ */
+    .pin-info {
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent !important;
+        z-index: 90;
+    }
+
+    /* ปรับขนาดไอคอนอื่นๆ */
+    .icon-group iconify-icon {
+        width: auto !important;
+        height: auto !important;
+    }
+
+    /* ขยาย "ไอคอนหมวดหมู่" */
+    .icon-group iconify-icon:not(.pin-default):not(.pin-selected) {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 25px !important;
+        border: 2px solid white !important;
+    }
+
+    /* ขยายขนาด "หมุดแดง" และ "เครื่องหมายถูก"  */
+    .pin-default {
+        font-size: 40px !important;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .pin-selected {
+        font-size: 20px !important;
+        top: 7px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        position: absolute !important;
+        display: block !important;
+
+    }
+
+    .selection-wrapper {
+        top: -35px !important;
+        width: 45px !important;
+    }
+
+    /* ปรับโซนด้านล่าง (Action Zone) */
+    .action-zone {
+        max-width: 600px;
+        margin: 20px auto 50px;
+    }
+
+    #trip_name {
+        font-size: 20px;
+        padding: 20px;
+    }
+
+    #btn-create-trip {
+        font-size: 22px;
+        padding: 20px 50px;
+    }
+
+}

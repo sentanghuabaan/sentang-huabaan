@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Trip Details - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item active"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="page-title">TRIP & LOCATION ANALYTICS</h2>
+                <button onclick="window.print()" class="btn-save active">
+                    <iconify-icon icon="material-symbols:print"></iconify-icon> พิมพ์รายงาน
+                </button>
+            </div>
+
+            <div class="search-wrapper" style="margin-bottom: 20px;">
+                <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                <input type="text" id="detailSearch" placeholder="ค้นหาข้อมูลทริป หรือ Location ID ..."
+                    onkeyup="searchDetailTable()" style="padding: 10px; border-radius: 20px; width: 1400px;">
+            </div>
+
+            <div class="stats-container">
+                <canvas id="tripChart" height="100"></canvas>
+                <div id="dashboard-summary" class="summary-box"
+                    style="margin-top: 20px; padding: 20px; background: #fdfaf6; border-left: 5px solid #BF7E46; border-radius: 8px;">
+                    <h3 style="color: #BF7E46; margin-top: 0;">สรุปภาพรวมสถานที่ท่องเที่ยว</h3>
+                    <p id="summary-text">กำลังโหลดข้อมูลสรุป...</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="scroll-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Trip ID</th>
+                                <th>Location ID</th>
+                                <th>Visit Order</th>
+                                <th>Arrival Time</th>
+                                <th>Stay (Min)</th>
+                                <th>Departure</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailData"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        function searchDetailTable() {
+            let input = document.getElementById("detailSearch").value.toLowerCase();
+            let table = document.getElementById("detailData");
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                let text = rows[i].innerText.toLowerCase();
+
+                rows[i].style.display = text.includes(input) ? "" : "none";
+            }
+        }
+
+        async function fetchTripDetails() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/trips/details`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const details = await res.json();
+                const tbody = document.getElementById('detailData');
+
+                if (details.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">ไม่มีข้อมูล</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = details.map(d => `
+                    <tr>
+                        <td>${d.trip_id}</td>
+                        <td>${d.location_id}</td>
+                        <td>${d.visit_order}</td>
+                        <td>${d.arrival_time}</td>
+                        <td>${d.stay_duration}</td>
+                        <td>${d.departure_time}</td>
+                        </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Error fetching details:", err);
+            }
+        }
+
+        async function loadDashboard() {
+            const res = await fetch(`${API_BASE_URL}/api/trips/stats`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) return;
+
+            const data = await res.json();
+            const ctx = document.getElementById('tripChart').getContext('2d');
+
+            const totalLocationsInCommunity = 17;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.location_name),
+                    datasets: [{
+                        label: 'ยอดฮิต',
+                        data: data.map(d => d.usage_count),
+                        backgroundColor: '#D4A373',
+                        borderRadius: 10,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '🏆 5 สถานที่ท่องเที่ยวที่ได้รับความนิยมสูงสุดในทริปผู้ใช้งาน',
+                            color: '#BF7E46',
+                            font: { size: 16, family: "'Noto Serif Thai', serif" },
+                            padding: { bottom: 20 }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'ชื่อสถานที่ท่องเที่ยว', font: { weight: 'bold' }, color: '#50AEE3' }
+                        },
+                        y: {
+                            title: { display: true, text: 'จำนวนครั้งที่ถูกเลือกในทริป', font: { weight: 'bold' }, color: '#50AEE3' },
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+            const topLocation = data[0];
+            const summaryText = document.getElementById('summary-text');
+
+            if (data.length > 0) {
+                summaryText.innerHTML = `
+                นี่คือ <strong>5 อันดับสถานที่จากทั้งหมด ${totalLocationsInCommunity} แห่ง</strong> 
+                ที่ได้รับความนิยมมากที่สุดในการสร้างทริปท่องเที่ยวในชุมชนของเรา โดยสถานที่อันดับ 1 คือ 
+                <strong>"${topLocation.location_name}"</strong> ซึ่งถูกเลือกลงในทริปผู้ใช้งานมากถึง 
+                <strong>${topLocation.usage_count} ครั้ง</strong> 
+                สะท้อนให้เห็นถึงความสนใจและความเป็นแลนด์มาร์คสำคัญที่ผู้ใช้ให้ความนิยมเป็นพิเศษ
+            `;
+            } else {
+                summaryText.textContent = "ยังไม่มีข้อมูลทริปเพียงพอสำหรับสร้างสรุป";
+            }
+        }
+
+        // ฟังก์ชันพิมพ์เฉพาะ Dashboard
+        function printDashboard() {
+            const printContents = document.querySelector('.stats-container').innerHTML;
+            const originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+            window.print(); // สั่งพิมพ์
+            document.body.innerHTML = originalContents; // กู้คืนหน้าเดิม
+            location.reload();
+        }
+
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminName');
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+
+        window.onload = () => { fetchTripDetails(); loadDashboard(); };
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const activeMenu = document.querySelector('.menu-item.active');
+
+            if (activeMenu) {
+                activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+
+</html>

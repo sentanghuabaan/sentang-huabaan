@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Trash - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu active">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <h3>🗑️ ถังขยะ (รายการที่ถูกลบ)</h3>
+            </header>
+
+            <div class="custom-filter-wrapper" style="width: 280px; margin-bottom: 20px;">
+                <div class="filter-display" onclick="toggleTrashFilter()">
+                    <iconify-icon icon="mdi:database" class="filter-icon"></iconify-icon>
+                    <span id="currentTrashFilterText">เลือกตาราง</span>
+                    <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                </div>
+                <div class="filter-options" id="trashFilterOptions">
+                    <div class="f-option" onclick="selectTrashTable('Location', 'Location')">Location</div>
+                    <div class="f-option" onclick="selectTrashTable('Location_Images', 'Location Images')">Location
+                        Images</div>
+                    <div class="f-option" onclick="selectTrashTable('Activity', 'Activity')">Activity</div>
+                    <div class="f-option" onclick="selectTrashTable('Activity_Images', 'Activity Images')">Activity
+                        Images</div>
+                    <div class="f-option" onclick="selectTrashTable('History', 'History')">History</div>
+                    <div class="f-option" onclick="selectTrashTable('History_Gallery', 'History Gallery')">History
+                        Gallery</div>
+                    <div class="f-option" onclick="selectTrashTable('VideoAR', 'AR Content')">AR Content</div>
+                    <div class="f-option" onclick="selectTrashTable('Community_Gallery', 'Community Gallery')">Community
+                        Gallery</div>
+                    <div class="f-option" onclick="selectTrashTable('Banners', 'Banner Ads')">Banner Ads</div>
+                    <div class="f-option" onclick="selectTrashTable('Review', 'Review')">Review</div>
+                    <div class="f-option" onclick="selectTrashTable('Map', 'Map')">Map</div>
+                    <div class="f-option" onclick="selectTrashTable('Travel_Route', 'Travel Route')">Travel Route</div>
+                    <div class="f-option" onclick="selectTrashTable('Trip', 'Trip')">Trip</div>
+                    <div class="f-option" onclick="selectTrashTable('Trip_Detail', 'Trip Detail')">Trip Detail</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="trashTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Deleted_at</th>
+                            <th>Deleted_by (ID)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trashData"></tbody>
+                </table>
+            </div>
+        </main>
+
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            function toggleTrashFilter() {
+                document.getElementById('trashFilterOptions').classList.toggle('show');
+            }
+
+            function selectTrashTable(tableValue, tableText) {
+                document.getElementById('currentTrashFilterText').innerText = tableText;
+                document.getElementById('trashFilterOptions').classList.remove('show');
+                fetchTrash(tableValue);
+            }
+
+            async function fetchTrash(table = 'Location') {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/trash/${table}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+
+                    const data = await response.json();
+                    console.log("ข้อมูลที่ได้รับจาก Server:", data);
+
+                    const tbody = document.getElementById('trashData');
+
+                    tbody.innerHTML = data.map(item => {
+                        try {
+                            const idKey = Object.keys(item).find(key => key.includes('_id'));
+                            const idValue = idKey ? item[idKey] : '-';
+
+                            const nameKeys = ['location_name', 'activity_name', 'title', 'history_name', 'image_url', 'trip_name', 'video_name', 'review_text', 'route_display_name', 'detail_display_name'];
+                            const nameKey = nameKeys.find(k => item.hasOwnProperty(k));
+                            const nameValue = nameKey ? item[nameKey] : 'ไม่มีชื่อ';
+
+                            let formattedDate = '-';
+                            if (item.deleted_at) {
+                                const d = new Date(item.deleted_at);
+                                if (!isNaN(d.getTime())) {
+                                    formattedDate = d.toLocaleDateString('th-TH', {
+                                        day: 'numeric', month: 'short', year: 'numeric'
+                                    });
+                                }
+                            }
+
+                            return `
+                            <tr>
+                                <td>
+                                    <button class="restore-btn" onclick="restoreLoc('${table}', '${idValue}')">
+                                        <iconify-icon icon="mdi:restore"></iconify-icon> กู้คืน
+                                    </button>
+                                </td>
+                                <td>${idValue}</td>
+                                <td>${nameValue}</td>
+                                <td>${formattedDate}</td>
+                                <td>Admin ID: ${item.deleted_by || '-'}</td>
+                            </tr>
+                        `;
+                        } catch (innerErr) {
+                            console.error("Error ในการ render แถวนี้:", item, innerErr);
+                            return `<tr><td colspan="5">ข้อมูลแถวนี้ผิดปกติ</td></tr>`;
+                        }
+                    }).join('');
+                } catch (err) {
+                    console.error("เกิดข้อผิดพลาด:", err);
+                    Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลถังขยะได้', 'error');
+                }
+            }
+
+            async function restoreLoc(table, id) {
+                const result = await Swal.fire({
+                    title: 'ยืนยันการกู้คืน?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Restore'
+                });
+
+                if (result.isConfirmed) {
+                    const res = await fetch(`${API_BASE_URL}/api/trash/restore/${table}/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (res.ok) {
+                        Swal.fire('เรียบร้อย!', 'ข้อมูลถูกกู้คืนแล้ว', 'success');
+                        fetchTrash(table);
+                    } else {
+                        Swal.fire('Error', 'ไม่สามารถกู้คืนได้', 'error');
+                    }
+                }
+            }
+
+            window.addEventListener('click', function (e) {
+                const wrapper = document.querySelector('.custom-filter-wrapper');
+                const options = document.getElementById('trashFilterOptions');
+                if (wrapper && !wrapper.contains(e.target)) {
+                    options.classList.remove('show');
+                }
+            });
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = () => {
+                selectTrashTable('Location', 'Location');
+            };
+
+            window.addEventListener("DOMContentLoaded", () => {
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+</body>
+
+</html>

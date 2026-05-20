@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เมนู - เส้นทางหัวบ้าน</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylemenu.css">
+</head>
+
+<body class="mobile-container">
+    <header class="menu-header">
+        <button class="close-btn" onclick="history.back()">
+            <iconify-icon icon="icon-park-solid:error"></iconify-icon>
+        </button>
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan2.png" alt="เส้นทางหัวบ้าน" class="menu-logo">
+        </div>
+    </header>
+
+    <nav class="menu-list">
+        <h2>เมนู</h2>
+        <ul>
+            <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+            <li><a href="history.html" class="menu-item">ประวัติ</a></li>
+            <li><a href="location.html" class="menu-item">สถานที่</a></li>
+            <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+            <li><a href="trip-planner.html" class="menu-item">วางแผนการเดินทาง</a></li>
+            <li><a href="map-recommend.html" class="menu-item">แผนที่แนะนำ</a></li>
+        </ul>
+    </nav>
+
+    <footer class="menu-footer">
+        <a href="login.html" id="loginLink" class="login-link">
+            <iconify-icon icon="bi:people-circle" class="user-icon" id="userIcon"></iconify-icon>
+            <span id="userNameText">เข้าสู่ระบบ</span>
+        </a>
+    </footer>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const prevPage = document.referrer.split("/").pop();
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (prevPage === href || (prevPage === "" && href === "index.html")) {
+                item.classList.add('active');
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const userDataStr = localStorage.getItem('user');
+            const userNameText = document.getElementById('userNameText');
+            const loginLink = document.getElementById('loginLink');
+            const userIcon = document.getElementById('userIcon');
+
+            if (userDataStr) {
+                const user = JSON.parse(userDataStr);
+                userNameText.textContent = user.username;
+                loginLink.href = "profile.html";
+
+                if (user.profile_img && userIcon) {
+                    const imgUrl = user.profile_img.startsWith('http')
+                        ? user.profile_img
+                        : `${API_BASE_URL}/${user.profile_img}`;
+
+                    const newImg = document.createElement('img');
+                    newImg.src = imgUrl;
+                    newImg.className = 'user-icon';
+
+                    userIcon.parentNode.replaceChild(newImg, userIcon);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,476 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: #FBEDD6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Header */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #FBEDD6;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom: 1px solid #B1A396;
+}
+
+.home-logo {
+    display: block;
+    width: 166px;
+    margin-top: 0;
+}
+
+.menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 25px;
+    transition: transform 0.2s;
+}
+
+.menu-trigger iconify-icon {
+    font-size: 45px;
+    color: #BF7E46;
+}
+
+.menu-trigger:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+/* --- (Title Section) --- */
+.planner-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.planner-wrapper h2 {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin: 30px 0 5px 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #4A2C2A;
+}
+
+.planner-wrapper p {
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-size: 26px;
+    font-weight: 900;
+    color: #BF7E46;
+    text-transform: uppercase;
+}
+
+.trip-type-badge {
+    background-color: #97C6E0;
+    color: #000;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 20px;
+    width: 85%;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: block;
+}
+
+.timeline-container {
+    position: relative;
+    padding-left: 40px;
+    margin-top: 30px;
+}
+
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 55px;
+    top: 10px;
+    bottom: 50px;
+    width: 2px;
+    border-left: 2px dashed var(--line-color);
+}
+
+.location-step {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#itinerary-list {
+    position: relative;
+    padding-left: 50px;
+    padding-right: 20px;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+#itinerary-list::before {
+    content: '';
+    position: absolute;
+    left: 32px;
+    top: 40px;
+    bottom: 25px;
+    width: 2px;
+    border-left: 2px dashed #BF7E46;
+    z-index: 1;
+}
+
+/* Badge เริ่มต้น/สิ้นสุด */
+.timeline-badge {
+    background-color: #BF7E46;
+    color: white;
+    padding: 4px 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    width: fit-content;
+    margin-left: -50px;
+    margin-right: auto;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.timeline-badge.end {
+    margin-top: 10px;
+    margin-left: -50px;
+}
+
+.step-marker {
+    position: absolute;
+    left: -32px;
+    width: 28px;
+    height: 28px;
+    background-color: #BF7E46;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 10;
+}
+
+.step-content {
+    padding-left: 10px;
+}
+
+.time-range {
+    color: #BF7E46;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.location-thumb {
+    width: 245px;
+    height: 110px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+    margin: 10px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+}
+
+.operating-info {
+    font-size: 13px;
+    color: #4A2C2A;
+    line-height: 1.5;
+}
+
+.travel-connector {
+    position: relative;
+    margin-left: -50px;
+    margin-top: -150px;
+    margin-bottom: 40px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    z-index: 5;
+}
+
+.connector-line {
+    position: absolute;
+    left: 0px;
+    top: -20px;
+    bottom: -10px;
+    width: 2px;
+    border-left: 2px dashed #BF7E46;
+}
+
+.travel-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    width: 40px;
+}
+
+.info-item span {
+    writing-mode: horizontal-tb;
+    transform: none;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    width: 100px;
+    justify-content: flex-start;
+}
+
+/* ปั่นจักรยาน */
+.info-item.bike {
+    color: #B1A396;
+}
+
+/* เดิน */
+.info-item.walk {
+    color: #7EA9C1;
+}
+
+/* ระยะทาง */
+.info-item.distance {
+    color: #BF7E46;
+}
+
+.info-item iconify-icon {
+    font-size: 20px;
+    padding: 2px;
+}
+
+.end-badge,
+.start-badge {
+    background: #BF7E46;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 0.9rem;
+    margin-left: -30px;
+}
+
+.date-picker-zone {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 20px;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #A9C9E2;
+    border-radius: 8px;
+    padding: 2px;
+}
+
+#trip_date {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 10px 10px 10px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #4A2C2A;
+    text-align: center;
+    cursor: pointer;
+}
+
+.input-with-icon iconify-icon {
+    position: absolute;
+    left: 15px;
+    font-size: 20px;
+    color: #4A2C2A;
+}
+
+.location-step.is-late .time-range {
+    color: #FF3636;
+}
+
+.warning-text {
+    background-color: #FFE5E5;
+    color: #FF3636;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.warning-text iconify-icon {
+    font-size: 18px;
+}
+
+.is-late .location-thumb {
+    border: 2px solid #FF3636;
+}
+
+.open-close-time {
+    font-weight: bold;
+    color: #4A2C2A;
+}
+
+@media (min-width: 768px) {
+    .mobile-container {
+        max-width: 100%;
+        background-color: #FBEDD6;
+    }
+
+    .planner-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    /* ปรับขนาดหัวข้อ */
+    .planner-wrapper h2 {
+        font-size: 30px;
+    }
+
+    .planner-wrapper p {
+        font-size: 34px;
+    }
+
+    /* ปรับ Badge ชื่อทริป */
+    .trip-type-badge {
+        font-size: 25px;
+        padding: 18px 60px;
+        max-width: 600px;
+        margin-bottom: 50px;
+    }
+
+    /* ปรับโครงสร้าง Timeline (เส้นประ) */
+    #itinerary-list {
+        padding-left: 120px;
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    #itinerary-list::before {
+        left: 77px;
+        width: 3px;
+    }
+
+    /* ปรับขนาดวงกลมตัวเลขและ Badge เริ่มต้น/สิ้นสุด */
+    .step-marker {
+        left: -63px;
+        width: 42px;
+        height: 42px;
+        font-size: 20px;
+    }
+
+    .timeline-badge {
+        font-size: 20px;
+        padding: 8px 25px;
+        margin-left: -95px;
+    }
+
+    /* ขยายขนาดเนื้อหา */
+    .time-range {
+        font-size: 22px;
+    }
+
+    .location-name {
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .location-thumb {
+        width: 500px;
+        height: 250px;
+        margin: 20px 0;
+        border-radius: 15px;
+    }
+
+    .operating-info {
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    /* ปรับขนาด Travel Info (ระยะห่าง/เวลาเดินทาง) */
+    .travel-connector {
+        margin-left: -95px;
+        min-height: 220px;
+        margin-top: -240px;
+        display: flex;
+        align-items: flex-start;
+        padding-top: 20px;
+        z-index: 5;
+    }
+
+    .travel-info {
+        gap: 80px;
+        width: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-item {
+        font-size: 18px !important;
+        width: 300px !important;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        gap: 5px;
+        font-weight: 900 !important;
+    }
+
+    .info-item iconify-icon {
+        font-size: 36px;
+    }
+
+    /* ปรับ Warning Text */
+    .warning-text {
+        font-size: 18px;
+        padding: 15px;
+        max-width: 85%;
+    }
+}

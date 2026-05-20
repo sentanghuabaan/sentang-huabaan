@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Images Management - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="#" class="menu-item active"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="ค้นหาด้วยรหัสสถานที่ หรือ Image ID" id="imgSearch"
+                        onkeyup="searchImageTable()">
+                </div>
+                <div class="action-controls">
+                    <button class="add-btn" onclick="openImageModal()">
+                        <iconify-icon icon="mdi:add-bold"></iconify-icon> Add Image
+                    </button>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <div class="scroll-container">
+                    <table id="imageTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Image ID</th>
+                                <th>Location ID</th>
+                                <th>Image URL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="imageData">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        // ฟังก์ชันค้นหา
+        function searchImageTable() {
+            let input = document.getElementById("imgSearch").value.toLowerCase();
+            let rows = document.querySelectorAll("#imageData tr");
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+            });
+        }
+
+        function editImage(id) {
+            window.location.href = `admin_edit_location_image.html?id=${id}`;
+        }
+
+        async function fetchImages() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/location-images`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const images = await response.json();
+                const tableBody = document.getElementById('imageData');
+
+                tableBody.innerHTML = images.map(img => `
+                    <tr>
+                        <td class="action-cell">
+                            <button class="edit-btn-sm" onclick="openImageModal('${img.image_id}')">
+                                <iconify-icon icon="material-symbols:edit"></iconify-icon> Edit
+                            </button>
+                            <button class="delete-btn-sm" onclick="deleteImage('${img.image_id}')">
+                                <iconify-icon icon="material-symbols:delete"></iconify-icon> Delete
+                            </button>
+                        </td>
+                        <td>${img.image_id}</td>
+                        <td>${img.location_id}</td>
+                        <td class="url-text">${img.image_url}</td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error("Error fetching images:", err); }
+        }
+
+        async function openImageModal(id = null) {
+            const isEdit = id !== null;
+            let imgData = { image_id: '', location_id: '', image_url: '' };
+
+            try {
+                // โหลดรายชื่อสถานที่มาทำชอยส์ Dropdown
+                const locRes = await fetch(`${API_BASE_URL}/api/locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const locations = await locRes.json();
+                let options = locations.map(l => `<option value="${l.location_id}">${l.location_name} (${l.location_id})</option>`).join('');
+
+                if (!isEdit) {
+                    const res = await fetch(`${API_BASE_URL}/api/location-images/next-id`, {
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+                    const data = await res.json();
+                    imgData.image_id = data.next_id;
+                } else {
+                    const res = await fetch(`${API_BASE_URL}/api/location-images/${id}`, {
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+                    imgData = await res.json();
+                }
+
+                await Swal.fire({
+                    title: isEdit ? '✏️ แก้ไขรูปภาพ' : '🖼️ เพิ่มรูปภาพใหม่',
+                    width: '700px',
+                    html: `
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; padding: 20px;">
+                            <div class="form-group" style="display: flex; flex-direction: column;"><label>Image ID</label><input type="text" id="swal-img-id" class="cute-edit-input" value="${imgData.image_id}" readonly></div>
+                            <div class="form-group" style="display: flex; flex-direction: column;"><label>Location</label><select id="swal-loc-id" class="cute-edit-input">${options}</select></div>
+                            
+                            <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;">
+                                <label>Upload Image (เลือกไฟล์รูปภาพสถานที่)</label>
+                                <input type="file" id="swal-file" class="cute-edit-input" accept="image/*" style="padding: 8px;">
+                            </div>
+                        </div>
+                    `,
+                    didOpen: () => {
+                        if (imgData.location_id) document.getElementById('swal-loc-id').value = imgData.location_id;
+                    },
+                    confirmButtonText: isEdit ? 'UPDATE' : 'ADD',
+                    showCancelButton: true,
+                    cancelButtonText: 'CANCEL',
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'cute-modal-style', title: 'cute-modal-title',
+                        confirmButton: 'cute-modal-button', cancelButton: 'cute-modal-button-cancel'
+                    },
+                    preConfirm: () => {
+                        const fileInput = document.getElementById('swal-file');
+                        return {
+                            image_id: document.getElementById('swal-img-id').value,
+                            location_id: document.getElementById('swal-loc-id').value,
+                            location_image: fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null
+                        }
+                    }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const method = isEdit ? 'PUT' : 'POST';
+                        const url = isEdit ? `${API_BASE_URL}/api/location-images/${id}` : `${API_BASE_URL}/api/location-images`;
+
+                        const formDataToSend = new FormData();
+                        formDataToSend.append('image_id', result.value.image_id);
+                        formDataToSend.append('location_id', result.value.location_id);
+
+                        if (result.value.location_image) {
+                            formDataToSend.append('image', result.value.location_image);
+                        }
+
+                        formDataToSend.append('admin_id', localStorage.getItem('adminId') || '1');
+
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`
+                            },
+                            body: formDataToSend
+                        });
+
+                        if (response.ok) {
+                            Swal.fire({ icon: 'success', title: 'บันทึกสำเร็จ!', confirmButtonColor: '#BF7E46' });
+                            fetchImages();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'บันทึกไม่สำเร็จ',
+                                text: errData.message || 'โปรดตรวจสอบสิทธิ์หลังบ้านแอดมิน หรือขนาดไฟล์รูปภาพ'
+                            });
+                        }
+                    }
+                });
+            } catch (err) { console.error("Modal Operation Failure:", err); }
+        }
+
+        // ฟังก์ชันลบ
+        async function deleteImage(id) {
+            const adminId = localStorage.getItem('adminId');
+
+            Swal.fire({
+                title: 'ยืนยันการลบรูปภาพ?',
+                text: `คุณต้องการลบรูปภาพรหัส ${id} ใช่หรือไม่?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FF9A9A',
+                confirmButtonText: 'ลบเลย',
+                cancelButtonText: 'ยกเลิก'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/location-images/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ admin_id: adminId })
+                        });
+                        if (response.ok) {
+                            Swal.fire({ title: 'ลบสำเร็จ!', icon: 'success', confirmButtonColor: '#BF7E46' });
+                            fetchImages();
+                        }
+                    } catch (err) { console.error(err); }
+                }
+            });
+        }
+
+        // ฟังก์ชัน Logout
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminName');
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+
+        window.onload = fetchImages;
+    </script>
+</body>
+
+</html>

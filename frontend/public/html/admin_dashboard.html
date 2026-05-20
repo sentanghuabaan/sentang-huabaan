@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_dashboard.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item active"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="dashboard-wrapper">
+                <header class="dashboard-header">
+                    <div class="header-main">
+                        <div>
+                            <h2>ภาพรวมระบบจัดการเส้นทางหัวบ้าน</h2>
+                            <p>ยินดีต้อนรับ, แอดมิน</p>
+                        </div>
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <button onclick="window.location.href='admin_location.html'" class="btn-quick add-loc">
+                                <iconify-icon icon="ic:baseline-add-location"></iconify-icon> เพิ่มสถานที่
+                            </button>
+                            <button onclick="window.location.href='admin_activity.html'" class="btn-quick add-act">
+                                <iconify-icon icon="fluent:calendar-add-24-filled"></iconify-icon> เพิ่มกิจกรรม
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Trash Alert -->
+                    <div id="trash-alert" class="trash-notification" style="display: none;">
+                        <iconify-icon icon="mdi:trash-can-alert" style="font-size: 24px;"></iconify-icon>
+                        <div class="trash-text">
+                            <p><strong>ระบบตรวจพบข้อมูลค้างในถังขยะ!</strong></p>
+                            <span>ขณะนี้มีรายการที่ถูกลบรวมทั้งหมด <strong id="trash-num">0</strong> รายการ
+                                จากทุกส่วนของระบบ</span>
+                        </div>
+                        <a href="admin_trash.html" class="btn-go-trash">จัดการถังขยะ</a>
+                    </div>
+                </header>
+
+                <!-- Summary Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon user"><iconify-icon icon="basil:user-solid"></iconify-icon></div>
+                        <div class="stat-details">
+                            <h3 id="count-users">0</h3>
+                            <p>ผู้ใช้งานทั้งหมด</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon location"><iconify-icon icon="ion:location-sharp"></iconify-icon></div>
+                        <div class="stat-details">
+                            <h3 id="count-locations">0</h3>
+                            <p>สถานที่ทั้งหมดในชุมชน</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon activity">
+                            <iconify-icon icon="lets-icons:date-fill"></iconify-icon>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="count-activities">0</h3>
+                            <p>กิจกรรมชุมชน</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon trip"><iconify-icon icon="mdi:map-marker-path"></iconify-icon></div>
+                        <div class="stat-details">
+                            <h3 id="count-trips">0</h3>
+                            <p>ทริปที่ถูกสร้าง</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon review"><iconify-icon icon="material-symbols:rate-review"></iconify-icon>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="count-reviews">0</h3>
+                            <p>รีวิวจากนักท่องเที่ยว</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ar-view" style="background: #e0f2f1; color: #009688;">
+                            <iconify-icon icon="tdesign:view-in-ar-filled"></iconify-icon>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="count-ar-views">0</h3>
+                            <p>ยอดเข้าชม AR รวม</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-main-content">
+                    <!-- Analytics Charts -->
+                    <div class="chart-section">
+                        <div class="chart-box">
+                            <div class="chart-header">
+                                <h3>สถิติการเข้าชม (Monthly Visitors)</h3>
+                                <span class="chart-year">ปี 2026</span>
+                            </div>
+
+                            <div class="chart-container visitor-chart-size">
+                                <canvas id="visitorChart"></canvas>
+                            </div>
+
+                            <!-- ส่วนสรุปยอดรวม Dropdown -->
+                            <div class="chart-summary">
+                                <select id="month-selector" onchange="updateMonthlySummary()" class="month-dropdown">
+                                    <option value="all">ดูทุกเดือน</option>
+                                    <option value="0">มกราคม</option>
+                                    <option value="1">กุมภาพันธ์</option>
+                                    <option value="2">มีนาคม</option>
+                                    <option value="3">เมษายน</option>
+                                    <option value="4">พฤษภาคม</option>
+                                    <option value="5">มิถุนายน</option>
+                                    <option value="6">กรกฎาคม</option>
+                                    <option value="7">สิงหาคม</option>
+                                    <option value="8">กันยายน</option>
+                                    <option value="9">ตุลาคม</option>
+                                    <option value="10">พฤศจิกายน</option>
+                                    <option value="11">ธันวาคม</option>
+                                </select>
+
+                                <!-- ข้อความแสดงผลสรุป -->
+                                <p class="summary-text">
+                                    <span id="summary-label">รวมการเข้าชมในปีนี้</span>:
+                                    <strong id="total-view-display">0</strong> คน
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="chart-box">
+                            <h3>5 อันดับสถานที่ยอดนิยม</h3>
+                            <div class="chart-container popular-chart-size">
+                                <canvas id="popularLocationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-box">
+                            <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
+                            <div class="chart-container ar-chart-size">
+                                <canvas id="arEngagementChart"></canvas>
+                            </div>
+                            <div id="ar-insight" class="chart-insight">
+                                <iconify-icon icon="mdi:lightbulb-on" style="color: #FFCE56;"></iconify-icon>
+                                <span id="ar-insight-text">กำลังโหลดข้อมูลสรุป...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Required & Recent Activity -->
+                    <div class="side-info-section">
+                        <div class="info-card">
+                            <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)
+                            </h3>
+                            <ul class="activity-list">
+                                <li>
+                                    <span class="status-badge pending">รอดำเนินการ</span>
+                                    <p>พิกัดร้านขายของที่ระลึกไม่ตรง - <span>2 ชม. ที่แล้ว</span></p>
+                                </li>
+                                <li>
+                                    <span class="status-badge pending">รอดำเนินการ</span>
+                                    <p>รูปภาพ AR ไม่แสดงผล - <span>5 ชม. ที่แล้ว</span></p>
+                                </li>
+                            </ul>
+                            <a href="admin_report.html" class="view-all">ดูรายงานทั้งหมด</a>
+                        </div>
+
+                        <div class="info-card">
+                            <h3><iconify-icon icon="mdi:history"></iconify-icon> กิจกรรมล่าสุด</h3>
+                            <ul class="activity-list log">
+                                <li><iconify-icon icon="mdi:edit"></iconify-icon> อัปเดตข้อมูล "เส้นทางริมน้ำ" <span>10
+                                        นาทีที่แล้ว</span></li>
+                                <li><iconify-icon icon="mdi:trash-can" class="text-danger"></iconify-icon>
+                                    ลบรีวิวไม่เหมาะสมไปยังถังขยะ <span>1 วันที่แล้ว</span></li>
+                            </ul>
+                            <a href="admin_activity_logs.html" class="view-all"
+                                style="display: block; text-align: center; margin-top: 15px; color: #BF7E46; font-weight: bold; text-decoration: none;">
+                                ดูประวัติกิจกรรมทั้งหมด <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStats();
+            renderVisitorChart();
+            renderPopularChart();
+            fetchRecentActivities();
+            fetchTrashCount();
+            renderARChart();
+            fetchRecentReports();
+        });
+
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const data = await response.json();
+
+                document.getElementById('count-users').innerText = data.users.toLocaleString();
+                document.getElementById('count-locations').innerText = data.locations.toLocaleString();
+                document.getElementById('count-activities').innerText = data.activities.toLocaleString();
+                document.getElementById('count-trips').innerText = data.trips.toLocaleString();
+                document.getElementById('count-reviews').innerText = data.reviews.toLocaleString();
+
+                if (data.ar_views !== undefined) {
+                    document.getElementById('count-ar-views').innerText = data.ar_views.toLocaleString();
+                }
+
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        let globalVisitorData = [];
+
+        async function renderVisitorChart() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/monthly-visitors`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+
+                globalVisitorData = data.values;
+
+                updateMonthlySummary();
+
+                const ctx = document.getElementById('visitorChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'จำนวนผู้เข้าชม',
+                            data: data.values,
+                            borderColor: '#BF7E46',
+                            tension: 0.4,
+                            fill: true,
+                            backgroundColor: 'rgba(191, 126, 70, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                    callback: (value) => value.toLocaleString()
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // ฟังก์ชันทำงานเมื่อมีการเปลี่ยนตัวเลือกใน Dropdown
+        function updateMonthlySummary() {
+            const selector = document.getElementById('month-selector');
+            const display = document.getElementById('total-view-display');
+            const label = document.getElementById('summary-label');
+
+            const selectedValue = selector.value;
+
+            if (selectedValue === "all") {
+                // คำนวณรวมทั้งปี
+                const total = globalVisitorData.reduce((a, b) => a + b, 0);
+                label.innerText = "รวมการเข้าชมในปีนี้";
+                display.innerText = total.toLocaleString();
+            } else {
+                // ดึงเฉพาะเดือนที่เลือก
+                const monthIndex = parseInt(selectedValue);
+                const monthName = selector.options[selector.selectedIndex].text;
+                const monthlyTotal = globalVisitorData[monthIndex];
+
+                label.innerText = `ยอดการเข้าชมเดือน ${monthName}`;
+                display.innerText = monthlyTotal.toLocaleString();
+            }
+        }
+
+        async function renderPopularChart() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/popular-locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+
+                const ctx = document.getElementById('popularLocationChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar', // ใช้กราฟแท่ง
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'จำนวนรีวิว (ครั้ง)',
+                            data: data.values,
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.8)',
+                                'rgba(255, 205, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(153, 102, 255, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)',
+                                'rgb(153, 102, 255)'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 },
+                                title: { display: true, text: 'จำนวนรีวิว', font: { family: 'Noto Serif Thai' } }
+                            },
+                            y: {
+                                ticks: { font: { family: 'Noto Serif Thai' } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error rendering popular chart:', error);
+            }
+        }
+
+        async function fetchRecentActivities() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/recent-activities`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const logs = await res.json();
+
+                const logList = document.querySelector('.activity-list.log');
+                logList.innerHTML = '';
+
+                if (logs.length === 0) {
+                    logList.innerHTML = '<li><p>ยังไม่มีกิจกรรมล่าสุดในระบบ</p></li>';
+                    return;
+                }
+
+                logs.forEach(log => {
+                    const li = document.createElement('li');
+
+                    // เลือกไอคอนตามประเภทการกระทำ
+                    let icon = 'mdi:pencil';
+                    let iconClass = 'text-warning';
+
+                    if (log.action_type === 'Insert') {
+                        icon = 'mdi:plus-circle';
+                        iconClass = 'text-success';
+                    } else if (log.action_type === 'Delete') {
+                        icon = 'mdi:trash-can';
+                        iconClass = 'text-danger';
+                    } else if (log.action_type === 'Banned') {
+                        icon = 'mdi:gavel';
+                        iconClass = 'text-dark';
+                    }
+
+                    const timeFormatted = timeAgo(new Date(log.Log_Time));
+
+                    li.innerHTML = `
+                <div class="log-content" style="display: flex; align-items: start; gap: 10px; margin-bottom: 8px;">
+                    <iconify-icon icon="${icon}" class="${iconClass}" style="font-size: 1.2rem; margin-top: 3px;"></iconify-icon> 
+                    <div style="flex: 1;">
+                        <p style="margin: 0; font-size: 14px; line-height: 1.4;">
+                            <strong>${log.admin_name || 'แอดมิน'}</strong>: 
+                            ${log.description}
+                        </p>
+                        <small style="color: #888; font-size: 12px;">ตาราง: ${log.table_name} • ${timeFormatted}</small>
+                    </div>
+                </div>
+            `;
+                    logList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching recent activities:', error);
+            }
+        }
+        // ฟังก์ชันนับถังขยะ
+        async function fetchTrashCount() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/trash-count`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+                if (data.total > 0) {
+                    document.getElementById('trash-alert').style.display = 'flex';
+                    document.getElementById('trash-num').innerText = data.total;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // ฟังก์ชันวาดกราฟ AR (Pie Chart)
+        async function renderARChart() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/ar-engagement`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+
+                // ตรวจสอบข้อมูลและคำนวณยอดรวม
+                const values = data.values ? data.values.map(v => Number(v) || 0) : [];
+                const totalViews = values.reduce((a, b) => a + b, 0);
+                const insightText = document.getElementById('ar-insight-text');
+
+                if (!data || values.length === 0 || totalViews === 0) {
+                    insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในขณะนี้";
+                    if (window.arChartInst) { window.arChartInst.destroy(); }
+                    return;
+                }
+
+                const canvas = document.getElementById('arEngagementChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+
+                // หาค่าสูงสุด 
+                const topLocation = data.labels[0] || "ไม่ระบุชื่อ";
+                const topViews = values[0] || 0;
+                const percentage = ((topViews / totalViews) * 100).toFixed(1);
+
+                // แสดงสรุปใต้กราฟ
+                insightText.innerHTML = `สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของยอดวิวทั้งหมด)`;
+
+                // วาดกราฟ
+                if (window.arChartInst) { window.arChartInst.destroy(); }
+
+                const locationColors = {
+                    "Grandma's House": '#9966FF', 'Rest & Roll Cafe': '#AC92EC',
+                    'Thursday Espresso Prachuab': '#5D9CEC', 'ก๋วยเตี๋ยว 9 บาท': '#87ceeb',
+                    'คำโฮม': '#4BC0C0', 'ผัดไทยหัวบ้าน': '#49d87b',
+                    'พิพิธภัณฑ์บ้านอาจารย์ไก่': '#FF9F40', 'ศรีเสนาะคาเฟ่': '#FFCE56',
+                    'ศาลเจ้าพ่อหลักเมือง': '#f2ffb1', 'ศาลเล่าปุงเท้ากงม่า': '#FF6384',
+                    'สุดา คาเฟ่': '#EC87C0', 'หน้าหม้อ Coffee': '#B1A396'
+                };
+
+                window.arChartInst = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: data.labels.map(label => locationColors[label] || '#CCCCCC'),
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { font: { family: 'Noto Serif Thai' } } }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("AR Chart Error:", e);
+                document.getElementById('ar-insight-text').innerText = "ไม่สามารถโหลดข้อมูล AR ได้ในขณะนี้";
+            }
+        }
+
+        // ฟังก์ชันดึงข้อมูลรายงาน
+        async function fetchRecentReports() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/recent-reports`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const reports = await res.json();
+
+                const reportList = document.querySelector('.activity-list');
+                reportList.innerHTML = '';
+
+                if (reports.length === 0) {
+                    reportList.innerHTML = '<li><p>ไม่มีรายงานปัญหาค้างคาในขณะนี้</p></li>';
+                    return;
+                }
+
+                reports.forEach(report => {
+                    const li = document.createElement('li');
+                    const timeFormatted = timeAgo(new Date(report.created_at));
+
+                    li.innerHTML = `
+                <span class="status-badge pending">รอดำเนินการ</span>
+                <p>
+                    <strong>${report.reason_type}</strong>: ${report.description || 'ไม่มีรายละเอียด'} 
+                    <br>
+                    <small style="color: #888;">โดย: ${report.reporter_name} - <span>${timeFormatted}</span></small>
+                </p>
+            `;
+                    reportList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching recent reports:', error);
+            }
+        }
+
+        // ฟังก์ชันคำนวณเวลา 
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " ปีที่แล้ว";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " เดือนที่แล้ว";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " วันที่แล้ว";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " ชม. ที่แล้ว";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " นาทีที่แล้ว";
+            return "เมื่อครู่นี้";
+        }
+
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminName');
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

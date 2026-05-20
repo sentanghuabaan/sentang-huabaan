@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ของฉัน - เส้นทางหัวบ้าน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylelogin-register.css">
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="handleCloseProfile()">
+            <iconify-icon icon="icon-park-solid:error"></iconify-icon>
+        </button>
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+    </header>
+
+    <main class="login-content">
+        <h2 class="login-title">โปรไฟล์ของฉัน</h2>
+
+        <div class="profile-card">
+            <div class="profile-info-header">
+                <iconify-icon icon="bi:person-circle" class="profile-avatar"></iconify-icon>
+                <div class="user-details">
+                    <h3 id="displayUsername">Username</h3>
+                    <p id="displayEmail">email@example.com</p>
+                    <button class="edit-btn" id="editProfileBtn"
+                        onclick="location.href='edit-profile.html'">แก้ไขโปรไฟล์</button>
+                </div>
+            </div>
+
+            <div class="profile-menu">
+                <div class="profile-menu-item" onclick="location.href='my-trip.html'">
+                    <iconify-icon icon="uil:comment-alt-message"></iconify-icon>
+                    <span>ประวัติการวางแผนการเดินทาง</span>
+                    <iconify-icon icon="weui:arrow-filled"></iconify-icon>
+                </div>
+                <div class="profile-menu-item" onclick="location.href='my-reviews.html'" style="cursor: pointer;">
+                    <iconify-icon icon="uil:comment-alt-message"></iconify-icon>
+                    <span>ประวัติการแสดงความคิดเห็น</span>
+                    <iconify-icon icon="weui:arrow-filled"></iconify-icon>
+                </div>
+                <div class="profile-menu-item" onclick="location.href='my-ads.html'">
+                    <iconify-icon icon="material-symbols:ad-units-outline"></iconify-icon>
+                    <span>ประวัติการลงโฆษณา / กิจกรรม</span>
+                    <iconify-icon icon="weui:arrow-filled"></iconify-icon>
+                </div>
+            </div>
+
+            <button class="submit-btn logout-btn" id="logoutBtn">ออกจากระบบ</button>
+
+            <div id="logoutModal" class="modal-overlay">
+                <div class="modal-box">
+                    <iconify-icon icon="mdi:logout"
+                        style="font-size: 50px; color: #d9534f; margin-bottom: 15px;"></iconify-icon>
+                    <p>คุณต้องการออกจากระบบ <br> ใช่หรือไม่?</p>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <button class="modal-btn cancel-btn" onclick="closeLogoutModal()"
+                            style="background-color: #B1A396; flex: 1;">ยกเลิก</button>
+                        <button class="modal-btn" onclick="confirmLogout()"
+                            style="background-color: #d9534f; flex: 1;">ออกจากระบบ</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                const API_BASE_URL = 'http://localhost:3000';
+
+                function handleCloseProfile() {
+                    // เช็คขนาดหน้าจอ
+                    const isLargeScreen = window.innerWidth >= 768;
+
+                    if (isLargeScreen) {
+                        const referrer = document.referrer;
+
+                        // เช็คว่ามาจากหน้าย่อยในกลุ่ม profile หรือไม่ 
+                        const isFromInternalProfile =
+                            referrer.includes('my-trip.html') ||
+                            referrer.includes('my-reviews.html') ||
+                            referrer.includes('my-ads.html') ||
+                            referrer.includes('edit-profile.html');
+
+                        if (!referrer || isFromInternalProfile || referrer.includes('login.html')) {
+                            // ถ้ามาจากหน้าย่อยในโปรไฟล์ หรือไม่มีประวัติ ให้ "ดีด" กลับหน้าหลักของเว็บ
+                            location.href = '../index.html';
+                        } else {
+                            // ถ้ามาจากหน้าอื่นๆ ของเว็บ ให้กลับไปหน้านั้น
+                            history.back();
+                        }
+                    } else {
+                        // ถ้าเป็นมือถือ ให้กลับไปหน้าเมนู
+                        location.href = 'menu.html';
+                    }
+                }
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    const userDataStr = localStorage.getItem('user');
+                    const logoutModal = document.getElementById('logoutModal');
+
+                    if (userDataStr) {
+                        const user = JSON.parse(userDataStr);
+
+                        document.getElementById('displayUsername').textContent = user.username;
+                        document.getElementById('displayEmail').textContent = user.email;
+
+                        // --- เริ่มต้นส่วนการดึงรูปโปรไฟล์จากหลังบ้านมาแสดง ---
+                        const profileAvatar = document.querySelector('.profile-avatar');
+
+                        // ตรวจสอบคัดกรองลิงก์รูปภาพโปรไฟล์จริงจากในเครื่อง
+                        if (user.profile_img && profileAvatar) {
+
+                            const imgUrl = user.profile_img.startsWith('http')
+                                ? user.profile_img
+                                : `${API_BASE_URL}/${user.profile_img}`;
+
+                            if (profileAvatar.tagName === 'ICONIFY-ICON' || profileAvatar.tagName === 'I') {
+                                const newImg = document.createElement('img');
+                                newImg.src = imgUrl;
+                                newImg.className = 'profile-avatar';
+
+                                newImg.style.width = '80px';
+                                newImg.style.height = '80px';
+                                newImg.style.borderRadius = '50%';
+                                newImg.style.objectFit = 'cover';
+                                newImg.style.border = '2px solid #BF7E46';
+
+                                profileAvatar.parentNode.replaceChild(newImg, profileAvatar);
+                            } else {
+                                profileAvatar.src = imgUrl;
+                            }
+                        }
+                    } else {
+                        window.location.href = 'login.html';
+                    }
+
+                    document.getElementById('editProfileBtn').addEventListener('click', function () {
+                        window.location.href = 'edit-profile.html';
+                    });
+
+                    // เมื่อกดปุ่มออกจากระบบหลัก ให้แสดง Modal
+                    document.getElementById('logoutBtn').addEventListener('click', function () {
+                        logoutModal.style.display = 'flex';
+                    });
+
+                    // ฟังก์ชันปิด Modal (เมื่อกดยกเลิก)
+                    window.closeLogoutModal = function () {
+                        logoutModal.style.display = 'none';
+                    }
+
+                    // ฟังก์ชันยืนยันการออกจากระบบ
+                    window.confirmLogout = function () {
+                        localStorage.removeItem('user');
+                        window.location.href = '../index.html';
+                    }
+                });
+            </script>
+</body>
+
+</html>

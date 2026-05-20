@@ -1,0 +1,403 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: #FBEDD6;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+/* --- Header Style (Standardized) --- */
+.login-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0px;
+    background-color: #FBEDD6;
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.login-logo {
+    width: 180px;
+    height: auto;
+    display: block;
+}
+
+.close-btn {
+    position: absolute;
+    top: 55px;
+    left: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.close-btn iconify-icon {
+    font-size: 38px;
+    color: #000;
+}
+
+.header-divider {
+    width: 100%;
+    height: 1px;
+    background-color: #B1A396;
+    margin-top: 10px;
+    opacity: 0.6;
+}
+
+/* reviews */
+img {
+    max-width: 40%;
+    height: auto;
+}
+
+.review-container {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: -10px;
+}
+
+.review-content {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.review-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* ปุ่ม Sort by */
+.review-filter-section {
+
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.custom-select-wrapper {
+    position: relative;
+    width: 140px;
+    user-select: none;
+}
+
+/* ส่วนหัวที่โชว์ค่าปัจจุบัน */
+.select-trigger {
+    background-color: #BF7E46;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.select-options {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.option {
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background-color: #FBEDD6;
+    color: #BF7E46;
+}
+
+/* เมื่อ Select เปิดอยู่ */
+.custom-select-wrapper.open .select-options {
+    display: block;
+}
+
+.custom-select-wrapper.open iconify-icon {
+    transform: rotate(180deg);
+}
+
+
+/* การ์ดรีวิวแต่ละอัน */
+.review-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
+.activity-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.location-info {
+    display: flex;
+    align-items: center;
+    color: #B18254;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    gap: 4px;
+}
+
+.location-info iconify-icon {
+    color: #BF7E46;
+}
+
+.location-info span {
+    color: #BF7E46;
+    font-weight: bold;
+}
+
+/* ดาว */
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 15px 0;
+}
+
+.star-icon {
+    font-size: 24px;
+    color: #FFB800;
+}
+
+
+/* รูปภาพในรีวิว */
+.review-images-grid {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.review-images-grid img {
+    flex: 0 0 120px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+.review-images-grid::-webkit-scrollbar {
+    display: none;
+}
+
+/* ข้อความรีวิว */
+.review-description {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: #000;
+}
+
+.logo-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+}
+
+@media (min-width: 768px) {
+    .mobile-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        background-color: #FBEDD6 !important;
+    }
+
+    .login-header {
+        width: 100%;
+        max-width: 800px;
+        margin: 50px auto 0;
+    }
+
+    .logo-wrapper {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: -20px;
+        margin-bottom: 0px;
+        text-align: center;
+    }
+
+    .login-logo {
+        width: 200px;
+        max-width: 200px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .review-container {
+        max-width: 1100px !important;
+        width: 90% !important;
+        margin: 20px auto !important;
+    }
+
+    .review-title {
+        font-size: 32px !important;
+        margin-top: 20px !important;
+        color: #503620;
+        text-align: center;
+    }
+
+    #reviewList {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 20px !important;
+        padding: 20px !important;
+    }
+
+    .review-card {
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 30px !important;
+        background: #FFFFFF !important;
+        border-radius: 15px !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* ปรับขนาดตัวอักษรเนื้อหารีวิว */
+    .review-description {
+        font-size: 16px !important;
+        line-height: 1.8 !important;
+        color: #4A4A4A;
+    }
+
+    /* ปรับปรุงโครงสร้าง Timeline */
+    .timeline-item {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .info-column {
+        flex: 1;
+    }
+
+    /* ปรับขนาดรูปภาพพรีวิว */
+    .review-images-grid img,
+    .trip-preview-img {
+        width: 150px !important;
+        height: 150px !important;
+        object-fit: cover !important;
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin: 0 !important;
+    }
+
+    .review-images-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 12px !important;
+        margin: 10px 0 0 0 !important;
+        flex-wrap: wrap !important;
+    }
+
+    .review-images-grid img {
+        width: 100% !important;
+        height: 100px !important;
+        object-fit: cover !important;
+        border-radius: 10px !important;
+    }
+
+    /* ปรับส่วน Filter */
+    .review-filter-section {
+        max-width: 800px;
+        margin: 0 auto 20px !important;
+    }
+
+    /* ปรับปุ่มปิด/ย้อนกลับ */
+    .close-btn {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+    }
+
+    .close-btn iconify-icon {
+        font-size: 40px !important;
+    }
+
+    .select-trigger {
+        font-size: 18px;
+        margin-top: -20px;
+    }
+
+    .option {
+        font-size: 16px;
+    }
+
+}

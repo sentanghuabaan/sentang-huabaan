@@ -1,0 +1,542 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: #FBEDD6;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+
+.login-header {
+    position: relative;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 60px;
+    left: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+    color: #8B5A2B;
+}
+
+.login-logo {
+    max-width: 180px;
+    height: auto;
+}
+
+/* Main Content */
+
+.login-content {
+    padding: 5px 20px;
+    flex-grow: 1;
+}
+
+.login-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: #333;
+    margin-top: -10px;
+    padding: 18px 0;
+    border-bottom: 1px solid #B1A396;
+    width: calc(100% + 40px);
+    margin-left: -20px;
+    margin-right: -20px;
+}
+
+/* Form Styles */
+
+#registerForm,
+#otpForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    width: 100%;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 20px 20px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background-color: #fff;
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:hover {
+    border: 2px solid #B1A396;
+}
+
+.input-group input:focus {
+    border: 2px solid #BF7E46;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(139, 90, 43, 0.2);
+}
+
+.password-group {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+}
+
+.toggle-password iconify-icon {
+    font-size: 24px;
+    color: #000;
+}
+
+.error-text {
+    color: #d9534f;
+    font-size: 16px;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+}
+
+.input-error {
+    border: 2px solid #d9534f !important;
+    background-color: #fff1f0 !important;
+}
+
+.forgot-password-link {
+    text-align: right;
+    margin-top: -5px;
+    color: #888888;
+    font-size: 14px;
+}
+
+.forgot-link {
+    color: #0056b3;
+    text-decoration: none;
+    font-size: 14px;
+    font-family: 'Noto Serif Thai', serif;
+    transition: color 0.3s ease;
+}
+
+.forgot-link:hover {
+    color: #051e36;
+    text-decoration: none;
+}
+
+.submit-btn {
+    background-color: #97C2DD;
+    color: #333;
+    padding: 20px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: opacity 0.2s;
+}
+
+.submit-btn:active {
+    opacity: 0.8;
+}
+
+/* Modal Overlay */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-box {
+    background-color: #FBEDD6;
+    padding: 30px;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-box p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+/* ปุ่มใน Modal */
+
+.modal-btn {
+    background-color: #BF7E46;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Noto Serif Thai', serif;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.modal-btn:hover {
+    background-color: #8B5A2B;
+}
+
+/* Register Prompt */
+
+.register-prompt {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.register-prompt a {
+    color: #008CD9;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+/* Profile Styles */
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.profile-info-header {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-left: 30px;
+    padding-bottom: 20px;
+}
+
+.profile-avatar {
+    font-size: 80px;
+    color: #000;
+}
+
+.user-details h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.user-details p {
+    margin: 5px 0 20px;
+    font-size: 14px;
+    color: #444;
+}
+
+.edit-btn {
+    background-color: #BF7E46;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-menu {
+    margin: 15px;
+    border-top: 1px solid #B1A396;
+}
+
+.profile-menu :hover {
+    color: #4e4e4e;
+    transition: background 0.2s;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #B1A396;
+    font-size: 16px;
+    color: #000;
+    cursor: pointer;
+}
+
+.profile-menu-item span {
+    flex-grow: 1;
+}
+
+.profile-menu-item iconify-icon {
+    font-size: 25px;
+}
+
+.logout-btn {
+    background-color: #97C2DD !important;
+    margin-top: 40px;
+}
+
+.cancel-btn:hover {
+    background-color: #8E8379 !important;
+}
+
+.modal-btn {
+    padding: 12px !important;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* --- ส่วน CSS สำหรับปุ่ม Google Login --- */
+
+.google-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 330px;
+    height: 70px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Noto Serif Thai', sans-serif;
+    font-size: 20px;
+    color: #374151;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s;
+    margin: 40px auto 0;
+    cursor: pointer;
+}
+
+.google-login-btn:hover {
+    background-color: #fff9ed;
+}
+
+.google-login-btn:active {
+    background-color: #fcf9f3;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.google-icon {
+    font-size: 30px;
+    margin-right: 20px;
+}
+
+/* --- CSS สำหรับหน้า OTP --- */
+
+.otp-inputs-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 30px 0;
+    background: none !important;
+    border: none !important;
+}
+
+.otp-field {
+    width: 40px;
+    height: 50px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+    font-family: 'Noto Serif Thai', sans-serif;
+}
+
+.otp-instruction {
+    text-align: center;
+    font-size: 18px;
+}
+
+#otpForm .login-title {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.verify-btn {
+    display: block;
+    height: 50px;
+    background-color: #41CA57;
+    margin-top: 20px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin: 20px auto 10px;
+}
+
+.verify-btn:hover {
+    background-color: #36b14b;
+    transition: background-color 0.2s;
+}
+
+.back-link-btn {
+    display: block;
+    margin: 0 auto;
+    margin-top: 20px;
+    background-color: #BF7E46;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.back-link-btn:hover {
+    background-color: #a56c36;
+    transition: background-color 0.2s;
+}
+
+.instruction-text {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.reset-finish-btn {
+    background-color: #41CA57 !important;
+    color: white !important;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+#resetPasswordForm .input-group {
+    margin-bottom: 10px;
+}
+
+.error-text {
+    color: #d9534f;
+    font-size: 14px;
+    text-align: center;
+    padding-left: 5px;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    /* ความกว้างของส่วนเนื้อหา */
+    .login-content {
+        width: 100%;
+        max-width: 500px;
+        background-color: #fff;
+        margin: 20px auto 40px;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        flex-grow: 0;
+    }
+
+    /*  Header และปุ่มปิด */
+    .logo-wrapper {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: -20px;
+        margin-bottom: 0px;
+        text-align: center;
+    }
+
+    /* ปรับขนาดโลโก้ */
+    .login-logo {
+        width: 200px;
+        max-width: 200px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .login-header {
+        width: 100%;
+        max-width: 500px;
+        margin: 50px auto 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+    .close-btn {
+        position: fixed;
+        top: 50px;
+        left: 50px;
+    }
+
+    .close-btn iconify-icon {
+        font-size: 30px;
+    }
+
+    /* หัวข้อ */
+    .login-title {
+        border-bottom: none;
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        font-size: 32px;
+    }
+
+    .input-group input {
+        border: 1px solid #000;
+    }
+
+    /* ปรับขนาดปุ่ม Google  */
+    .google-login-btn {
+        margin-top: 30px;
+        height: 60px;
+    }
+}

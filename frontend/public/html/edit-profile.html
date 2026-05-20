@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แก้ไขโปรไฟล์ - เส้นทางหัวบ้าน</title>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/style-editprofile.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <a href="profile.html" class="back-btn">
+                <iconify-icon icon="ion:chevron-back-outline"></iconify-icon>
+            </a>
+            <div class="logo-wrapper">
+                <img src="../image/logohuabaan.png" alt="โลโก้" class="logo">
+            </div>
+            <div class="header-spacer"></div>
+        </div>
+
+        <h2>แก้ไขโปรไฟล์</h2>
+
+        <div class="profile-img-container" onclick="document.getElementById('fileInput').click()">
+            <div class="avatar">
+                <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/1144/1144760.png" alt="Profile">
+            </div>
+            <div class="camera-icon-wrapper">
+                <iconify-icon icon="solar:camera-bold" style="font-size: 24px;"></iconify-icon>
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" onchange="previewImage(event)" style="display: none;">
+
+        <div class="form-group">
+            <label>ชื่อ</label>
+            <input type="text" id="username" value="">
+        </div>
+
+        <div class="form-group">
+            <label>อีเมล</label>
+            <input type="email" id="email" value="" readonly style="background-color: #f0f0f0;">
+        </div>
+
+        <button class="save-btn" onclick="updateProfile()">บันทึก</button>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        let selectedFile = null;
+
+        async function loadUserProfile() {
+            const userData = JSON.parse(localStorage.getItem('user'));
+
+            if (userData) {
+                document.getElementById('username').value = userData.username;
+                document.getElementById('email').value = userData.email;
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    document.getElementById('profilePreview').src = imgUrl;
+                } else {
+                    document.getElementById('profilePreview').src = "https://cdn-icons-png.flaticon.com/512/1144/1144760.png";
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        window.onload = loadUserProfile;
+
+        // --- ฟังก์ชันเลือกรูปจากเครื่องและพรีวิว ---
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+
+                const reader = new FileReader();
+                reader.onload = function () {
+                    document.getElementById('profilePreview').src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- ฟังก์ชันส่งข้อมูลไปอัปเดตที่ Backend ---
+        async function updateProfile() {
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const userData = JSON.parse(localStorage.getItem('user'));
+
+            const userToken = localStorage.getItem('userToken');
+
+            // Alert เตือนเมื่อไม่ได้กรอกชื่อ
+            if (!username.trim()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกชื่อผู้ใช้',
+                    confirmButtonColor: '#B08968',
+                    background: '#FBEDD6',
+                    color: '#5C4033',
+                    customClass: {
+                        popup: 'my-swal-popup'
+                    }
+                });
+                return;
+            }
+
+            // Alert กำลังบันทึกข้อมูล
+            Swal.fire({
+                title: 'กำลังบันทึกข้อมูล...',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                background: '#FBEDD6',
+                color: '#5C4033',
+                customClass: {
+                    popup: 'my-swal-popup'
+                },
+                didOpen: () => {
+                    Swal.showLoading();
+                    const loader = document.querySelector('.swal2-loader');
+                    if (loader) {
+                        loader.style.borderTopColor = '#B08968';
+                    }
+                }
+            });
+
+            try {
+                const formData = new FormData();
+                formData.append('user_id', userData.user_id);
+                formData.append('new_username', username);
+                formData.append('new_email', email);
+
+                if (selectedFile) {
+                    formData.append('profile_img', selectedFile);
+                }
+
+                const response = await fetch(`${API_BASE_URL}/api/update-profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    userData.username = username;
+                    userData.email = email;
+
+                    if (data.profile_img) {
+                        userData.profile_img = data.profile_img;
+                    }
+
+                    localStorage.setItem('user', JSON.stringify(userData));
+
+                    // Alert บันทึกสำเร็จ
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ!',
+                        text: 'ข้อมูลโปรไฟล์ของคุณถูกอัปเดตแล้ว',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#B08968',
+                        background: '#FBEDD6',
+                        color: '#5C4033',
+                        iconColor: '#A2EB4F',
+                        customClass: {
+                            popup: 'my-swal-popup'
+                        }
+                    }).then(() => {
+                        window.location.href = 'profile.html';
+                    });
+
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error("Update Error:", error);
+
+                // Alert เกิดข้อผิดพลาด
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: error.message || 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#d9534f',
+                    background: '#FBEDD6',
+                    color: '#5C4033',
+                    customClass: {
+                        popup: 'my-swal-popup'
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

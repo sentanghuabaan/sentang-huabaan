@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Banners Ads - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item active"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2 class="page-title">BANNER ADS MANAGEMENT</h2>
+
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="ค้นหาหัวข้อโฆษณา..." id="bannerSearch"
+                        onkeyup="filterBannerTable()">
+                </div>
+
+                <div class="custom-filter-wrapper">
+                    <div class="filter-display" onclick="toggleDropdown('statusFilterOptions')">
+                        <iconify-icon icon="mdi:list-status" class="filter-icon"></iconify-icon>
+                        <span id="currentStatusText">Status</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="statusFilterOptions">
+                        <div class="f-option" onclick="applyFilter('status', 'all', 'All Status')">All Status</div>
+                        <div class="f-option" onclick="applyFilter('status', 'pending', 'Pending')">Pending</div>
+                        <div class="f-option" onclick="applyFilter('status', 'approved', 'Approved')">Approved</div>
+                        <div class="f-option" onclick="applyFilter('status', 'rejected', 'Rejected')">Rejected</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>จัดการ</th>
+                            <th>รูปภาพ</th>
+                            <th>หัวข้อ / รายละเอียด</th>
+                            <th>ผู้ลงโฆษณา</th>
+                            <th>วันที่แสดงผล</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bannerData"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) { window.location.href = 'admin_login.html'; }
+
+            // ฟังก์ชันเปิด/ปิด Dropdown
+            function toggleDropdown(id) {
+                document.querySelectorAll('.filter-options').forEach(opt => {
+                    if (opt.id !== id) opt.classList.remove('show');
+                });
+                document.getElementById(id).classList.toggle('show');
+            }
+
+            // ฟังก์ชันเลือกค่าจาก Filter
+            function applyFilter(type, value, text) {
+                if (type === 'status') {
+                    document.getElementById('currentStatusText').innerText = text;
+                }
+                document.querySelectorAll('.filter-options').forEach(opt => opt.classList.remove('show'));
+                filterBannerTable();
+            }
+
+            // ฟังก์ชันหลักในการกรองตาราง
+            function filterBannerTable() {
+                const searchText = document.getElementById("bannerSearch").value.toLowerCase();
+                const statusFilter = document.getElementById("currentStatusText").innerText.toLowerCase();
+
+                const rows = document.querySelectorAll("#bannerData tr");
+
+                rows.forEach(row => {
+                    // ดึงข้อความทั้งหมดในแถวเพื่อค้นหา
+                    const rowText = row.innerText.toLowerCase();
+
+                    // ดึงสถานะ
+                    const statusBadge = row.cells[5].querySelector('.badge');
+                    const rowStatus = statusBadge ? statusBadge.innerText.toLowerCase().trim() : "";
+
+                    // เช็คเงื่อนไขค้นหา
+                    const matchesSearch = rowText.includes(searchText);
+
+                    // เช็คเงื่อนไขสถานะ
+                    const matchesStatus = (statusFilter === "status" || statusFilter === "all status") || rowStatus === statusFilter;
+
+                    // แสดงแถวเฉพาะที่ตรงทั้งสองเงื่อนไข
+                    if (matchesSearch && matchesStatus) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            // ปิด Dropdown เมื่อคลิกข้างนอก 
+            window.onclick = function (event) {
+                if (!event.target.closest('.custom-filter-wrapper')) {
+                    document.querySelectorAll('.filter-options').forEach(opt => opt.classList.remove('show'));
+                }
+            }
+
+            async function fetchBanners() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/banners/all`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+
+                    const banners = await response.json();
+                    const tbody = document.getElementById('bannerData');
+
+                    tbody.innerHTML = banners.map(b => {
+                        let bannerImgUrl = "";
+                        if (b.image_url) {
+                            bannerImgUrl = b.image_url.trim().startsWith('http')
+                                ? b.image_url.trim()
+                                : `${API_BASE_URL}/${b.image_url.trim()}`;
+                        } else {
+                            bannerImgUrl = '../image/logohuabaan2.png';
+                        }
+
+                        return `
+                        <tr>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="manage-btn" onclick="manageBanner(${b.banner_id}, '${b.title}')">
+                                        <iconify-icon icon="mdi:cog"></iconify-icon> Manage
+                                    </button>
+                                    <button class="delete-btn" onclick="softDeleteBanner(${b.banner_id})">
+                                        <iconify-icon icon="mdi:trash-can"></iconify-icon> Delete
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <img src="${bannerImgUrl}" class="banner-img-preview" 
+                                    onclick="window.open(this.src)" title="คลิกเพื่อดูรูปใหญ่" onerror="this.src='../image/logohuabaan2.png'">
+                            </td>
+                            <td>
+                                <div style="text-align: left;">
+                                    <strong style="color: #8B5A2B; font-size: 16px;">${b.title}</strong><br>
+                                    <small style="color: #666;">${b.description || '-'}</small>
+                                </div>
+                            </td>
+                            <td style="font-weight: bold; color: #444;">ID: ${b.banner_id}</td>
+                            <td>
+                                <div style="font-size: 13px; color: #555;">
+                                    <div><iconify-icon icon="mdi:calendar-start"></iconify-icon> ${new Date(b.start_date).toLocaleDateString('th-TH')}</div>
+                                    <div><iconify-icon icon="mdi:calendar-end"></iconify-icon> ${new Date(b.end_date).toLocaleDateString('th-TH')}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: ${getStatusColor(b.status)}; padding: 6px 12px; border-radius: 20px; color: white; font-size: 12px;">
+                                    ${b.status.toUpperCase()}
+                                </span>
+                                ${b.status === 'rejected' && b.admin_note ?
+                                `<div style="font-size: 11px; color: #d9534f; margin-top: 5px; width: 120px; word-wrap: break-word;">
+                                        เหตุผล: ${b.admin_note}
+                                    </div>` : ''
+                            }
+                            </td>
+                        </tr>
+                    `;
+                    }).join('');
+                } catch (err) {
+                    console.error("Error fetching banners:", err);
+                }
+            }
+
+            async function manageBanner(id, title) {
+                const { value: formValues } = await Swal.fire({
+                    title: 'จัดการโฆษณา',
+                    html:
+                        `<div style="text-align:left; font-size:14px; margin-bottom:5px;">สถานะ:</div>` +
+                        `<select id="swal-status" class="swal2-input" style="width:80%; margin-top:0;">
+                            <option value="approved">อนุมัติ (Approved)</option>
+                            <option value="rejected" selected>ปฏิเสธ (Rejected)</option>
+                            <option value="pending">รอตรวจสอบ (Pending)</option>
+                        </select>` +
+                        `<div style="text-align:left; font-size:14px; margin-bottom:5px; margin-top:15px;">หมายเหตุ (จำเป็นเมื่อปฏิเสธ):</div>` +
+                        `<textarea id="swal-note" class="swal2-textarea" placeholder="ระบุเหตุผลที่โฆษณาไม่ผ่าน..." style="width:80%;"></textarea>`,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึกข้อมูล',
+                    confirmButtonColor: '#BF7E46',
+                    preConfirm: () => {
+                        const status = document.getElementById('swal-status').value;
+                        const note = document.getElementById('swal-note').value.trim();
+
+                        if (status === 'rejected' && !note) {
+                            Swal.showValidationMessage('กรุณาระบุเหตุผลที่ปฏิเสธโฆษณาชิ้นนี้ด้วย');
+                            return false;
+                        }
+
+                        return {
+                            status: status,
+                            admin_note: note
+                        }
+                    }
+                });
+
+                if (formValues) {
+                    try {
+                        const res = await fetch(`${API_BASE_URL}/api/banners/status/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formValues)
+                        });
+
+                        if (res.ok) {
+                            Swal.fire({
+                                title: 'สำเร็จ!',
+                                text: 'อัปเดตข้อมูลและแจ้งหมายเหตุเรียบร้อย',
+                                icon: 'success',
+                                confirmButtonColor: '#BF7E46'
+                            });
+                            fetchBanners();
+                        }
+                    } catch (error) {
+                        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+                    }
+                }
+            }
+
+            function getStatusColor(status) {
+                switch (status) {
+                    case 'approved': return '#4CAF50';
+                    case 'rejected': return '#F44336';
+                    default: return '#FF9800';
+                }
+            }
+
+            async function softDeleteBanner(id) {
+                const { isConfirmed } = await Swal.fire({
+                    title: 'ยืนยันการลบ?',
+                    text: "โฆษณานี้จะถูกย้ายไปที่ถังขยะ และบันทึก ID ของคุณเป็นผู้ลบ",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF6B6B',
+                    cancelButtonColor: '#A5A5A5',
+                    confirmButtonText: 'ลบข้อมูล',
+                    cancelButtonText: 'ยกเลิก'
+                });
+
+                if (isConfirmed) {
+                    const adminId = localStorage.getItem('adminId') || 0;
+
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/banners/delete/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ admin_id: adminId })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire('ลบแล้ว!', 'ข้อมูลถูกย้ายไปที่ถังขยะเรียบร้อย', 'success');
+                            fetchBanners();
+                        }
+                    } catch (error) {
+                        Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์', 'error');
+                    }
+                }
+            }
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = fetchBanners;
+
+            window.addEventListener("DOMContentLoaded", () => {
+                // หาเมนูตัวที่มีคลาส active อยู่
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    // สั่งให้เลื่อนมาแสดงตรงกลางแถบ Sidebar 
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

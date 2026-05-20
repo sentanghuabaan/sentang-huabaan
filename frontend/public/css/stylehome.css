@@ -1,0 +1,802 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: #FBEDD6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Header */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #FBEDD6;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-logo {
+    display: block;
+    width: 166px;
+    margin-top: 0;
+}
+
+.menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 25px;
+    transition: transform 0.2s;
+}
+
+.menu-trigger iconify-icon {
+    font-size: 45px;
+    color: #BF7E46;
+}
+
+.menu-trigger:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+/* Hero Banner */
+.hero-banner {
+    position: relative;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../image/banner-bg.png');
+    background-size: cover;
+    background-position: center;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.banner-content {
+    width: 100%;
+    padding-right: 25px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.banner-content h3 {
+    font-size: 24px;
+    margin-top: 5px;
+    margin-bottom: -5px;
+    color: #FBEDD6;
+}
+
+.banner-content p {
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.read-more {
+    background-color: #BF7E46;
+    color: #FBEDD6;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Floating Camera Icon */
+.camera-icon-wrapper {
+    position: absolute;
+    bottom: -30px;
+    top: 325px;
+    right: 10px;
+    background-color: #BF7E46;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ส่วนของกล่องข้อความ */
+.camera-icon-wrapper::before {
+    content: "แสกนดูเรื่องราวที่นี่";
+    position: absolute;
+    right: 85px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #B1A396;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    animation: bounceHorizontal 2s infinite;
+}
+
+/* ส่วนของลูกศร */
+.camera-icon-wrapper::after {
+    content: "";
+    position: absolute;
+    right: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 15px solid #B1A396;
+    z-index: 10;
+    animation: bounceHorizontal 2s infinite;
+}
+
+/* Animation ให้ขยับชี้ไปทางขวาเบาๆ */
+@keyframes bounceHorizontal {
+
+    0%,
+    100% {
+        transform: translateY(-50%) translateX(0);
+    }
+
+    50% {
+        transform: translateY(-50%) translateX(8px);
+    }
+}
+
+
+.camera-float {
+    font-size: 45px;
+    color: #FBEDD6;
+}
+
+/* Banner AR */
+/* Container หลักของ Slider */
+.hero-slider {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.slider-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.slider-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.slide-item {
+    min-width: 100%;
+    height: 220px;
+    scroll-snap-align: start;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.ar-banner-slide {
+    background: linear-gradient(rgba(80, 54, 32, 0.6), rgba(80, 54, 32, 0.6)),
+        url('../image/community-blur.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+}
+
+.ar-style {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 0 20px;
+}
+
+.ar-style {
+    text-align: left !important;
+    align-items: flex-start !important;
+    padding-left: 25px !important;
+}
+
+.ar-tag {
+    background: #BF7E46;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    margin-bottom: 5px;
+}
+
+/* จุดบอกตำแหน่ง (Dots) */
+.slider-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.s-dot {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+}
+
+.s-dot.active {
+    background: white;
+    width: 20px;
+    border-radius: 10px;
+}
+
+/* Places Grid */
+.home-main {
+    padding: 20px 35px 10px;
+    background-color: #FBEDD6;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #503620;
+}
+
+.places-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.place-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 160px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.place-card:active {
+    transform: scale(0.97);
+}
+
+.place-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.place-label {
+    position: absolute;
+    bottom: 6px;
+    width: 92%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.80);
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    border-radius: 10px;
+    padding: 8px 5px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* community_gallery */
+.gallery-section {
+    background-color: #97C6E0;
+    padding: 10px 0;
+    margin-top: 30px;
+    text-align: center;
+}
+
+.gallery-title {
+    margin: 15px 0 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background-color: transparent;
+}
+
+.gallery-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+}
+
+.gallery-slider {
+    display: flex;
+    gap: 30px;
+    padding: 0 20px;
+}
+
+.gallery-item {
+    flex: 0 0 80%;
+    scroll-snap-align: center;
+    position: relative;
+    height: 200px;
+    border: 2px solid #333;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item.focused {
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    margin-top: 5px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: #888482;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background-color: #503620;
+}
+
+/* banners */
+/* Section & Layout */
+.ad-banner-section {
+    padding: 0 20px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+/* ปุ่มเพิ่มโฆษณา */
+.add-ad-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #fdf5e6;
+    border: 1.5px dashed #d4a373;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-ad-prompt:active {
+    transform: scale(0.98);
+    background-color: #f5ead8;
+}
+
+.add-ad-prompt iconify-icon {
+    font-size: 24px;
+    color: #BF7E46;
+}
+
+.add-ad-prompt span {
+    font-family: 'Noto Serif Thai', serif;
+    font-size: 14px;
+    color: #8B5A2B;
+    font-weight: bold;
+}
+
+/* Slider สำหรับการ์ดโฆษณา */
+.banner-slider-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+#banner-slider {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 15px;
+    padding: 10px 5px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+#banner-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.ad-card {
+    min-width: 85%;
+    height: 160px;
+    border-radius: 15px;
+    scroll-snap-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.ad-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ad-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    color: white;
+    padding: 15px;
+}
+
+.ad-info h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.ad-info p {
+    margin: 5px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+/* Modal สำหรับกรอกข้อมูล */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    width: 85%;
+    border-radius: 15px;
+}
+
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.submit-btn {
+    background: #d4a373;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#adForm input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #BF7E46;
+}
+
+#adForm label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    color: #8B5A2B;
+}
+
+.swal2-popup {
+    width: 85% !important;   
+    max-width: 340px !important;  
+    padding: 25px 20px !important;  
+    border-radius: 16px !important;
+}
+
+.swal2-icon {
+    transform: scale(0.85) !important; 
+    margin-top: 10px !important;
+    margin-bottom: 5px !important;
+}
+
+.swal2-title {
+    font-size: 20px !important;   
+    font-weight: bold !important;
+    margin-top: 10px !important;
+    padding: 0 !important;
+}
+
+.swal2-html-container {
+    font-size: 15px !important;  
+    line-height: 1.5 !important;
+    margin-top: 8px !important;
+    padding: 0 5px !important;
+}
+
+.swal2-actions {
+    margin-top: 20px !important;
+}
+
+.swal2-confirm {
+    font-size: 16px !important;
+    padding: 8px 35px !important; 
+    border-radius: 8px !important;
+}
+
+/* Custom Alert */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-box {
+    background-color: #FBEDD6;
+    padding: 30px;
+    border-radius: 15px;
+    width: 85%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-box p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.modal-btn {
+    background-color: #BF7E46;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+
+    /* logo */
+    .home-header img {
+        width: 200px;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+        height: 330px;
+        justify-content: flex-end;
+    }
+
+    .banner-content {
+        padding-right: 50px;
+        max-width: 500px;
+    }
+
+    .banner-content h3 {
+        font-size: 32px;
+    }
+
+    .banner-content p {
+        font-size: 17px;
+    }
+
+    .read-more {
+        font-size: 15px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+
+    /* AR */
+    .camera-icon-wrapper::before {
+        font-size: 16px;
+    }
+
+    .camera-icon-wrapper {
+        position: absolute;
+        top: 400px;
+        right: 40px;
+    }
+
+    /* ปรับปรุงส่วน Banner AR */
+    .slide-item.ar-banner-slide {
+        height: 330px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 60px;
+    }
+
+    .banner-content.ar-style {
+        width: 100%;
+        max-width: 700px;
+        height: 260px;
+        padding: 20px;
+        margin-left: 0;
+        margin-right: auto;
+        border-radius: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .ar-style span {
+        font-size: 16px;
+    }
+
+    .ar-style h3 {
+        font-size: 32px;
+    }
+
+    .ar-style p {
+        font-size: 17px;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    /* Popup ของ SweetAlert2 */
+    .swal2-popup {
+        max-width: 450px !important;
+        padding: 30px !important;    
+        border-radius: 20px !important; 
+    }
+
+    .swal2-title {
+        font-size: 26px !important;
+        font-weight: bold !important;
+        color: #5C4033 !important;  
+        margin-top: 15px !important;
+    }
+
+    .swal2-html-container {
+        font-size: 17px !important;
+        line-height: 1.6 !important;
+        color: #705335 !important;
+        margin-top: 10px !important;
+    }
+
+    .swal2-actions {
+        margin-top: 25px !important;
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .swal2-confirm {
+        font-size: 17px !important;
+        padding: 10px 45px !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* สถานที่ & กิจกรรม */
+    .home-main {
+        padding: 40px 60px;
+    }
+
+    .places-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+
+    .place-card {
+        height: 200px;
+    }
+
+    .place-label {
+        font-size: 14px;
+    }
+
+    /* Ad Banner */
+    .add-ad-prompt span {
+        font-size: 16px;
+    }
+
+    .ad-card {
+        min-width: 45%;
+        height: 200px;
+    }
+
+    .add-ad-prompt {
+        max-width: 600px;
+        margin: 0 auto 20px;
+    }
+
+    .ad-info p {
+        font-size: 15px;
+    }
+
+    /* Gallery */
+    .gallery-title {
+        font-size: 24px;
+    }
+
+    .gallery-item {
+        flex: 0 0 55%;
+        height: 250px;
+    }
+
+    .gallery-item.focused {
+        transform: scale(1.05);
+    }
+}

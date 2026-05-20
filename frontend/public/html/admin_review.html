@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Review - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item active"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2 class="page-title">REVIEW MANAGEMENT</h2>
+
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label><iconify-icon icon="ion:location-sharp"></iconify-icon> กรองตามสถานที่:</label>
+                    <select id="filterLocation" onchange="applyFilters()">
+                        <option value="all">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><iconify-icon icon="lets-icons:date-fill"></iconify-icon> กรองตามกิจกรรม:</label>
+                    <select id="filterActivity" onchange="applyFilters()">
+                        <option value="all">ทั้งหมด</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><iconify-icon icon="material-symbols:star"></iconify-icon> กรองตามคะแนน:</label>
+                    <select id="filterRating" onchange="applyFilters()">
+                        <option value="all">ทั้งหมด</option>
+                        <option value="5">5 ดาว</option>
+                        <option value="4">4 ดาว</option>
+                        <option value="3">3 ดาว</option>
+                        <option value="2">2 ดาว</option>
+                        <option value="1">1 ดาว</option>
+                    </select>
+                </div>
+                <button class="reset-btn" onclick="resetFilters()">ล้างค่า</button>
+            </div>
+
+            <div class="table-container">
+                <table id="reviewTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>User</th>
+                            <th>Location</th>
+                            <th>Activity</th>
+                            <th>Rating</th>
+                            <th>Text Preview</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewData">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <div id="reviewModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2 style="color: #BF7E46;">รายละเอียดรีวิว</h2>
+                <hr>
+                <p><strong>ผู้ใช้:</strong> <span id="modalUser"></span></p>
+                <p><strong>สถานที่:</strong> <span id="modalLoc"></span></p>
+                <p><strong>กิจกรรม:</strong> <span id="modalAct"></span></p>
+                <p><strong>คะแนน:</strong> <span id="modalRating"></span></p>
+                <p><strong>วันที่รีวิว:</strong> <span id="modalDate"></span></p>
+                <p><strong>เนื้อหา:</strong></p>
+                <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin-top: 10px;">
+                    <p id="fullReviewText"></p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            let allReviews = [];
+
+            async function loadFilterOptions() {
+                try {
+                    const [locRes, actRes] = await Promise.all([
+                        fetch(`${API_BASE_URL}/api/locations`, { headers: { 'Authorization': `Bearer ${adminToken}` } }),
+                        fetch(`${API_BASE_URL}/api/activities`, { headers: { 'Authorization': `Bearer ${adminToken}` } })
+                    ]);
+
+                    const locations = await locRes.json();
+                    const activities = await actRes.json();
+
+                    const locSelect = document.getElementById('filterLocation');
+                    const actSelect = document.getElementById('filterActivity');
+
+                    locations.forEach(loc => {
+                        locSelect.innerHTML += `<option value="${loc.location_name}">${loc.location_name}</option>`;
+                    });
+
+                    activities.forEach(act => {
+                        actSelect.innerHTML += `<option value="${act.activity_name}">${act.activity_name}</option>`;
+                    });
+                } catch (err) { console.error("Error loading filters:", err); }
+            }
+
+            async function fetchReviews() {
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/admin/reviews`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+
+                    allReviews = await res.json();
+                    renderTable(allReviews);
+                } catch (fetchErr) { console.error("Fetch reviews failed:", fetchErr); }
+            }
+
+            function renderTable(data) {
+                const tbody = document.getElementById('reviewData');
+                tbody.innerHTML = data.map(item => `
+                    <tr>
+                        <td class="action-cell">
+                            <button class="view-btn" onclick="showReview(${JSON.stringify(item).replace(/"/g, '&quot;')})"><iconify-icon icon="carbon:view-filled"></iconify-icon>View</button>
+                            <button class="delete-btn-sm" onclick="deleteReview('${item.review_id}')"><iconify-icon icon="material-symbols:delete"></iconify-icon>Delete</button>
+                        </td>
+                        <td>${item.username || 'Anonymous'}</td>
+                        <td>${item.location_name || '-'}</td>
+                        <td>${item.activity_name || '-'}</td>
+                        <td>${item.rating} ⭐</td>
+                        <td onclick="showReview(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="cursor:pointer; color:#BF7E46;">
+                            คลิกเพื่อดู
+                        </td>
+                        <td>
+                            <div class="status-container">
+                                <div class="switch-group">
+                                    <label class="switch">
+                                        <input type="checkbox" ${item.status === 'active' ? 'checked' : ''} 
+                                            onchange="handleStatusChange('${item.review_id}', this)">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span id="status-text-${item.review_id}" style="color: ${item.status === 'active' ? '#4CAF50' : '#e74c3c'}; font-weight: 600;">
+                                        ${item.status === 'active' ? 'แสดง' : 'ซ่อน'}
+                                    </span>
+                                </div>
+                                
+                                <span id="reason-text-${item.review_id}" class="reason-text">
+                                    ${(item.status !== 'active' && item.hide_reason) ? `(เหตุผล: ${item.hide_reason})` : ''}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            function applyFilters() {
+                const locValue = document.getElementById('filterLocation').value;
+                const actValue = document.getElementById('filterActivity').value;
+                const ratingValue = document.getElementById('filterRating').value;
+
+                const filtered = allReviews.filter(review => {
+                    // ตรวจสอบสถานที่
+                    const matchLoc = locValue === 'all' || review.location_name === locValue;
+
+                    // ตรวจสอบกิจกรรม
+                    const matchAct = actValue === 'all' || review.activity_name === actValue;
+
+                    // ตรวจสอบคะแนน (Rating) 
+                    const matchRating = ratingValue === 'all' || Number(review.rating) === Number(ratingValue);
+
+                    return matchLoc && matchAct && matchRating;
+                });
+
+                renderTable(filtered);
+            }
+
+            function resetFilters() {
+                document.getElementById('filterLocation').value = 'all';
+                document.getElementById('filterActivity').value = 'all';
+                document.getElementById('filterRating').value = 'all';
+                renderTable(allReviews);
+            }
+
+            async function openReasonModal(id, currentStatus) {
+                const { value: reason } = await Swal.fire({
+                    title: 'ระบุเหตุผลที่ซ่อนรีวิว',
+                    input: 'select',
+                    inputOptions: {
+                        'ข้อมูลไม่ถูกต้อง': 'ข้อมูลไม่ถูกต้อง',
+                        'ข้อมูลไม่อัปเดต': 'ข้อมูลไม่อัปเดต',
+                        'เนื้อหาไม่เหมาะสม': 'เนื้อหาไม่เหมาะสม'
+                    },
+                    inputPlaceholder: 'กรุณาเลือกเหตุผล',
+                    showCancelButton: true,
+                    confirmButtonText: 'บันทึก',
+                    cancelButtonText: 'ยกเลิก',
+                    confirmButtonColor: '#BF7E46',
+
+                    customClass: {
+                        title: 'swal-title-custom',
+                        confirmButton: 'swal-btn-confirm',
+                        input: 'swal2-select'
+                    }
+                });
+
+                if (reason) {
+                    // ส่งค่าไป Update ที่ API
+                    await fetch(`${API_BASE_URL}/api/reviews/${id}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'inactive', hide_reason: reason, admin_id: localStorage.getItem('adminId') })
+                    });
+                    fetchReviews();
+                }
+            }
+
+            async function handleStatusChange(id, checkbox) {
+                const statusText = document.getElementById(`status-text-${id}`);
+                const reasonText = document.getElementById(`reason-text-${id}`);
+
+                if (!checkbox.checked) {
+                    const { value: formValues } = await Swal.fire({
+                        title: 'ระบุเหตุผลที่ซ่อนรีวิว',
+                        html:
+                            '<select id="reason-select" class="swal2-select" style="display:flex; width: 100%;" onchange="toggleOtherInput()">' +
+                            '<option value="ข้อมูลไม่ถูกต้อง">ข้อมูลไม่ถูกต้อง</option>' +
+                            '<option value="ข้อมูลไม่อัปเดต">ข้อมูลไม่อัปเดต</option>' +
+                            '<option value="เนื้อหาไม่เหมาะสม">เนื้อหาไม่เหมาะสม</option>' +
+                            '<option value="other">อื่นๆ (โปรดระบุ)</option>' +
+                            '</select>' +
+                            '<input id="other-input" class="swal2-input" placeholder="ระบุเหตุผลเพิ่มเติม" style="display:none;">',
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'บันทึก',
+                        confirmButtonColor: '#BF7E46',
+                        didOpen: () => {
+                            window.toggleOtherInput = () => {
+                                const select = document.getElementById('reason-select');
+                                const input = document.getElementById('other-input');
+                                input.style.display = (select.value === 'other') ? 'flex' : 'none';
+                            };
+                        },
+                        preConfirm: () => {
+                            const select = document.getElementById('reason-select');
+                            const input = document.getElementById('other-input');
+                            if (select.value === 'other' && !input.value) {
+                                Swal.showValidationMessage('กรุณาระบุเหตุผลในช่องอื่นๆ');
+                            }
+                            return select.value === 'other' ? input.value : select.value;
+                        }
+                    });
+
+                    if (formValues) {
+                        await updateReviewStatus(id, 'inactive', formValues);
+                        statusText.textContent = 'ซ่อน';
+                        statusText.style.color = '#e74c3c';
+                        reasonText.textContent = 'เหตุผล: ' + formValues;
+                    } else {
+                        checkbox.checked = true;
+                    }
+                } else {
+                    await updateReviewStatus(id, 'active', null);
+                    statusText.textContent = 'แสดง';
+                    statusText.style.color = '#4CAF50';
+                    reasonText.textContent = '';
+                }
+            }
+
+            async function updateReviewStatus(id, status, reason) {
+                const adminId = localStorage.getItem('adminId');
+                await fetch(`${API_BASE_URL}/api/reviews/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status, hide_reason: reason, admin_id: adminId })
+                });
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตสถานะสำเร็จ', showConfirmButton: false, timer: 1500 });
+            }
+
+            // ฟังก์ชันเปิด Modal พร้อมรายละเอียด
+            function showReview(item) {
+                document.getElementById('modalUser').textContent = item.username;
+                document.getElementById('modalLoc').textContent = item.location_name || '-';
+                document.getElementById('modalAct').textContent = item.activity_name || '-';
+
+                document.getElementById('modalRating').textContent = item.rating + ' ดาว';
+                document.getElementById('modalDate').textContent = new Date(item.created_at).toLocaleString();
+                document.getElementById('fullReviewText').textContent = item.review_text;
+                document.getElementById('reviewModal').style.display = "block";
+                document.getElementById('fullReviewText').textContent = item.review_text;
+
+                let reasonHtml = item.status === 'inactive' ?
+                    `<p style="color: #e74c3c;"><strong>เหตุผลที่ซ่อน:</strong> ${item.hide_reason || 'ไม่มีการระบุ'}</p>` : '';
+
+                // ใส่เหตุผลต่อท้ายใน Modal
+                document.getElementById('fullReviewText').innerHTML += `<hr>${reasonHtml}`;
+
+                document.getElementById('reviewModal').style.display = "block";
+            }
+
+            // ปิด Modal
+            function closeModal() { document.getElementById('reviewModal').style.display = "none"; }
+
+            // ฟังก์ชัน Toggle สถานะ
+            async function toggleStatus(id, checkbox) {
+                const status = checkbox.checked ? 'active' : 'inactive';
+                const adminId = localStorage.getItem('adminId');
+
+                checkbox.parentElement.nextElementSibling.textContent = checkbox.checked ? 'แสดง' : 'ซ่อน';
+
+                await fetch(`${API_BASE_URL}/api/reviews/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status, hide_reason: reason, admin_id: adminId })
+                });
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตสถานะแล้ว', showConfirmButton: false, timer: 1500 });
+            }
+
+            // ฟังก์ชันสำหรับลบรีวิว
+            async function deleteReview(id) {
+                const adminId = localStorage.getItem('adminId');
+
+                Swal.fire({
+                    title: 'คุณแน่ใจไหม?',
+                    text: `ต้องการลบรีวิวรหัส ${id} ใช่หรือไม่?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#FF9A9A',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ใช่, ลบเลย!',
+                    cancelButtonText: 'ยกเลิก'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`${API_BASE_URL}/api/reviews/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Authorization': `Bearer ${adminToken}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ admin_id: adminId })
+                            });
+                            if (response.ok) {
+                                Swal.fire('ลบเรียบร้อย!', 'รีวิวถูกลบออกจากระบบแล้ว', 'success');
+                                fetchReviews();
+                            }
+                        } catch (err) {
+                            console.error('Error deleting review:', err);
+                        }
+                    }
+                });
+            }
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = async () => {
+                await Promise.all([
+                    fetchReviews(),
+                    loadFilterOptions()
+                ]);
+            };
+
+            window.addEventListener("DOMContentLoaded", () => {
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

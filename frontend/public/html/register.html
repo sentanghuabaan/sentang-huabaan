@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สร้างบัญชี - เส้นทางหัวบ้าน</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylelogin-register.css">
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="history.back()">
+            <iconify-icon icon="material-symbols:arrow-back-ios-new-rounded"></iconify-icon>
+        </button>
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+    </header>
+
+    <main class="login-content">
+        <h2 class="login-title">สร้างบัญชี</h2>
+
+        <form id="registerForm" class="login-form" autocomplete="off">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="ชื่อบัญชี" required>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder="อีเมล" required>
+            </div>
+
+            <div class="input-group password-group">
+                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">
+                    <iconify-icon icon="el:eye-close" id="eyeIcon"></iconify-icon>
+                </button>
+            </div>
+
+            <button type="submit" class="submit-btn" style="background-color: #97C2DD;">ลงทะเบียน</button>
+        </form>
+
+        <form id="otpForm" class="login-form" style="display: none;" autocomplete="off">
+            <p class="otp-instruction">เราได้ส่งรหัสยืนยันไปยังอีเมลของคุณแล้ว</p>
+
+            <div class="input-group otp-inputs-wrapper">
+                <input type="text" class="otp-field" maxlength="1">
+                <input type="text" class="otp-field" maxlength="1">
+                <input type="text" class="otp-field" maxlength="1">
+                <input type="text" class="otp-field" maxlength="1">
+                <input type="text" class="otp-field" maxlength="1">
+                <input type="text" class="otp-field" maxlength="1">
+            </div>
+
+            <button type="submit" class="submit-btn verify-btn">ยืนยันรหัส OTP</button>
+            <button type="button" class="back-link-btn" onclick="showRegister()">ย้อนกลับ</button>
+        </form>
+
+    </main>
+
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-box">
+            <iconify-icon id="modalIcon" icon="" style="font-size: 50px; margin-bottom: 15px;"></iconify-icon>
+            <p id="modalMessage"></p>
+            <button class="modal-btn" onclick="closeModal()">ตกลง</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.icon = 'ph:eye-fill';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.icon = 'ph:eye-slash-fill';
+            }
+        }
+
+        // ฟังก์ชันควบคุม Modal
+        const modal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalIcon = document.getElementById('modalIcon');
+        let successRedirect = false;
+
+        function showModal(message, type) {
+            modalMessage.innerHTML = message;
+            modal.style.display = 'flex';
+
+            if (type === 'success') {
+                modalIcon.icon = "ep:success-filled";
+                modalIcon.style.color = "#4CAF50";
+                successRedirect = true;
+            } else {
+                modalIcon.icon = "material-symbols:error";
+                modalIcon.style.color = "#d9534f";
+                successRedirect = false;
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            if (successRedirect) {
+                window.location.href = '../index.html';
+            }
+        }
+
+        // ตัวแปรสำหรับเก็บข้อมูลชั่วคราวก่อนกดยืนยัน OTP
+        let tempUserData = {};
+
+        // ฟังก์ชันสลับหน้า
+        function showOTP() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('otpForm').style.display = 'block';
+            document.querySelector('.login-title').textContent = 'ยืนยันอีเมล';
+        }
+
+        function showRegister() {
+            // แสดงฟอร์มสมัคร
+            document.getElementById('registerForm').style.display = 'flex';
+
+            document.getElementById('registerForm').style.flexDirection = 'column';
+
+            // ซ่อนฟอร์ม OTP
+            document.getElementById('otpForm').style.display = 'none';
+
+            // คืนค่า Title
+            const title = document.querySelector('.login-title');
+            title.textContent = 'สร้างบัญชี';
+
+            window.scrollTo(0, 0);
+        }
+
+        // เมื่อกดปุ่ม "ลงทะเบียน" (ขอ OTP)
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // ตรวจสอบ Domain
+            const allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com'];
+            const domain = email.split('@')[1];
+
+            if (!emailRegex.test(email)) {
+                return showModal('รูปแบบอีเมลไม่ถูกต้อง (เช่น ...@gmail.com)', 'error');
+            }
+
+            if (!allowedDomains.includes(domain.toLowerCase())) {
+                return showModal('กรุณาใช้อีเมลจาก Gmail, Outlook, Hotmail หรือ Yahoo เท่านั้น', 'error');
+            }
+
+            tempUserData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register-request`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tempUserData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showOTP();
+                } else {
+                    showModal(data.message || 'เกิดข้อผิดพลาด', 'error');
+                }
+            } catch (error) {
+                showModal('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            }
+        });
+
+        // เมื่อกดปุ่ม "ยืนยันรหัส OTP" (บันทึกข้อมูลจริง)
+        document.getElementById('otpForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const inputs = document.querySelectorAll(".otp-field");
+            const otp_code = Array.from(inputs).map(input => input.value).join("");
+
+            if (otp_code.length < 6) {
+                return showModal('กรุณากรอกรหัส OTP ให้ครบ 6 หลัก', 'error');
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/verify-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ...tempUserData,
+                        otp_code: otp_code
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    if (data.token) {
+                        localStorage.setItem('userToken', data.token);
+                    }
+                    
+                    showModal('ยืนยันตัวตนสำเร็จ <br> ยินดีต้อนรับสู่เส้นทางหัวบ้าน', 'success');
+                    successRedirect = true;
+                } else {
+                    showModal(data.message || 'รหัส OTP ไม่ถูกต้องหรือหมดอายุ', 'error');
+                }
+            } catch (error) {
+                showModal('เกิดข้อผิดพลาดในการตรวจสอบรหัส', 'error');
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputs = document.querySelectorAll(".otp-field");
+
+            inputs.forEach((input, index) => {
+                // เมื่อพิมพ์ตัวเลข
+                input.addEventListener("input", (e) => {
+                    // ถ้าระบบรับค่ามา
+                    if (e.target.value.length > 0 && index < inputs.length - 1) {
+                        // เลื่อนไปช่องถัดไป
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                // เมื่อกดปุ่มลบ
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && e.target.value.length === 0 && index > 0) {
+                        // ย้อนกลับไปช่องก่อนหน้า
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>

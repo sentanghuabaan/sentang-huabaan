@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการลงโฆษณา - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <link rel="stylesheet" href="../css/style-myads.css">
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="location.href='profile.html'">
+            <iconify-icon icon="weui:back-filled"></iconify-icon>
+        </button>
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+        <div class="header-divider"></div>
+    </header>
+
+    <main class="login-content">
+        <h2 class="login-title">ประวัติการลงโฆษณา</h2>
+
+        <div class="filter-tabs">
+            <button class="tab active" onclick="filterAds('all', this)">ทั้งหมด</button>
+            <button class="tab" onclick="filterAds('pending', this)">รอตรวจ</button>
+            <button class="tab" onclick="filterAds('approved', this)">อนุมัติแล้ว</button>
+            <button class="tab" onclick="filterAds('rejected', this)">ไม่ผ่าน</button>
+        </div>
+
+        <div id="adsContainer" class="ads-list">
+            <div class="empty-state">กำลังโหลดข้อมูล...</div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        let allAds = [];
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(userData);
+            const container = document.getElementById('adsContainer');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/banners/user/${user.user_id}`);
+                allAds = await response.json();
+
+                renderAds(allAds);
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                container.innerHTML = '<div class="empty-state">ไม่สามารถโหลดข้อมูลได้</div>';
+            }
+        });
+
+        // ฟังก์ชันสำหรับกรองข้อมูล
+        function filterAds(status, element) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+
+            if (status === 'all') {
+                renderAds(allAds);
+            } else {
+                const filtered = allAds.filter(ad => ad.status === status);
+                renderAds(filtered);
+            }
+        }
+
+        // ฟังก์ชันสำหรับวาด HTML การ์ดโฆษณา
+        function renderAds(adsList) {
+            const container = document.getElementById('adsContainer');
+
+            if (adsList.length === 0) {
+                container.innerHTML = `
+            <div class="empty-state">
+                <iconify-icon icon="mdi:advertisement-off" style="font-size: 50px;"></iconify-icon>
+                <p>ไม่พบรายการที่ตรงกับเงื่อนไข</p>
+            </div>`;
+                return;
+            }
+
+            container.innerHTML = adsList.map(ad => {
+                let statusClass = 'status-pending';
+                let statusText = 'รอตรวจสอบ';
+                if (ad.status === 'approved') { statusClass = 'status-approved'; statusText = 'อนุมัติแล้ว'; }
+                if (ad.status === 'rejected') { statusClass = 'status-rejected'; statusText = 'ไม่ผ่านการอนุมัติ'; }
+
+                const imgUrl = (ad.image_url && ad.image_url.trim().startsWith('http'))
+                    ? ad.image_url.trim()
+                    : `${API_BASE_URL}/${ad.image_url}`;
+
+                return `
+            <div class="ad-item">
+                <img src="${imgUrl}" class="ad-img" onerror="this.src='../image/logohuabaan.png'">
+                <div class="ad-details">
+                    <h4>${ad.title}</h4>
+                    <p>${ad.description}</p>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    
+                    ${ad.status === 'rejected' && ad.admin_note ? `
+                        <div class="admin-note">
+                            <strong>เหตุผลจากแอดมิน:</strong><br>
+                            ${ad.admin_note}
+                        </div>
+                    ` : ''}
+
+                    <p style="font-size: 11px; margin-top: 8px; color: #999;">
+                        วันที่ลงประกาศ: ${new Date(ad.created_at).toLocaleDateString('th-TH')}
+                    </p>
+                </div>
+            </div>
+        `;
+            }).join('');
+        }
+    </script>
+</body>
+
+</html>

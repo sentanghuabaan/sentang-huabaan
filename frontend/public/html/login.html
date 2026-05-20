@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - เส้นทางหัวบ้าน</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylelogin-register.css">
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="handleCloseLogin()">
+            <iconify-icon icon="icon-park-solid:error"></iconify-icon>
+        </button>
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+    </header>
+
+    <main class="login-content">
+        <h2 class="login-title">เข้าสู่ระบบ</h2>
+
+        <form id="loginForm" class="login-form" autocomplete="off">
+            <div class="input-group">
+                <input type="email" id="email" placeholder="อีเมล" required>
+            </div>
+
+            <div class="input-group password-group">
+                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">
+                    <iconify-icon icon="el:eye-close" id="eyeIcon"></iconify-icon>
+                </button>
+            </div>
+            <div id="errorMessage" class="error-text"></div>
+
+            <div class="forgot-password-link">
+                <a href="forgot-password.html" class="forgot-link">ลืมรหัสผ่าน?</a>
+            </div>
+
+            <button type="submit" class="submit-btn">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="register-prompt">
+            <a href="register.html">สร้างบัญชีใหม่</a>
+        </div>
+
+        <div class="login-container">
+            <a href="javascript:void(0)" onclick="handleGoogleLogin()" class="google-login-btn">
+                <iconify-icon icon="devicon:google" class="google-icon"></iconify-icon>
+                <span>เข้าสู่ระบบด้วย Google</span>
+            </a>
+        </div>
+
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function handleGoogleLogin() {
+            window.location.href = `${API_BASE_URL}/api/auth/google`;
+        }
+
+        function handleCloseLogin() {
+            // เช็คความกว้างหน้าจอ (768px คือ iPad/Desktop)
+            const isLargeScreen = window.innerWidth >= 768;
+
+            if (isLargeScreen) {
+                // ถ้าหน้าจอกว้าง ให้ย้อนกลับไปหน้าก่อนหน้า
+                // แต่ถ้าไม่มีประวัติหน้าก่อนหน้า หรือมาจากหน้า Register/Forgot Password ให้กลับหน้าหลัก
+                const referrer = document.referrer;
+                const isInternalAuth = referrer.includes('register.html') || referrer.includes('forgot-password.html');
+
+                if (!referrer || isInternalAuth) {
+                    location.href = '../index.html';
+                } else {
+                    history.back();
+                }
+            } else {
+                // ถ้าเป็นมือถือ ให้ไปหน้าเมนูตามเดิมที่ออกแบบไว้
+                location.href = 'menu.html';
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.icon = 'ph:eye-fill';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.icon = 'ph:eye-slash-fill';
+            }
+        }
+
+        // ส่วนเชื่อมต่อหลังบ้านสำหรับ Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const inputs = document.querySelectorAll('.input-group input');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // บันทึกข้อมูลลง localStorage 
+                    localStorage.setItem('user', JSON.stringify({
+                        user_id: data.user_id,
+                        username: data.username,
+                        role: data.role,
+                        email: email,
+                        profile_img: data.profile_img
+                    }));
+
+                    localStorage.setItem('userToken', data.token);
+
+                    window.location.href = '../index.html';
+                } else {
+                    errorMessage.textContent = data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+                    errorMessage.style.display = 'block';
+
+                    inputs.forEach(input => input.classList.add('input-error'));
+                }
+            } catch (error) {
+                errorMessage.textContent = 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User- เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_user.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../image/logohuabaan2.png" alt="Logo" class="admin-logo">
+            </div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item">
+                    <iconify-icon icon="mage:dashboard-fill" class="menu-icon"></iconify-icon> Dashboard
+                </a>
+                <a href="#" class="menu-item active">
+                    <iconify-icon icon="basil:user-solid" class="menu-icon"></iconify-icon> User
+                </a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP
+                </a>
+                <a href="admin_location.html" class="menu-item">
+                    <iconify-icon icon="ion:location-sharp" class="menu-icon"></iconify-icon> Location
+                </a>
+                <a href="admin_location_images.html" class="menu-item">
+                    <iconify-icon icon="mdi:image-location" class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item">
+                    <iconify-icon icon="lets-icons:date-fill" class="menu-icon"></iconify-icon> Activity
+                </a>
+                <a href="admin_activity_images.html" class="menu-item">
+                    <iconify-icon icon="material-symbols:imagesmode" class="menu-icon"></iconify-icon> Activity Images
+                </a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon>
+                    History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item">
+                    <iconify-icon icon="tdesign:view-in-ar-filled" class="menu-icon"></iconify-icon> AR Content
+                </a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="search" id="searchInput" onkeyup="searchTable()">
+                </div>
+
+                <div class="custom-filter-wrapper" id="roleFilterWrapper">
+                    <div class="filter-display" onclick="toggleRoleFilter()">
+                        <iconify-icon icon="mdi:account-cog" class="filter-icon"></iconify-icon>
+                        <span id="currentRoleFilterText">Role</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="roleFilterOptions">
+                        <div class="f-option" onclick="applyRoleFilter('all', 'All Roles')">All Roles</div>
+                        <div class="f-option" onclick="applyRoleFilter('role-admin', 'Admin')">Admin</div>
+                        <div class="f-option" onclick="applyRoleFilter('role-user', 'User')">User</div>
+                    </div>
+                </div>
+
+                <div class="custom-filter-wrapper">
+                    <div class="filter-display" onclick="toggleFilterDropdown()">
+                        <iconify-icon icon="mdi:filter" class="filter-icon"></iconify-icon>
+                        <span id="currentFilterText">Status</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="filterOptions">
+                        <div class="f-option" onclick="applyFilter('all', 'All Status')">All Status</div>
+                        <div class="f-option" onclick="applyFilter('active', 'Active')">Active</div>
+                        <div class="f-option" onclick="applyFilter('banned', 'Banned')">Banned</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Gmail</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userListData"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // ตรวจสอบตั๋ว Token จริงจากหลังบ้าน
+        const adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            window.location.href = 'admin_login.html';
+        }
+
+        function toggleRoleFilter() {
+            document.getElementById('filterOptions').classList.remove('show');
+            document.getElementById('roleFilterOptions').classList.toggle('show');
+        }
+
+        function toggleFilterDropdown() {
+            document.getElementById('roleFilterOptions').classList.remove('show');
+            document.getElementById('filterOptions').classList.toggle('show');
+        }
+
+        // ปิด Dropdown เมื่อคลิกข้างนอก
+        window.addEventListener('click', function (e) {
+            if (!e.target.closest('.custom-filter-wrapper')) {
+                const filterOpts = document.getElementById('filterOptions');
+                const roleOpts = document.getElementById('roleFilterOptions');
+                if (filterOpts) filterOpts.classList.remove('show');
+                if (roleOpts) roleOpts.classList.remove('show');
+            }
+
+            if (!e.target.closest('.custom-select') && !e.target.closest('.custom-options')) {
+                document.querySelectorAll('.custom-options').forEach(opt => {
+                    opt.classList.remove('show');
+                });
+            }
+        });
+
+        // ฟังก์ชันเลือกค่า Role และสั่งกรองรวม
+        function applyRoleFilter(value, text) {
+            document.getElementById('currentRoleFilterText').innerText = text;
+            document.getElementById('roleFilterOptions').classList.remove('show');
+            filterTable();
+        }
+
+        // ฟังก์ชันเลือกค่า Status และสั่งกรองรวม
+        function applyFilter(value, text) {
+            document.getElementById('currentFilterText').innerText = text;
+            document.getElementById('filterOptions').classList.remove('show');
+            filterTable();
+        }
+
+        function filterTable() {
+            const searchText = document.getElementById("searchInput").value.toLowerCase();
+
+            // ดึงค่าจากปุ่ม Filter ด้านบนมาเตรียมไว้
+            const roleFilter = document.getElementById("currentRoleFilterText").innerText.toLowerCase().trim();
+            const statusFilter = document.getElementById("currentFilterText").innerText.toLowerCase().trim();
+
+            const rows = document.querySelectorAll("#userListData tr");
+
+            rows.forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+
+                // ดึงค่าปัจจุบันที่เลือกอยู่ใน Dropdown ของแถวนั้น
+                const selectedRoleText = row.querySelector("td:nth-child(4) .selected-text").innerText.toLowerCase().trim();
+                const selectedStatusText = row.querySelector("td:nth-child(5) .selected-text").innerText.toLowerCase().trim();
+
+                // ตรวจสอบเงื่อนไข Search
+                const matchesSearch = rowText.includes(searchText);
+
+                // ตรวจสอบเงื่อนไข Role 
+                const matchesRole = (roleFilter === "role" || roleFilter === "all roles") ||
+                    (selectedRoleText === roleFilter);
+
+                // ตรวจสอบเงื่อนไข Status 
+                const matchesStatus = (statusFilter === "status" || statusFilter === "all status") ||
+                    (selectedStatusText === statusFilter);
+
+                if (matchesSearch && matchesRole && matchesStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        function searchTable() {
+            filterTable();
+        }
+
+        // --- ระบบจัดการข้อมูลผู้ใช้ ---
+        async function fetchUsers() {
+            try {
+                // ส่ง Token แนบไปใน Headers เพื่อยืนยันตัวแอดมินที่เข้าสู่ระบบแล้วเท่านั้น
+                const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // ถ้าแอบปลอมเข้ามา ให้ดีดกลับหน้าล็อกอินทันที
+                if (response.status === 401 || response.status === 403) {
+                    localStorage.clear();
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+
+                const users = await response.json();
+                const tableBody = document.getElementById('userListData');
+
+                tableBody.innerHTML = users.map(user => {
+                    const status = (user.status || 'active').toLowerCase();
+                    const role = (user.role || 'user').toLowerCase();
+
+                    let profileDisplay = '';
+                    if (user.profile_img) {
+                        const imgUrl = user.profile_img.startsWith('http')
+                            ? user.profile_img
+                            : `${API_BASE_URL}/${user.profile_img}`;
+
+                        profileDisplay = `<img src="${imgUrl}" class="avatar-icon" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px;">`;
+                    } else {
+                        // หากผู้ใช้ไม่มีการใส่รูปภาพ ให้ใช้ไอคอนเริ่มต้น
+                        profileDisplay = `<iconify-icon icon="carbon:user-avatar-filled" class="avatar-icon" style="font-size: 40px; color: #888; margin-right: 10px;"></iconify-icon>`;
+                    }
+
+                    return `
+                    <tr>
+                        <td>${user.user_id}</td>
+                        <td class="user-cell" style="display: flex; align-items: center;">
+                            ${profileDisplay}
+                            <span>${user.username}</span>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>
+                            <div class="custom-select-wrapper">
+                                <div class="custom-select role-${role}" onclick="toggleCellDropdown(this)">
+                                    <span class="selected-text">${role.charAt(0).toUpperCase() + role.slice(1)}</span>
+                                    <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                                </div>
+                                <div class="custom-options">
+                                    <div class="option" onclick="updateRole(${user.user_id}, 'admin', this)">Admin</div>
+                                    <div class="option" onclick="updateRole(${user.user_id}, 'user', this)">User</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="status-cell-container" style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <div class="custom-select-wrapper">
+                                    <div class="custom-select ${status}" onclick="toggleCellDropdown(this)">
+                                        <span class="selected-text">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                                    </div>
+                                    <div class="custom-options">
+                                        <div class="option" onclick="updateStatus(${user.user_id}, 'active', this)">Active</div>
+                                        <div class="option" onclick="updateStatus(${user.user_id}, 'banned', this)">Banned</div>
+                                    </div>
+                                </div>
+
+                                ${status === 'banned' && user.ban_reason ?
+                            `<div class="ban-reason-label">
+                                        <iconify-icon icon="mdi:alert-circle" style="font-size: 14px; flex-shrink: 0;"></iconify-icon>
+                                        <span>เหตุผล: ${user.ban_reason}</span>
+                                    </div>` : ''}
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (err) { console.error('❌ Fetch error:', err); }
+        }
+
+        function toggleCellDropdown(element) {
+            const filterOpts = document.getElementById('filterOptions');
+            const roleOpts = document.getElementById('roleFilterOptions');
+            if (filterOpts) filterOpts.classList.remove('show');
+            if (roleOpts) roleOpts.classList.remove('show');
+
+            document.querySelectorAll('.custom-options').forEach(opt => {
+                if (opt !== element.nextElementSibling) opt.classList.remove('show');
+            });
+            element.nextElementSibling.classList.toggle('show');
+        }
+
+        async function updateRole(userId, newRole, el) {
+            const adminId = localStorage.getItem('adminId');
+
+            const res = await fetch(`${API_BASE_URL}/api/admin/update-role`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    role: newRole,
+                    admin_id: adminId
+                })
+            });
+            if (res.ok) fetchUsers();
+        }
+
+        async function updateStatus(userId, newStatus, el) {
+            let banReason = null;
+
+            if (newStatus === 'banned') {
+                const { value: formValues } = await Swal.fire({
+                    title: 'ระบุเหตุผลการระงับผู้ใช้งาน',
+                    html: `
+                        <div style="text-align: left; padding: 0 10px;">
+                            <label for="ban-reason-select" style="font-size: 14px; color: #666; margin-bottom: 5px; display: block;">สาเหตุหลัก:</label>
+                            <select id="ban-reason-select" class="swal2-select" style="width: 100%; margin: 0 0 15px 0; font-family: 'Noto Serif Thai';" onchange="toggleOtherInput()">
+                                <option value="" disabled selected>-- โปรดเลือกเหตุผล --</option>
+                                <option value="ทำผิดกฎการรีวิว (ใช้คำไม่สุภาพ)">ทำผิดกฎการรีวิว (ใช้คำไม่สุภาพ)</option>
+                                <option value="สแปมข้อมูล">สแปมข้อมูล</option>
+                                <option value="ปั่นยอดเข้าชม">ปั่นยอดเข้าชม (ปั่นวิว)</option>
+                                <option value="พฤติกรรมไม่เหมาะสม">พฤติกรรมไม่เหมาะสม</option>
+                                <option value="other">อื่นๆ (โปรดระบุรายละเอียด)</option>
+                            </select>
+                            
+                            <div id="other-reason-container" style="display:none; animation: fadeIn 0.3s;">
+                                <label for="other-reason-text" style="font-size: 14px; color: #666; margin-bottom: 5px; display: block;">รายละเอียดเพิ่มเติม:</label>
+                                <textarea id="other-reason-text" class="swal2-textarea" style="width: 100%; margin: 0; font-family: 'Noto Serif Thai'; min-height: 100px;" placeholder="ระบุเหตุผลที่ต้องการแบนผู้ใช้นี้..."></textarea>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันการระงับบัญชี',
+                    confirmButtonColor: '#e74c3c',
+                    cancelButtonText: 'ยกเลิก',
+                    cancelButtonColor: '#7f8c8d',
+                    reverseButtons: false,
+                    didOpen: () => {
+                        window.toggleOtherInput = () => {
+                            const select = document.getElementById('ban-reason-select');
+                            const container = document.getElementById('other-reason-container');
+                            if (select.value === 'other') {
+                                container.style.display = 'block';
+                            } else {
+                                container.style.display = 'none';
+                            }
+                        };
+                    },
+                    preConfirm: () => {
+                        const select = document.getElementById('ban-reason-select');
+                        const textarea = document.getElementById('other-reason-text');
+
+                        if (!select.value) {
+                            Swal.showValidationMessage('กรุณาเลือกสาเหตุหลัก');
+                            return false;
+                        }
+                        if (select.value === 'other' && !textarea.value.trim()) {
+                            Swal.showValidationMessage('กรุณาระบุรายละเอียดในช่อง "อื่นๆ"');
+                            return false;
+                        }
+
+                        return select.value === 'other' ? textarea.value.trim() : select.value;
+                    }
+                });
+
+                if (!formValues) {
+                    fetchUsers();
+                    return;
+                }
+                banReason = formValues;
+            }
+
+            // ส่วนเรียก API
+            const adminId = localStorage.getItem('adminId');
+            const res = await fetch(`${API_BASE_URL}/api/admin/update-status`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    status: newStatus,
+                    ban_reason: banReason,
+                    admin_id: adminId
+                })
+            });
+
+            if (res.ok) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'อัปเดตสถานะสำเร็จ',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                fetchUsers();
+            }
+        }
+
+        function logoutAdmin() {
+            Swal.fire({
+                title: 'ออกจากระบบ?',
+                text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#ccc',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                borderRadius: '20px'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminName');
+                    window.location.href = 'admin_login.html';
+                }
+            });
+        }
+
+        window.onload = fetchUsers;
+    </script>
+</body>
+
+</html>

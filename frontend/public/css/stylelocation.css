@@ -1,0 +1,263 @@
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+.mobile-container {
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Home Header */
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #FBEDD6;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-logo {
+    display: block;
+    width: 166px;
+    margin-top: 0;
+}
+
+.menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 25px;
+    transition: transform 0.2s;
+}
+
+.menu-trigger iconify-icon {
+    font-size: 45px;
+    color: #BF7E46;
+}
+
+.menu-trigger:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+.container {
+    border-top: 1px solid #B1A396;
+    width: 100%;
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: #DEAB7E;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-content {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.place-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4A2C2A;
+}
+
+/* สถานะ เปิด/ปิด */
+
+.status-badge {
+    padding: 5px 20px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.status-open {
+    background-color: #E2F2D5;
+    color: #1B3C15;
+}
+
+.status-closed {
+    background-color: #F9C5C5;
+    color: #611A1A;
+}
+
+/* ปุ่มดูทั้งหมด */
+
+.btn-view-all {
+    background-color: #B97B4B;
+    color: white;
+    border: none;
+    padding: 10px 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-view-all:hover {
+    background-color: #9A6239;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    background-color: #FBEDD6;
+}
+
+.mobile-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #FBEDD6;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 40px 10% !important;
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: transparent;
+    }
+
+    .title {
+        text-align: center;
+        font-size: 36px !important;
+        color: #503620;
+        margin-bottom: 50px !important;
+    }
+
+    #card-container {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 30px !important;
+        padding: 20px 0;
+    }
+
+    .card {
+        background-color: #ffffff !important;
+        border-radius: 25px !important;
+        overflow: hidden;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+        margin-bottom: 0 !important;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    }
+
+    .card:hover {
+        transform: translateY(-10px) !important;
+        box-shadow: 0 15px 30px rgba(112, 60, 14, 0.15) !important;
+    }
+
+    .card img {
+        width: 100%;
+        height: 280px !important;
+        object-fit: cover !important;
+        border-bottom: 3px solid #DEAB7E;
+    }
+
+    .card-content {
+        padding: 25px !important;
+        background-color: #DEAB7E;
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .place-name {
+        font-size: 22px !important;
+        color: #4B3621 !important;
+        font-weight: bold;
+    }
+
+    .status-badge {
+        padding: 6px 18px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .btn-view-all {
+        margin: 50px auto !important;
+        display: block;
+        padding: 15px 60px !important;
+        background-color: #BF7E46 !important;
+        color: #fff;
+        font-size: 18px !important;
+        border-radius: 30px !important;
+        border: none;
+        cursor: pointer;
+    }
+}
+
+.nav-menu-desktop,
+.user-profile-header {
+    display: none;
+}

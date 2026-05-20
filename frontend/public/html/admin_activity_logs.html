@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Activity Logs - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_user.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section">
+                <img src="../image/logohuabaan2.png" alt="Logo" class="admin-logo">
+            </div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item">
+                    <iconify-icon icon="mage:dashboard-fill" class="menu-icon"></iconify-icon> Dashboard
+                </a>
+                <a href="admin_user.html" class="menu-item">
+                    <iconify-icon icon="basil:user-solid" class="menu-icon"></iconify-icon> User
+                </a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP
+                </a>
+                <a href="admin_location.html" class="menu-item">
+                    <iconify-icon icon="ion:location-sharp" class="menu-icon"></iconify-icon> Location
+                </a>
+                <a href="admin_location_images.html" class="menu-item">
+                    <iconify-icon icon="mdi:image-location" class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item">
+                    <iconify-icon icon="lets-icons:date-fill" class="menu-icon"></iconify-icon> Activity
+                </a>
+                <a href="admin_activity_images.html" class="menu-item">
+                    <iconify-icon icon="material-symbols:imagesmode" class="menu-icon"></iconify-icon> Activity Images
+                </a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon>
+                    History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item">
+                    <iconify-icon icon="tdesign:view-in-ar-filled" class="menu-icon"></iconify-icon> AR Content
+                </a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item active">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2 class="page-title">SYSTEM ACTIVITY LOGS</h2>
+
+            <header class="top-bar">
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="ค้นหาชื่อแอดมิน หรือตาราง..." id="logSearch" onkeyup="filterLogs()">
+                </div>
+
+                <!-- ตัวกรองตาราง -->
+                <div class="custom-filter-wrapper">
+                    <div class="filter-display" onclick="toggleDropdown('tableFilter')">
+                        <iconify-icon icon="mdi:database-search" class="filter-icon"></iconify-icon>
+                        <span id="currentTableText">All Tables</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="tableFilter">
+                        <div class="f-option" onclick="applyLogFilter('All Tables')">All Tables</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>วัน-เวลา</th>
+                            <th>แอดมิน</th>
+                            <th>การกระทำ</th>
+                            <th>ตาราง</th>
+                            <th>ID ข้อมูล</th>
+                            <th>รายละเอียด</th>
+                            <th>ดูข้อมูลเดิม/ใหม่</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logData"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            // ฟังก์ชันเปิด/ปิด Dropdown
+            function toggleDropdown(id) {
+                document.getElementById(id).classList.toggle('show');
+            }
+
+            // ฟังก์ชันเลือกค่าจาก Filter ตาราง
+            function applyLogFilter(tableName) {
+                document.getElementById('currentTableText').innerText = tableName;
+                document.getElementById('tableFilter').classList.remove('show');
+                filterLogs();
+            }
+
+            let allLogs = [];
+
+            // ฟังก์ชันดึงข้อมูล Log มาแสดงในตาราง
+            async function fetchActivityLogs() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/admin/activity-logs`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+                    allLogs = await response.json();
+
+                    // สร้างรายชื่อตารางที่ไม่ซ้ำกันสำหรับ Filter
+                    generateTableFilter(allLogs);
+
+                    // แสดงข้อมูลในตาราง
+                    renderLogs(allLogs);
+                } catch (err) {
+                    console.error("Error fetching logs:", err);
+                }
+            }
+
+            // ฟังก์ชันสร้างรายชื่อตารางใน Dropdown แบบอัตโนมัติ
+            function generateTableFilter(logs) {
+                const filterOptions = document.getElementById('tableFilter');
+                const uniqueTables = [...new Set(logs.map(log => log.table_name))];
+
+                filterOptions.innerHTML = '<div class="f-option" onclick="applyLogFilter(\'All Tables\')">All Tables</div>';
+
+                uniqueTables.sort().forEach(tableName => {
+                    const option = document.createElement('div');
+                    option.className = 'f-option';
+                    option.innerText = tableName;
+                    option.onclick = () => applyLogFilter(tableName);
+                    filterOptions.appendChild(option);
+                });
+            }
+
+            // ฟังก์ชันวาดตาราง
+            function renderLogs(logs) {
+                const tbody = document.getElementById('logData');
+                tbody.innerHTML = logs.map(log => {
+                    const actionType = log.action_type ? log.action_type.toLowerCase() : 'update';
+                    const badgeClass = `badge-${actionType}`;
+
+                    return `
+            <tr>
+                <td style="font-size: 13px;">${new Date(log.created_at).toLocaleString('th-TH')}</td>
+                <td>
+                    <div class="user-cell">
+                        <iconify-icon icon="carbon:user-avatar-filled"></iconify-icon>
+                        ${log.admin_name || 'administrator'}
+                    </div>
+                </td>
+                <td><span class="action-badge ${badgeClass}">${log.action_type}</span></td>
+                <td><strong>${log.table_name}</strong></td>
+                <td><span class="target-id-code">${log.target_id}</span></td>
+                <td class="truncate" title="${log.description}">${log.description || '-'}</td>
+                <td style="text-align: center;">
+                    <button class="view-btn-sm" onclick="viewChanges('${escapeHtml(JSON.stringify(log.old_value))}', '${escapeHtml(JSON.stringify(log.new_value))}')">
+                        <iconify-icon icon="mdi:eye"></iconify-icon> View
+                    </button>
+                </td>
+            </tr>
+        `;
+                }).join('');
+            }
+
+            // ฟังก์ชันกำหนดสี Badge
+            function getActionClass(action) {
+                switch (action.toLowerCase()) {
+                    case 'insert': return 'badge-success';
+                    case 'update': return 'badge-warning';
+                    case 'delete': return 'badge-danger';
+                    case 'banned': return 'badge-dark';
+                    default: return 'badge-info';
+                }
+            }
+
+            // ฟังก์ชันสำหรับ Filter ข้อมูลในตาราง
+            function filterLogs() {
+                const searchText = document.getElementById("logSearch").value.toLowerCase();
+                const tableFilter = document.getElementById("currentTableText").innerText;
+
+                const filtered = allLogs.filter(log => {
+                    const matchesSearch = (
+                        log.admin_name?.toLowerCase().includes(searchText) ||
+                        log.description?.toLowerCase().includes(searchText) ||
+                        log.target_id?.toString().toLowerCase().includes(searchText) ||
+                        log.table_name?.toLowerCase().includes(searchText)
+                    );
+
+                    const matchesTable = (tableFilter === "All Tables" || log.table_name === tableFilter);
+
+                    return matchesSearch && matchesTable;
+                });
+
+                renderLogs(filtered);
+            }
+
+            // ฟังก์ชันเปิดดูรายละเอียดความเปลี่ยนแปลง
+            function viewChanges(oldVal, newVal) {
+                let oldData = null;
+                let newData = null;
+
+                const unescapeHtml = (str) => {
+                    if (!str) return '';
+                    return str.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+                };
+
+                try {
+                    const cleanOld = unescapeHtml(oldVal);
+                    const cleanNew = unescapeHtml(newVal);
+
+                    oldData = (cleanOld && cleanOld !== "null" && cleanOld !== '""' && cleanOld !== 'null') ? JSON.parse(JSON.parse(cleanOld)) : null;
+                    newData = (cleanNew && cleanNew !== "null" && cleanNew !== '""' && cleanNew !== 'null') ? JSON.parse(JSON.parse(cleanNew)) : null;
+                } catch (e) {
+                    try {
+                        oldData = oldVal ? JSON.parse(unescapeHtml(oldVal)) : null;
+                        newData = newVal ? JSON.parse(unescapeHtml(newVal)) : null;
+                    } catch (innerE) {
+                        oldData = oldVal;
+                        newData = newVal;
+                    }
+                }
+
+                const formatJSON = (data) => {
+                    if (!data) return '<span style="color: #999;">ไม่มีข้อมูลเดิม</span>';
+                    if (typeof data === 'object') {
+                        return `<pre class="json-display" style="background:#f8f9fa; padding:10px; border-radius:5px; max-height:200px; overflow-y:auto;">${JSON.stringify(data, null, 2)}</pre>`;
+                    }
+                    return `<pre class="json-display" style="background:#f8f9fa; padding:10px; border-radius:5px; max-height:200px; overflow-y:auto;">${data}</pre>`;
+                };
+
+                Swal.fire({
+                    title: '<span style="font-family: Noto Serif Thai; font-weight: bold;">รายละเอียดความเปลี่ยนแปลง</span>',
+                    width: '800px',
+                    html: `
+                    <div style="text-align: left; font-family: sans-serif;">
+                        <div style="margin-bottom: 15px;">
+                            <p style="color: #d33; font-weight: bold; margin-bottom: 5px;">ข้อมูลเดิม (Old Value):</p>
+                            ${formatJSON(oldData)}
+                        </div>
+                        <div>
+                            <p style="color: #28a745; font-weight: bold; margin-bottom: 5px;">ข้อมูลใหม่ (New Value):</p>
+                            ${formatJSON(newData)}
+                        </div>
+                    </div>
+                `,
+                    confirmButtonColor: '#BF7E46',
+                    confirmButtonText: 'ปิดหน้าต่าง'
+                });
+            }
+
+            // ฟังก์ชันป้องกันตัวอักษรพิเศษใน JSON
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+            }
+
+            window.onload = fetchActivityLogs;
+
+
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+            window.addEventListener("DOMContentLoaded", () => {
+                // หาเมนูตัวที่มีคลาส active อยู่
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    // สั่งให้เลื่อนมาแสดงตรงกลางแถบ Sidebar 
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+</body>
+
+</html>

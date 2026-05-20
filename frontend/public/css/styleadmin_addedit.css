@@ -1,0 +1,181 @@
+/* --- ส่วนหัวข้อ (Page Title) --- */
+.page-title-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    background-color: #C3BAB1;
+}
+
+.page-title {
+    margin: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    letter-spacing: 1px;
+}
+
+/* --- ฟอร์มและตาราง (Layout) --- */
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(191, 126, 70, 0.05);
+    border: 1px solid #F3E5DC;
+}
+
+.admin-table th {
+    color: #8C6F5E;
+    padding: 18px 15px;
+    text-align: left;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-top: 1px solid #F3E5DC;
+}
+
+/* --- ปุ่มกด (Buttons) --- */
+.add-btn,
+.edit-btn-sm,
+.delete-btn-sm,
+.view-btn,
+.btn-save {
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* ปุ่มบันทึกสถานะปกติ */
+.btn-save {
+    background-color: #E2E2E2;
+    color: #777;
+    cursor: not-allowed;
+}
+
+/* ปุ่มบันทึกสถานะเมื่อมีการแก้ไข */
+.btn-save.active {
+    background-color: #BF7E46 !important;
+    color: white !important;
+    cursor: pointer;
+}
+
+/* --- Inputs --- */
+.cute-input-table {
+    width: 90px !important;
+    padding: 8px;
+    border: 1px solid #F3E5DC !important;
+    border-radius: 8px !important;
+    text-align: center;
+    background-color: #fff;
+}
+
+/* --- SweetAlert2 Theme --- */
+.swal2-popup.cute-modal-style {
+    width: 850px;
+    border-radius: 25px !important;
+    background-color: #FFFDF9 !important;
+    border: 2px solid #F3E5DC !important;
+}
+
+.swal2-title {
+    color: #BF7E46 !important;
+}
+
+.swal2-confirm.cute-modal-button {
+    background-color: #BF7E46 !important;
+    color: white !important;
+    padding: 10px 30px !important;
+    border-radius: 20px !important;
+    margin-right: 10px;
+}
+
+.form-grid label {
+    font-size: 18px;
+    color: #5D4037;
+}
+
+.cute-edit-field-wrapper {
+    margin-bottom: 15px;
+}
+
+.cute-edit-label {
+    display: block;
+    font-weight: bold;
+    color: #BF7E46;
+    margin-bottom: 5px;
+    font-size: 18px;
+    padding: 14px;
+    height: auto;
+}
+
+.cute-edit-input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #F3E5DC;
+    padding: 10px;
+    background-color: white;
+    color: #6D4C3D;
+    font-size: 15px;
+}
+
+
+.cute-edit-input:focus,
+.swal2-confirm.cute-modal-button:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #D4A373;
+}
+
+textarea.cute-edit-input {
+    min-height: 120px !important;
+}
+
+.form-group {
+    margin-bottom: 10px !important;
+}
+
+/* สไตล์สำหรับกล่อง Modal โดยรวม */
+.cute-modal-style {
+    background-color: #faf7f2 !important;
+    border-radius: 30px !important;
+    padding: 20px !important;
+}
+
+.cute-modal-title {
+    color: #8b7355 !important;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.cute-modal-button {
+    background-color: #BF7E46 !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 10px 25px !important;
+}
+
+.cute-modal-button:hover {
+    background-color: #BF6A3A !important;
+    transition: background-color 0.3s ease;
+}
+
+.cute-modal-button-cancel {
+    background-color: #FF9A9A !important;
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 10px 25px !important;
+}
+
+.cute-modal-button-cancel:hover {
+    background-color: #FF7A7A !important;
+    transition: background-color 0.3s ease;
+}

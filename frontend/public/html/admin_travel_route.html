@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Travel Route - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+    <link rel="stylesheet" href="../css/styleadmin_addedit.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item active"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="route-management-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="page-title">TRAVEL ROUTE MANAGEMENT</h2>
+                    <button onclick="addRoute()" class="btn-save active" style="padding: 10px 20px; font-size: 18px;">+
+                        เพิ่มเส้นทางใหม่</button>
+                </div>
+
+                <div class="filter-section" style="margin-bottom: 30px; display: flex; align-items: center;">
+                    <label for="filter-from">📍 เลือกสถานที่ต้นทาง:</label>
+                    <select id="filter-from" onchange="loadRoutes()">
+                    </select>
+                </div>
+
+                <table id="route-table" class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ถึงสถานที่ (ปลายทาง)</th>
+                            <th>เวลาเดิน (นาที)</th>
+                            <th>เวลาปั่น (นาที)</th>
+                            <th>ระยะทาง (เมตร)</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="route-body">
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            // โหลดรายชื่อสถานที่มาใส่ Dropdown
+            async function fetchLocations() {
+                const res = await fetch(`${API_BASE_URL}/api/locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+
+                const locations = await res.json();
+                const filterFrom = document.getElementById('filter-from');
+
+                locations.sort((a, b) => {
+                    return a.location_name.localeCompare(b.location_name, 'th');
+                });
+
+                filterFrom.innerHTML = '<option value="">-- เลือกสถานที่ต้นทาง --</option>';
+                locations.forEach(loc => {
+                    filterFrom.innerHTML += `<option value="${loc.location_id}">${loc.location_name}</option>`;
+                });
+            }
+
+            // โหลด Route เมื่อเปลี่ยนต้นทาง
+            async function loadRoutes() {
+                const fromId = document.getElementById('filter-from').value;
+                console.log("กำลังโหลดข้อมูลของ:", fromId);
+
+                if (!fromId) return;
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/map/routes/${fromId}`, {
+                        headers: { 'Authorization': `Bearer ${adminToken}` }
+                    });
+
+                    if (res.status === 401 || res.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+
+                    const routes = await res.json();
+
+                    const tbody = document.getElementById('route-body');
+                    tbody.innerHTML = '';
+
+                    if (routes.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">ไม่พบข้อมูลเส้นทางในสถานที่นี้</td></tr>';
+                        return;
+                    }
+
+                    routes.forEach(route => {
+                        tbody.innerHTML += `
+                        <tr>
+                            <td>${route.to_location_name || 'ไม่ระบุชื่อ'}</td>
+                            <td><input type="number" value="${route.travel_time_walk || 0}" class="cute-input-table" id="time-walk-${route.travel_route_id}" oninput="markChanged('${route.travel_route_id}')"></td>
+                            <td><input type="number" value="${route.travel_time_bike || 0}" class="cute-input-table" id="time-bike-${route.travel_route_id}" oninput="markChanged('${route.travel_route_id}')"></td>
+                            <td><input type="number" value="${route.distance || 0}" class="cute-input-table" id="dist-${route.travel_route_id}" oninput="markChanged('${route.travel_route_id}')"></td>
+                            <td>
+                                <button id="btn-${route.travel_route_id}" onclick="updateRoute('${route.travel_route_id}')" class="view-btn">บันทึก</button>
+                                <button onclick="deleteRoute('${route.travel_route_id}')" class="view-btn" style="background-color: #FF7F7F !important;">ลบ</button>
+                            </td>
+                        </tr>`;
+                    });
+                } catch (err) {
+                    console.error("Error:", err);
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
+                }
+            }
+
+            // ฟังก์ชันเปลี่ยนสีปุ่ม
+            function markChanged(id) {
+                const btn = document.getElementById(`btn-${id}`);
+                if (btn) {
+                    btn.classList.add('active');
+                }
+            }
+            // ฟังก์ชันบันทึกการแก้ไข
+            async function updateRoute(id) {
+                const adminId = localStorage.getItem('adminId');
+                const btn = document.getElementById(`btn-${id}`);
+
+                if (!btn) return;
+                if (!btn.classList.contains('active')) {
+                    Swal.fire({ icon: 'info', title: 'ยังไม่มีการแก้ไขข้อมูลนะจ๊ะ', confirmButtonColor: '#BF7E46' });
+                    return;
+                }
+
+                const walk = document.getElementById(`time-walk-${id}`).value;
+                const bike = document.getElementById(`time-bike-${id}`).value;
+                const dist = document.getElementById(`dist-${id}`).value;
+
+                const res = await fetch(`${API_BASE_URL}/api/map/routes/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ travel_route_id: id, travel_time_walk: walk, travel_time_bike: bike, distance: dist, admin_id: adminId })
+                });
+
+                if (res.ok) {
+                    Swal.fire({ icon: 'success', title: 'อัปเดตเส้นทางเรียบร้อย', confirmButtonColor: '#BF7E46' });
+                    btn.classList.remove('active');
+                }
+            }
+
+            // ฟังก์ชันลบเส้นทาง
+            async function deleteRoute(id) {
+                const adminId = localStorage.getItem('adminId');
+
+                const result = await Swal.fire({
+                    title: 'ลบเส้นทาง?',
+                    text: "คุณแน่ใจหรือไม่ที่จะลบเส้นทางนี้ออกจากระบบ?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#E2E2E2',
+                    confirmButtonText: 'ลบเลย',
+                    cancelButtonText: 'ยกเลิก'
+                });
+
+                if (result.isConfirmed) {
+                    const res = await fetch(`${API_BASE_URL}/api/map/routes/delete/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ admin_id: adminId })
+                    });
+                    if (res.ok) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'ลบข้อมูลเรียบร้อยแล้ว!',
+                            confirmButtonColor: '#BF7E46'
+                        });
+                        loadRoutes();
+                    }
+                }
+            }
+
+            // ฟังก์ชันเพิ่มเส้นทาง
+            async function addRoute() {
+                const fromId = document.getElementById('filter-from').value;
+                if (!fromId) { Swal.fire('แจ้งเตือน', 'กรุณาเลือกสถานที่ต้นทางก่อน', 'warning'); return; }
+
+                // ดึงรายชื่อสถานที่ปลายทางมาทำ dropdown
+                const res = await fetch(`${API_BASE_URL}/api/locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const locations = await res.json();
+                let options = locations.map(l => `<option value="${l.location_id}">${l.location_name}</option>`).join('');
+
+                const { value: formValues } = await Swal.fire({
+                    title: '✏️ เพิ่มเส้นทางใหม่',
+                    html: `
+                        <div class="cute-modal-content-wrapper">
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">📍 ถึงสถานที่ (ปลายทาง):</label>
+                                <select id="swal-to" class="swal2-select cute-edit-input">${options}</select>
+                            </div>
+                            
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🚶 เวลาเดิน (นาที):</label>
+                                <input type="number" id="swal-walk" class="swal2-input cute-edit-input" placeholder="เวลาเดิน (นาที)">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🚴 เวลาปั่น (นาที):</label>
+                                <input type="number" id="swal-bike" class="swal2-input cute-edit-input" placeholder="เวลาปั่น (นาที)">
+                            </div>
+
+                            <div class="cute-edit-field-wrapper">
+                                <label class="cute-edit-label">🔢 ระยะทาง (เมตร):</label>
+                                <input type="number" id="swal-dist" class="swal2-input cute-edit-input" placeholder="ระยะทาง (เมตร)">
+                            </div>
+                        </div>
+                    `,
+
+                    customClass: {
+                        popup: 'cute-modal-style',
+                        title: 'cute-modal-title',
+                        htmlContainer: 'cute-modal-content',
+                        confirmButton: 'cute-modal-button',
+                        cancelButton: 'cute-modal-button-cancel'
+                    },
+                    confirmButtonText: 'เพิ่มเส้นทาง',
+                    showCancelButton: true,
+                    cancelButtonText: 'ยกเลิก',
+                    buttonsStyling: false,
+                    preConfirm: () => {
+                        return {
+                            to_id: document.getElementById('swal-to').value,
+                            walk: document.getElementById('swal-walk').value,
+                            bike: document.getElementById('swal-bike').value,
+                            dist: document.getElementById('swal-dist').value
+                        }
+                    }
+                });
+
+                if (formValues) {
+                    const adminId = localStorage.getItem('adminId');
+                    const response = await fetch(`${API_BASE_URL}/api/map/routes/add`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            from_id: fromId,
+                            ...formValues,
+                            admin_id: adminId
+                        })
+                    });
+                    if (res.ok) {
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'เพิ่มเส้นทางใหม่สำเร็จ!',
+                            confirmButtonColor: '#BF7E46'
+                        });
+                        loadRoutes();
+                    }
+                }
+            }
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = fetchLocations;
+
+            window.addEventListener("DOMContentLoaded", () => {
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>

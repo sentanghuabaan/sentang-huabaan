@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติ - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylehistory.css">
+    <link rel="stylesheet" href="../css/stylefooter.css">
+    <link rel="stylesheet" href="../css/responsive-nav.css">
+</head>
+
+<body class="mobile-container">
+    <header class="home-header">
+        <img src="../image/logohuabaan.png" alt="logo" class="home-logo">
+
+        <nav class="nav-menu-desktop">
+            <ul>
+                <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+                <li><a href="history.html" class="menu-item active">ประวัติ</a></li>
+                <li><a href="location.html" class="menu-item">สถานที่</a></li>
+                <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+                <li><a href="trip-planner.html" class="menu-item">วางแผนการเดินทาง</a></li>
+                <li><a href="map-recommend.html" class="menu-item">แผนที่แนะนำ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-profile-header" id="user-auth-section">
+            <a href="login.html" class="login-trigger" id="user-link">
+                <img id="header-user-avatar" src="" alt="Profile"
+                    style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #BF7E46;">
+
+                <iconify-icon id="default-user-icon" icon="mdi:user-circle"></iconify-icon>
+            </a>
+        </div>
+        <a href="menu.html" class="menu-trigger">
+            <iconify-icon icon="material-symbols:menu-rounded"></iconify-icon>
+        </a>
+    </header>
+
+    <section class="video-banner">
+        <div id="player-wrapper">
+            <div id="player"></div>
+        </div>
+
+        <div class="video-overlay" id="videoOverlay">
+            <div class="play-icon" id="playBtn">
+                <iconify-icon id="iconStatus" icon="carbon:play-filled"></iconify-icon>
+            </div>
+        </div>
+    </section>
+
+    <main class="history-content" id="historyContainer">
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+
+    <script>
+
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function updateUserProfileHeader() {
+            const userStr = localStorage.getItem('user');
+            const userLink = document.getElementById('user-link');
+            const userAvatar = document.getElementById('header-user-avatar');
+            const defaultIcon = document.getElementById('default-user-icon');
+
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                userLink.href = "profile.html";
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    userAvatar.src = imgUrl;
+                    userAvatar.style.display = 'block';
+                    defaultIcon.style.display = 'none';
+                } else {
+                    // หากระบบจริงไม่มีรูป ให้ซ่อนรูปภาพและแสดงไอคอนเริ่มต้นแทน
+                    userAvatar.style.display = 'none';
+                    defaultIcon.style.display = 'block';
+                }
+            } else {
+                // กรณีที่ยังไม่ได้ล็อกอิน ให้กลับไปหน้า Login
+                userLink.href = "login.html";
+                userAvatar.style.display = 'none';
+                defaultIcon.style.display = 'block';
+            }
+        }
+
+        let allHistoryData = [];
+
+        async function fetchHistory() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/history`);
+                allHistoryData = await response.json();
+
+                renderHistory(allHistoryData.slice(0, 4), true);
+            } catch (error) {
+                console.error('Error loading history:', error);
+                const container = document.getElementById('historyContainer');
+                container.innerHTML = "<p style='text-align:center;'>ไม่สามารถโหลดข้อมูลได้</p>";
+            }
+        }
+
+        function renderHistory(data, showButton) {
+            const container = document.getElementById('historyContainer');
+            if (!container) return;
+
+            let htmlContent = data.map((item, index) => {
+                let imageSrc = '';
+
+                if (item.gallery_images && item.gallery_images.length > 0) {
+                    const path = item.gallery_images[0].trim();
+                    imageSrc = path.startsWith('http') ? path : `${API_BASE_URL}/${path}`;
+                } else if (item.thumbnail_url) {
+                    const path = item.thumbnail_url.trim();
+                    imageSrc = path.startsWith('http') ? path : `${API_BASE_URL}/${path}`;
+                }
+
+                const finalImage = imageSrc || 'https://via.placeholder.com/150?text=No+Image';
+
+                return `
+            <article class="history-block ${index % 2 !== 0 ? 'reverse' : ''}">
+                <div class="block-image">
+                    <img src="${finalImage}" alt="ประวัติ" 
+                         onerror="this.src='https://via.placeholder.com/150?text=Error'">
+                </div>
+                <div class="block-text">
+                    <p style="font-size: 14px; line-height: 1.6; color: #333;">
+                        ${item.content_text || ''}
+                    </p>
+                </div>
+            </article>
+        `;
+            }).join('');
+
+            container.innerHTML = htmlContent;
+
+            if (showButton && allHistoryData.length > 4) {
+                container.innerHTML += `
+            <div class="footer-action">
+                <button class="read-more" onclick="showAll()">ดูทั้งหมด</button>
+            </div>
+        `;
+            }
+        }
+
+        window.showAll = function () {
+            renderHistory(allHistoryData, false);
+        };
+
+        function loadFooter() {
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    footerPlaceholder.innerHTML = data;
+
+                    const footerLogo = footerPlaceholder.querySelector('.footer-logo');
+                    if (footerLogo) {
+                        footerLogo.src = '../image/logohuabaan2.png';
+                    }
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+
+        fetchHistory();
+        loadFooter();
+        updateUserProfileHeader();
+
+
+        let player;
+
+        window.onYouTubeIframeAPIReady = function () {
+            player = new YT.Player('player', {
+                height: '100%',
+                width: '100%',
+                videoId: '65PqN_wKVG0',
+                playerVars: {
+                    'autoplay': 1,
+                    'mute': 1,
+                    'loop': 1,
+                    'playlist': '65PqN_wKVG0',
+                    'controls': 0,
+                    'showinfo': 0,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // เมื่อ Player พร้อม ให้สั่งงานการคลิกบนพื้นหลังวิดีโอ
+        function onPlayerReady(event) {
+            const videoOverlay = document.getElementById('videoOverlay');
+            const iconStatus = document.getElementById('iconStatus');
+            const playIconDiv = document.querySelector('.play-icon');
+
+            videoOverlay.addEventListener('click', () => {
+                const state = player.getPlayerState();
+
+                playIconDiv.classList.remove('animate-play');
+                void playIconDiv.offsetWidth;
+
+                if (state === YT.PlayerState.PLAYING) {
+                    player.pauseVideo();
+                    iconStatus.setAttribute('icon', 'carbon:play-filled');
+                } else {
+                    player.playVideo();
+                    player.unMute();
+                    iconStatus.setAttribute('icon', 'carbon:pause-filled');
+
+                    playIconDiv.classList.add('animate-play');
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            const videoOverlay = document.getElementById('videoOverlay');
+            const iconStatus = document.getElementById('iconStatus');
+
+            if (event.data === YT.PlayerState.PAUSED) {
+                videoOverlay.classList.add('is-paused');
+                iconStatus.setAttribute('icon', 'carbon:play-filled');
+            } else if (event.data === YT.PlayerState.PLAYING) {
+                videoOverlay.classList.remove('is-paused');
+            }
+
+            if (event.data === YT.PlayerState.ENDED) {
+                player.playVideo();
+            }
+        }
+    </script>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+</body>
+
+</html>

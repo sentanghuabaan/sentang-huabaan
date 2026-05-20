@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Report - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/stylecommon.css">
+    <link rel="stylesheet" href="../css/styleadmin_location.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
+            <nav class="menu">
+                <a href="admin_dashboard.html" class="menu-item"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item">
+                    <iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item active"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item">
+                    <iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs
+                </a>
+                <a href="admin_trash.html" class="menu-item trash-menu">
+                    <iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="divider"></div>
+                <a href="javascript:void(0)" class="menu-item logout-btn" onclick="logoutAdmin()">
+                    <iconify-icon icon="mdi:logout" class="menu-icon"></iconify-icon> Log Out
+                </a>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <h2 class="page-title">REPORT MANAGEMENT</h2>
+
+            <header class="top-bar">
+                <!-- ค้นหาชื่อผู้แจ้ง/ผู้ถูกแจ้ง -->
+                <div class="search-wrapper">
+                    <iconify-icon icon="material-symbols:search-rounded" class="search-icon"></iconify-icon>
+                    <input type="text" placeholder="ค้นหาชื่อผู้ใช้งาน..." id="reportSearch"
+                        onkeyup="filterReportTable()">
+                </div>
+
+                <!-- ตัวกรองสถานะ -->
+                <div class="custom-filter-wrapper">
+                    <div class="filter-display" onclick="toggleDropdown('statusFilterOptions')">
+                        <iconify-icon icon="mdi:list-status" class="filter-icon"></iconify-icon>
+                        <span id="currentStatusText">Status</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="statusFilterOptions">
+                        <div class="f-option" onclick="applyFilter('status', 'all', 'All Status')">All Status</div>
+                        <div class="f-option" onclick="applyFilter('status', 'pending', 'Pending')">Pending</div>
+                        <div class="f-option" onclick="applyFilter('status', 'checked', 'Checked')">Checked</div>
+                    </div>
+                </div>
+
+                <!-- ตัวกรองเหตุผล -->
+                <div class="custom-filter-wrapper">
+                    <div class="filter-display" onclick="toggleDropdown('reasonFilterOptions')">
+                        <iconify-icon icon="mdi:alert-circle-outline" class="filter-icon"></iconify-icon>
+                        <span id="currentReasonText">Reason</span>
+                        <iconify-icon icon="mingcute:down-fill" class="arrow-icon"></iconify-icon>
+                    </div>
+                    <div class="filter-options" id="reasonFilterOptions">
+                        <div class="f-option" onclick="applyFilter('reason', 'all', 'All Reasons')">All Reasons</div>
+                        <div class="f-option" onclick="applyFilter('reason', 'คำพูดไม่เหมาะสม', 'คำพูดไม่เหมาะสม')">
+                            คำพูดไม่เหมาะสม</div>
+                        <div class="f-option" onclick="applyFilter('reason', 'สแปมข้อมูล', 'สแปมข้อมูล')">สแปมข้อมูล
+                        </div>
+                        <div class="f-option"
+                            onclick="applyFilter('reason', 'แอบอ้างเป็นบุคคลอื่น', 'แอบอ้างเป็นบุคคลอื่น')">
+                            แอบอ้างเป็นบุคคลอื่น</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>จัดการ</th>
+                            <th>ผู้แจ้ง</th>
+                            <th>ผู้ถูกแจ้ง</th>
+                            <th>เหตุผล</th>
+                            <th>รายละเอียด</th>
+                            <th>วันที่แจ้ง</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportData"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:3000';
+
+            const adminToken = localStorage.getItem('adminToken');
+            if (!adminToken) {
+                window.location.href = 'admin_login.html';
+            }
+
+            // ฟังก์ชันเปิด/ปิด Dropdown
+            function toggleDropdown(id) {
+                document.querySelectorAll('.filter-options').forEach(opt => {
+                    if (opt.id !== id) opt.classList.remove('show');
+                });
+                document.getElementById(id).classList.toggle('show');
+            }
+
+            // ฟังก์ชันเลือกค่าจาก Filter
+            function applyFilter(type, value, text) {
+                if (type === 'status') {
+                    document.getElementById('currentStatusText').innerText = text;
+                } else {
+                    document.getElementById('currentReasonText').innerText = text;
+                }
+                document.querySelectorAll('.filter-options').forEach(opt => opt.classList.remove('show'));
+                filterReportTable();
+            }
+
+            // ฟังก์ชันหลักในการกรองตาราง (Search + Status + Reason)
+            function filterReportTable() {
+                const searchText = document.getElementById("reportSearch").value.toLowerCase();
+                const statusFilter = document.getElementById("currentStatusText").innerText.toLowerCase();
+                const reasonFilter = document.getElementById("currentReasonText").innerText.toLowerCase();
+
+                const rows = document.querySelectorAll("#reportData tr");
+
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    const rowStatus = row.cells[6].innerText.toLowerCase();
+                    const rowReason = row.cells[3].innerText.toLowerCase();
+
+                    const matchesSearch = text.includes(searchText);
+                    const matchesStatus = (statusFilter === "status" || statusFilter === "all status") || rowStatus.includes(statusFilter);
+                    const matchesReason = (reasonFilter === "reason" || reasonFilter === "all reasons") || rowReason.includes(reasonFilter);
+
+                    if (matchesSearch && matchesStatus && matchesReason) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            // ปิด Dropdown เมื่อคลิกข้างนอก
+            window.onclick = function (event) {
+                if (!event.target.closest('.custom-filter-wrapper')) {
+                    document.querySelectorAll('.filter-options').forEach(opt => opt.classList.remove('show'));
+                }
+            }
+
+            async function fetchReports() {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/account-reports`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.status === 401 || response.status === 403) {
+                        localStorage.clear();
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+                    const reports = await response.json();
+                    const tbody = document.getElementById('reportData');
+
+                    tbody.innerHTML = reports.map(r => `
+                        <tr>
+                            <td class="action-cell">
+                                ${r.status === 'pending' ? `
+                                    <button class="edit-btn-sm" onclick="handleReport(${r.report_id}, ${r.reported_user_id}, '${r.reason_type}')">
+                                        <iconify-icon icon="mdi:gavel"></iconify-icon> Manage
+                                    </button>
+                                ` : `<iconify-icon icon="mdi:check-circle" style="color: #4CAF50; font-size: 24px;"></iconify-icon>`}
+                            </td>
+                            <td>${r.reporter_name} (ID: ${r.reporter_id})</td>
+                            <td>${r.reported_name} (ID: ${r.reported_user_id})</td>
+                            <td><span class="badge" style="background: #BF7E46; padding: 5px 10px; border-radius: 10px; color: white;">${r.reason_type}</span></td>
+                            <td class="truncate">${r.description || '-'}</td>
+                            <td>${new Date(r.created_at).toLocaleString('th-TH')}</td>
+                            <td>
+                                <span style="color: ${r.status === 'pending' ? '#FF9A9A' : '#4CAF50'}; font-weight: bold;">
+                                    ${r.status.toUpperCase()}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } catch (err) {
+                    console.error("Error fetching reports:", err);
+                }
+            }
+
+            async function handleReport(report_id, reported_user_id, report_reason) {
+                const { value: actionResult } = await Swal.fire({
+                    title: 'จัดการรายการแจ้งเหตุ',
+                    text: `เหตุผลที่ได้รับรายงานมาคือ: "${report_reason}"`,
+                    icon: 'warning',
+                    input: 'select',
+                    inputOptions: {
+                        'banned': 'ระงับการใช้งาน (Banned)',
+                        'ignore': 'เพิกเฉย (Checked)'
+                    },
+                    inputPlaceholder: '-- เลือกการดำเนินการ --',
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยัน',
+                    cancelButtonText: 'ยกเลิก',
+                    preConfirm: (value) => {
+                        if (!value) {
+                            Swal.showValidationMessage('กรุณาเลือกการดำเนินการ');
+                        }
+                        return value;
+                    }
+                });
+
+                if (actionResult) {
+                    const adminId = localStorage.getItem('adminId');
+
+                    // อัปเดตสถานะ User (Banned หรือไม่)
+                    const resUser = await fetch(`${API_BASE_URL}/api/admin/update-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            user_id: reported_user_id,
+                            status: actionResult,
+                            ban_reason: actionResult === 'banned' ? report_reason : null,
+                            admin_id: adminId
+                        })
+                    });
+
+                    // อัปเดตตาราง account_reports
+                    if (resUser.ok) {
+                        const resReport = await fetch(`${API_BASE_URL}/api/account-reports/action/${report_id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${adminToken}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                action_type: actionResult,
+                                reported_user_id: reported_user_id,
+                                admin_id: adminId
+                            })
+                        });
+
+                        if (resReport.ok) {
+                            Swal.fire('สำเร็จ', 'ดำเนินการเรียบร้อยแล้ว', 'success');
+                            fetchReports();
+                        }
+                    }
+                }
+            }
+
+            function logoutAdmin() {
+                Swal.fire({
+                    title: 'ออกจากระบบ?',
+                    text: "คุณต้องการออกจากระบบจัดการใช่หรือไม่",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#BF7E46',
+                    cancelButtonColor: '#ccc',
+                    confirmButtonText: 'ตกลง',
+                    cancelButtonText: 'ยกเลิก',
+                    borderRadius: '20px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('adminToken');
+                        localStorage.removeItem('adminName');
+                        window.location.href = 'admin_login.html';
+                    }
+                });
+            }
+
+            window.onload = fetchReports;
+
+            window.addEventListener("DOMContentLoaded", () => {
+                const activeMenu = document.querySelector('.menu-item.active');
+
+                if (activeMenu) {
+                    activeMenu.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

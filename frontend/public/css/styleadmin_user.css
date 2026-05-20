@@ -1,0 +1,256 @@
+#userTable {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#userTable th:nth-child(1),
+#userTable td:nth-child(1) {
+    width: 5%;
+}
+
+#userTable th:nth-child(2),
+#userTable td:nth-child(2) {
+    width: 18%;
+}
+
+#userTable th:nth-child(3),
+#userTable td:nth-child(3) {
+    width: 27%;
+}
+
+#userTable th:nth-child(4),
+#userTable td:nth-child(4) {
+    width: 20%;
+}
+
+#userTable th:nth-child(5),
+#userTable td:nth-child(5) {
+    width: 15%;
+}
+
+#userTable th:nth-child(6),
+#userTable td:nth-child(6) {
+    width: 15%;
+}
+
+#userListData tr {
+    background-color: white !important;
+}
+
+#userListData tr td {
+    height: 70px;
+    vertical-align: middle;
+    background-color: transparent !important;
+}
+
+#userTable td:nth-child(3) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+    margin-right: 10px;
+    font-size: 30px;
+    color: #888;
+}
+
+.custom-select-wrapper {
+    position: relative;
+    width: 100px;
+}
+
+.custom-select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.custom-select.active {
+    background-color: #D6F6C6;
+    color: #4CAF50;
+}
+
+.custom-select.banned {
+    background-color: #FFC1C1;
+    color: #FF5252;
+}
+
+.custom-options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.custom-options.show {
+    display: block;
+}
+
+.custom-select.role-admin {
+    background-color: #E0F2F1;
+    color: #00897B;
+}
+
+.custom-select.role-user {
+    background-color: #E3F2FD;
+    color: #1E88E5;
+}
+
+.option {
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.option:hover {
+    background-color: #FBEDD6;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#roleFilterWrapper .filter-display {
+    background-color: #FBEDD6;
+    border: 1px solid #B1A396;
+}
+
+#roleFilterWrapper .filter-display:hover {
+    background-color: #f2e1c9;
+}
+
+/* ตกแต่งตาราง OTP */
+#otpTable {
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0 15px !important;
+}
+
+#otpData tr td {
+    background-color: white !important;
+    padding: 20px !important;
+    border: none !important;
+}
+
+#otpData tr td:first-child {
+    border-radius: 15px 0 0 15px !important;
+}
+
+#otpData tr td:last-child {
+    border-radius: 0 15px 15px 0 !important;
+}
+
+/* หัวตาราง */
+#otpTable thead th {
+    padding: 10px 20px;
+    color: #000;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* จัดการเซลล์ปุ่มลบให้อยู่หน้าสุด */
+.action-cell {
+    width: 80px;
+    text-align: center;
+}
+
+/* ปุ่มลบ */
+.delete-btn-sm {
+    background-color: #FF9A9A;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+}
+
+#otpData tr td {
+    background-color: white !important;
+    padding: 15px !important;
+    border: none !important;
+}
+
+#otpTable {
+    border-collapse: separate !important;
+    border-spacing: 0 15px !important;
+}
+
+.action-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.delete-btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background-color: #FF9A9A;
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* ban user */
+.ban-reason-label {
+    font-size: 12px;
+    color: #e74c3c;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: #fff5f5;
+    border-radius: 8px;
+    border: 1px solid #ffcccc;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.4;
+    width: max-content;
+    max-width: 250px;
+    white-space: normal;
+}
+
+.ban-reason-label span {
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ban-reason-label:hover span {
+    max-width: none;
+    white-space: normal;
+}

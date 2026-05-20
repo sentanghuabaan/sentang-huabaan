@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สถานที่แนะนำ - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylemap-recommend.css">
+    <link rel="stylesheet" href="../css/styleplantrip.css">
+    <link rel="stylesheet" href="../css/stylefooter.css">
+    <link rel="stylesheet" href="../css/responsive-nav.css">
+</head>
+
+<body class="mobile-container">
+    <header class="home-header">
+        <img src="../image/logohuabaan.png" alt="logo" class="home-logo">
+
+        <nav class="nav-menu-desktop">
+            <ul>
+                <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+                <li><a href="history.html" class="menu-item">ประวัติ</a></li>
+                <li><a href="location.html" class="menu-item">สถานที่</a></li>
+                <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+                <li><a href="trip-planner.html" class="menu-item">วางแผนการเดินทาง</a></li>
+                <li><a href="map-recommend.html" class="menu-item active">แผนที่แนะนำ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-profile-header" id="user-auth-section">
+            <a href="login.html" class="login-trigger" id="user-link">
+                <img id="header-user-avatar" src="" alt="Profile"
+                    style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #BF7E46;">
+
+                <iconify-icon id="default-user-icon" icon="mdi:user-circle"></iconify-icon>
+            </a>
+        </div>
+        <a href="menu.html" class="menu-trigger">
+            <iconify-icon icon="material-symbols:menu-rounded"></iconify-icon>
+        </a>
+    </header>
+
+    <main class="recommend-wrapper">
+        <div class="section-header">
+            <h2>สถานที่แนะนำ</h2>
+        </div>
+        <div class="filter-container">
+            <button class="filter-btn active" data-type="all">ทั้งหมด</button>
+            <button class="filter-btn" data-type="คาเฟ่">คาเฟ่</button>
+            <button class="filter-btn" data-type="ร้านอาหาร">ร้านอาหาร</button>
+            <button class="filter-btn" data-type="โรงแรม">โรงแรม</button>
+            <button class="filter-btn" data-type="เกสต์เฮ้าส์">เกสต์เฮ้าส์</button>
+            <button class="filter-btn" data-type="ประวัติศาสตร์">ประวัติศาสตร์</button>
+        </div>
+    </main>
+
+    <!-- พื้นที่แสดงแผนที่/สถานที่แนะนำ -->
+    <div id="map-container" style="position: relative; overflow: hidden;">
+        <img src="../image/Map.png" id="map-bg" style="width: 100%;">
+        <div id="pins-layer"></div>
+    </div>
+
+    <!-- Card รายละเอียดสถานที่ (จะแสดงเมื่อคลิกหมุด) -->
+    <div id="recommend-card" class="hidden">
+        <h3 id="card-name"></h3>
+        <div class="card-meta">
+            <span id="card-distance"></span>
+            <span id="card-status"></span>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function updateUserProfileHeader() {
+            const userStr = localStorage.getItem('user');
+            const userLink = document.getElementById('user-link');
+            const userAvatar = document.getElementById('header-user-avatar');
+            const defaultIcon = document.getElementById('default-user-icon');
+
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                userLink.href = "profile.html";
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    userAvatar.src = imgUrl;
+                    userAvatar.style.display = 'block';
+                    defaultIcon.style.display = 'none';
+                } else {
+                    // หากระบบจริงไม่มีรูป ให้ซ่อนรูปภาพและแสดงไอคอนเริ่มต้นแทน
+                    userAvatar.style.display = 'none';
+                    defaultIcon.style.display = 'block';
+                }
+            } else {
+                // กรณีที่ยังไม่ได้ล็อกอิน ให้กลับไปหน้า Login
+                userLink.href = "login.html";
+                userAvatar.style.display = 'none';
+                defaultIcon.style.display = 'block';
+            }
+        }
+
+        // ฟังก์ชันสำหรับดึงข้อมูลสถานที่จาก API
+        async function fetchRecommendedPlaces(type = 'all') {
+            try {
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    const response = await fetch(`${API_BASE_URL}/api/recommendations?lat=${userLat}&lng=${userLng}&type=${type}`);
+                    const places = await response.json();
+
+                    renderPins(places);
+
+                    updateAllPinsStatus();
+                });
+            } catch (error) {
+                console.error('Error fetching places:', error);
+            }
+        }
+
+        // ฟังก์ชันช่วยจัดการทิศทางป้ายชื่อมา
+        function getLabelDirection(id) {
+            const leftLabels = ['LOC-011', 'LOC-006', 'LOC-007'];
+            const rightLabels = ['LOC-002'];
+            const topLabels = ['LOC-008', 'LOC-010', 'LOC-014', 'LOC-015', 'LOC-017', 'LOC-013', 'LOC-005'];
+            if (leftLabels.includes(id)) return 'direction-left';
+            if (rightLabels.includes(id)) return 'direction-right';
+            if (topLabels.includes(id)) return 'direction-top';
+            return 'direction-bottom';
+        }
+
+        function renderPins(places) {
+            const pinLayer = document.getElementById('pins-layer');
+            pinLayer.innerHTML = '';
+
+            places.forEach(loc => {
+                const pin = document.createElement('div');
+                pin.setAttribute('data-op', loc.operating_days || "ทุกวัน");
+                pin.setAttribute('data-open', loc.opening_time);
+                pin.setAttribute('data-close', loc.closing_time);
+
+                const dirClass = getLabelDirection(loc.location_id);
+
+                // ตรวจสอบ Street Art
+                const isStreetArt = !loc.location_id || loc.location_id === 'null' ||
+                    (loc.map_id && (loc.map_id.startsWith('MAP-18') || loc.map_id.startsWith('MAP-19') ||
+                        loc.map_id.startsWith('MAP-20') || loc.map_id.startsWith('MAP-21') ||
+                        loc.map_id.startsWith('MAP-22')));
+
+                pin.style.left = `${loc.position_x}%`;
+                pin.style.top = `${loc.position_y}%`;
+
+                const thumbPath = loc.thumbnail_image ?
+                    (loc.thumbnail_image.trim().startsWith('http') ? loc.thumbnail_image.trim() : `${API_BASE_URL}/backend/${loc.thumbnail_image.trim()}`)
+                    : '../image/logohuabaan.png';
+
+                if (isStreetArt) {
+                    pin.className = `location-pin street-art-pin ${dirClass}`;
+                    pin.innerHTML = `<img src="${thumbPath}" class="location-img" onerror="this.src='../image/logohuabaan.png'">`;
+                } else {
+                    pin.className = `location-pin ${dirClass}`;
+                    pin.innerHTML = `
+                        <div class="pin-content">
+                            <img src="${thumbPath}" class="location-img" onerror="this.src='../image/logohuabaan.png'">
+                                <div class="pin-info">
+                                    <div class="icon-group">
+                                        <div class="selection-wrapper">
+                                        <iconify-icon icon="fa6-solid:location-pin" class="pin-default"></iconify-icon>
+                                        </div>
+                                    </div>
+                                <span class="location-name">${loc.location_name}</span>
+                            </div>
+                        </div>
+                        `;
+
+                    pin.addEventListener('click', (e) => {
+                        e.stopPropagation();
+
+                        document.querySelectorAll('.location-pin').forEach(p => p.classList.remove('selected'));
+                        pin.classList.add('selected');
+
+                        showLocationDetail(loc);
+                    });
+                }
+                pinLayer.appendChild(pin);
+            });
+        }
+
+        function showLocationDetail(place) {
+            const card = document.getElementById('recommend-card');
+            const container = document.getElementById('map-container');
+
+            // คำนวณสถานะ เปิด/ปิด
+            const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+            const selectedDay = days[new Date().getDay()];
+            const opDays = (place.operating_days || "ทุกวัน").trim();
+
+            let isClosedDay = false;
+            if (opDays !== "ทุกวัน") {
+                if (opDays.includes("ยกเว้น") && opDays.includes(selectedDay)) isClosedDay = true;
+                else if (opDays.startsWith("ทุกวัน") && !opDays.includes(selectedDay)) isClosedDay = true;
+            }
+
+            const now = new Date();
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":00";
+            const isOpen = !isClosedDay && (currentTime >= place.opening_time && currentTime <= place.closing_time);
+
+            //  อัปเดตข้อมูลใน UI Card
+            document.getElementById('card-name').innerText = place.location_name;
+
+            let distDisplay = place.distance < 1
+                ? `${(place.distance * 1000).toFixed(0)} ม.`
+                : `${place.distance.toFixed(2)} กม.`;
+            document.getElementById('card-distance').innerText = distDisplay;
+
+            const statusEl = document.getElementById('card-status');
+            statusEl.innerText = isOpen ? 'เปิด' : 'ปิด';
+            statusEl.className = `status-badge ${isOpen ? 'status-open' : 'status-closed'}`;
+
+            // จัดการตำแหน่ง Card 
+            const cardWidth = 180;
+            const containerWidth = container.offsetWidth;
+            const containerHeight = container.offsetHeight;
+
+            // คำนวณแกน X (พิกเซล)
+            let posX = (place.position_x / 100) * containerWidth;
+            let leftPosition = posX - (cardWidth / 2);
+
+            // เช็คขอบจอซ้าย-ขวา
+            if (leftPosition < 10) leftPosition = 10;
+            else if (leftPosition + cardWidth > containerWidth - 10) leftPosition = containerWidth - cardWidth - 10;
+
+            // คำนวณแกน Y (พิกเซล)
+            let posY = (place.position_y / 100) * containerHeight;
+
+            // ตั้งค่าตำแหน่งจริง
+            card.style.left = `${leftPosition}px`;
+            card.style.top = (window.innerWidth >= 768)
+                ? `${posY - 10}px`
+                : `${posY + 230}px`;
+            card.style.transform = `translateY(0)`;
+
+            card.classList.add('active');
+            card.classList.remove('hidden');
+        }
+
+        function updateAllPinsStatus() {
+            const pins = document.querySelectorAll('.location-pin');
+            const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+
+            const now = new Date();
+            const selectedDay = days[now.getDay()];
+            const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":00";
+
+            pins.forEach(pin => {
+                const opDays = pin.getAttribute('data-op') || "ทุกวัน";
+                const openTime = pin.getAttribute('data-open');
+                const closeTime = pin.getAttribute('data-close');
+
+
+                let isClosedDay = false;
+                if (opDays !== "ทุกวัน") {
+                    if (opDays.includes("ยกเว้น") && opDays.includes(selectedDay)) isClosedDay = true;
+                    else if (opDays.startsWith("ทุกวัน") && !opDays.includes(selectedDay)) isClosedDay = true;
+                }
+
+                // เช็คเวลาเปิดทำการ
+                let isOpen = false;
+                if (openTime && closeTime) {
+                    const isTimeOpen = currentTime >= openTime && currentTime <= closeTime;
+                    isOpen = !isClosedDay && isTimeOpen;
+                }
+
+            });
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                // เปลี่ยนสถานะปุ่มที่เลือก
+                document.querySelector('.filter-btn.active').classList.remove('active');
+                this.classList.add('active');
+
+                // ดึงข้อมูลใหม่ตามหมวดหมู่ (location_type)
+                const selectedType = this.getAttribute('data-type');
+                fetchRecommendedPlaces(selectedType);
+            });
+        });
+
+        function loadFooter() {
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    footerPlaceholder.innerHTML = data;
+
+                    const footerLogo = footerPlaceholder.querySelector('.footer-logo');
+                    if (footerLogo) {
+                        footerLogo.src = '../image/logohuabaan2.png';
+                    }
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+
+        document.getElementById('map-bg').addEventListener('click', () => {
+            document.getElementById('recommend-card').classList.remove('active');
+            document.querySelectorAll('.location-pin').forEach(p => p.classList.remove('selected'));
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserProfileHeader();
+            loadFooter();
+            fetchRecommendedPlaces('all');
+        });
+
+    </script>
+
+</body>
+
+</html>

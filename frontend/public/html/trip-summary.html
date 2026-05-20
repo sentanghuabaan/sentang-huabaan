@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปแผนการเดินทาง - เส้นทางหัวบ้าน</title>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylesummary.css">
+    <link rel="stylesheet" href="../css/responsive-nav.css">
+    <link rel="stylesheet" href="../css/stylefooter.css">
+</head>
+
+<body class="mobile-container">
+    <header class="home-header">
+        <img src="../image/logohuabaan.png" alt="logo" class="home-logo">
+
+        <nav class="nav-menu-desktop">
+            <ul>
+                <li><a href="../index.html" class="menu-item">หน้าแรก</a></li>
+                <li><a href="history.html" class="menu-item">ประวัติ</a></li>
+                <li><a href="location.html" class="menu-item">สถานที่</a></li>
+                <li><a href="activity.html" class="menu-item">กิจกรรม</a></li>
+                <li><a href="trip-planner.html" class="menu-item active">วางแผนการเดินทาง</a></li>
+                <li><a href="map-recommend.html" class="menu-item">แผนที่แนะนำ</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-profile-header" id="user-auth-section">
+            <a href="login.html" class="login-trigger" id="user-link">
+                <img id="header-user-avatar" src="" alt="Profile"
+                    style="display: none; width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #BF7E46;">
+
+                <iconify-icon id="default-user-icon" icon="mdi:user-circle"></iconify-icon>
+            </a>
+        </div>
+        <a href="menu.html" class="menu-trigger">
+            <iconify-icon icon="material-symbols:menu-rounded"></iconify-icon>
+        </a>
+    </header>
+
+    <main class="planner-wrapper">
+        <h2>วางแผนการเดินทาง</h2>
+        <p>ONE DAY</p>
+
+        <div id="display-trip-name" class="trip-type-badge">กำลังโหลดชื่อทริป...</div>
+
+        <div id="itinerary-list">
+            กำลังประมวลผลเส้นทางที่ดีที่สุด...
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function updateUserProfileHeader() {
+            const userStr = localStorage.getItem('user');
+            const userLink = document.getElementById('user-link');
+            const userAvatar = document.getElementById('header-user-avatar');
+            const defaultIcon = document.getElementById('default-user-icon');
+
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                userLink.href = "profile.html";
+
+                if (userData.profile_img) {
+                    const imgUrl = userData.profile_img.startsWith('http')
+                        ? userData.profile_img
+                        : `${API_BASE_URL}/${userData.profile_img}`;
+
+                    userAvatar.src = imgUrl;
+                    userAvatar.style.display = 'block';
+                    defaultIcon.style.display = 'none';
+                } else {
+                    // หากระบบจริงไม่มีรูป ให้ซ่อนรูปภาพและแสดงไอคอนเริ่มต้นแทน
+                    userAvatar.style.display = 'none';
+                    defaultIcon.style.display = 'block';
+                }
+            } else {
+                // กรณีที่ยังไม่ได้ล็อกอิน ให้กลับไปหน้า Login
+                userLink.href = "login.html";
+                userAvatar.style.display = 'none';
+                defaultIcon.style.display = 'block';
+            }
+        }
+
+        function loadFooter() {
+            fetch('footer.html')
+                .then(response => response.text())
+                .then(data => {
+                    const footerPlaceholder = document.getElementById('footer-placeholder');
+                    if (footerPlaceholder) {
+                        footerPlaceholder.innerHTML = data;
+                        const footerLogo = footerPlaceholder.querySelector('.footer-logo');
+                        if (footerLogo) {
+                            footerLogo.src = '../image/logohuabaan2.png';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateUserProfileHeader();
+            loadFooter();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const tripId = urlParams.get('id');
+
+            if (!tripId) {
+                alert("ไม่พบรหัสการเดินทาง");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/map/trip-details/${tripId}`);
+                const data = await response.json();
+                renderItinerary(data);
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        });
+
+        // ฟังก์ชันสำหรับวาดแผนการเดินทาง
+        function renderItinerary(items) {
+            if (items.length > 0) {
+                document.getElementById('display-trip-name').innerText = items[0].trip_name;
+            }
+
+            const container = document.getElementById('itinerary-list');
+            container.innerHTML = '';
+
+            container.innerHTML += `<div class="timeline-badge">เริ่มต้น</div>`;
+
+            items.forEach((item, index) => {
+                const isLate = item.arrival_time > item.closing_time;
+
+                // --- เช็คว่ามาถึงก่อนร้านเปิดหรือไม่ ---
+                const arrivalVal = item.arrival_time.substring(0, 5).replace(':', '');
+                const openingVal = item.opening_time.substring(0, 5).replace(':', '');
+                const isBeforeOpen = arrivalVal < openingVal;
+
+                const isHotel = item.location_name.includes('โรงแรม') || item.location_name.includes('ที่พัก');
+
+                const card = document.createElement('div');
+                card.className = `location-step ${isLate ? 'is-late-warning' : ''}`;
+
+                let locationImgUrl = "";
+                if (item.first_image) {
+                    locationImgUrl = item.first_image.trim().startsWith('http')
+                        ? item.first_image.trim()
+                        : `${API_BASE_URL}/${item.first_image.trim()}`;
+                } else {
+                    locationImgUrl = '../image/logohuabaan.png';
+                }
+
+                card.innerHTML = `
+                    <div class="step-marker">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="time-range">${item.arrival_time.substring(0, 5)} - ${item.departure_time.substring(0, 5)}</div>
+                        <div class="location-name">${item.location_name}</div>
+                        
+                        <!-- แจ้งเตือนกรณีมาถึงก่อนร้านเปิด -->
+                        ${isBeforeOpen && !isHotel ? `
+                            <div class="warning-text shop-warning" style="color: #d97706; background: #fffbeb; padding: 8px; border-radius: 8px; margin-top: 5px; font-size: 13px; display: flex; align-items: center; gap: 5px;">
+                                <iconify-icon icon="mdi:store-clock"></iconify-icon> 
+                                คุณอาจไปถึงก่อนเวลาเปิด (เปิด ${item.opening_time.substring(0, 5)} น.)
+                            </div>` : ''}
+
+                        ${isLate ? `<div class="warning-text"><iconify-icon icon="ion:warning"></iconify-icon> สถานที่นี้อาจปิดก่อนที่คุณจะไปถึง</div>` : ''}
+
+                        <!-- แจ้งเตือนเช็คอินโรงแรม -->
+                        ${isHotel && parseInt(item.arrival_time.split(':')[0]) < 14 ? `
+                            <div class="warning-text hotel-warning" style="color: #d97706; background: #fffbeb; padding: 8px; border-radius: 8px; margin-top: 5px;">
+                                <iconify-icon icon="mdi:clock-alert"></iconify-icon> 
+                                เช็คอินได้เวลา 14:00 น. อาจต้องฝากกระเป๋าไว้ก่อน
+                            </div>` : ''}
+
+                        <img src="${locationImgUrl}" class="location-thumb" onerror="this.src='../image/logohuabaan.png'">
+                        <div class="operating-info">
+                            เวลาทำการ : ${item.operating_days || 'ทุกวัน'} <br>
+                            (${item.opening_time.substring(0, 5)} - ${item.closing_time.substring(0, 5)})
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                if (index < items.length - 1) {
+                    const route = document.createElement('div');
+                    route.className = 'travel-connector';
+                    const dist = item.next_distance ? `${Math.round(item.next_distance)} เมตร` : 'กำลังคำนวณ';
+                    const walkTime = item.next_walk_time ? `${item.next_walk_time} นาที` : '1 นาที';
+                    const bikeTime = item.next_bike_time ? `${item.next_bike_time} นาที` : '1 นาที';
+
+                    route.innerHTML = `
+                        <div class="travel-info">
+                            <div class="info-item bike"><span>${bikeTime}</span><iconify-icon icon="grommet-icons:bike"></iconify-icon></div>
+                            <div class="info-item walk"><span>${walkTime}</span><iconify-icon icon="fa-solid:walking"></iconify-icon></div>
+                            <div class="info-item distance"><span>${dist}</span><iconify-icon icon="game-icons:path-distance"></iconify-icon></div>
+                        </div>
+                    `;
+                    container.appendChild(route);
+                }
+            });
+
+            const endNode = document.createElement('div');
+            endNode.className = 'timeline-badge end';
+            endNode.innerText = 'สิ้นสุด';
+            container.appendChild(endNode);
+        }
+    </script>
+</body>
+
+</html>

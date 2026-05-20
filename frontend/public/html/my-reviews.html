@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการแสดงความคิดเห็น - เส้นทางหัวบ้าน</title>
+    <link rel="stylesheet" href="../css/style-myreviews.css">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+</head>
+
+<body class="mobile-container">
+    <header class="login-header">
+        <button class="close-btn" onclick="history.back()">
+            <iconify-icon icon="ion:chevron-back-outline"></iconify-icon>
+        </button>
+
+        <div class="logo-wrapper">
+            <img src="../image/logohuabaan.png" alt="เส้นทางหัวบ้าน" class="login-logo">
+        </div>
+
+        <div class="header-divider"></div>
+    </header>
+
+    <main class="review-content">
+        <h2 class="review-title">การแสดงความคิดเห็นของคุณ</h2>
+
+        <div class="review-container">
+            <div class="review-filter-section">
+                <div class="custom-select-wrapper" id="customSelect">
+                    <div class="select-trigger">
+                        <span id="selectedOption">ล่าสุด</span>
+                        <iconify-icon icon="mingcute:down-fill"></iconify-icon>
+                    </div>
+                    <div class="select-options">
+                        <div class="option" data-value="newest">ล่าสุด</div>
+                        <div class="option" data-value="highest">คะแนนสูงที่สุด</div>
+                        <div class="option" data-value="lowest">คะแนนน้อยที่สุด</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reviewList">
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        async function fetchReviews(sortBy = 'newest') {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            if (!userData) { window.location.href = 'login.html'; return; }
+
+            const listElement = document.getElementById('reviewList');
+
+            listElement.innerHTML = '<p style="text-align:center; margin-top:20px;">กำลังโหลด...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/my-reviews/${userData.user_id}?sort=${sortBy}`);
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    listElement.innerHTML = '<p style="text-align:center;">ไม่สามารถโหลดข้อมูลได้</p>';
+                    return;
+                }
+
+                if (data.length === 0) {
+                    listElement.innerHTML = '<p style="text-align:center; margin-top:50px;">ยังไม่มีประวัติการรีวิว</p>';
+                    return;
+                }
+
+                listElement.innerHTML = data.map(rev => {
+                    let displayTitle = rev.activity_name || "";
+                    let displayLocation = rev.location_name || "เส้นทางหัวบ้าน";
+
+                    const dateOpts = { day: 'numeric', month: 'short', year: 'numeric' };
+                    const formattedDate = new Date(rev.created_at).toLocaleDateString('th-TH', dateOpts);
+
+                    // ตรวจสอบสถานะการซ่อน
+                    let hiddenOverlay = "";
+                    if (rev.status === 'inactive') {
+                        hiddenOverlay = `
+                            <div class="hidden-alert" style="background: #FFF5F5; border: 1px solid #FFD1D1; padding: 10px; border-radius: 10px; margin-bottom: 10px;">
+                                <p style="color: #E53E3E; font-size: 13px; margin: 0;">
+                                    <iconify-icon icon="mdi:eye-off"></iconify-icon> 
+                                    <strong>รีวิวนี้ถูกซ่อนโดยผู้ดูแล</strong>: ${rev.hide_reason || 'เหตุผลด้านความปลอดภัย'}
+                                </p>
+                                <small style="color: #888;">ข้อมูลนี้จะไม่แสดงต่อสาธารณะ</small>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="review-card" style="${rev.status === 'inactive' ? 'opacity: 0.8;' : ''}">
+                            ${hiddenOverlay}
+                            <div class="review-card-header">
+                                <div class="activity-title">${displayTitle}</div>
+                                <div class="review-date">รีวิวเมื่อวันที่ ${formattedDate}</div>
+                            </div>
+                            
+                            <div class="location-info">
+                                <iconify-icon icon="mdi:location" style="color: #BF7E46;"></iconify-icon>
+                                <span style="color: #BF7E46; font-weight: bold;">${displayLocation}</span>
+                            </div>
+
+                            <div class="star-rating">
+                                ${Array(Math.max(0, parseInt(rev.rating) || 0)).fill(0).map(() => `
+                                    <iconify-icon icon="ph:star-fill" class="star-icon"></iconify-icon>
+                                `).join('')}
+                            </div>
+
+                            <div class="review-images-grid">
+                                ${rev.review_image_url ? rev.review_image_url.split(',').map(img => {
+                        const t = img.trim();
+                        if (!t) return '';
+
+                        let src = "";
+                        if (t.startsWith('http')) {
+                            src = t;
+                        } else if (t.startsWith('upload/') || t.startsWith('picture/') || t.startsWith('pic_map/')) {
+                            src = `${API_BASE_URL}/${t}`;
+                        } else {
+                            src = t.includes('backend/picture/') ? `${API_BASE_URL}/${t}` : `${API_BASE_URL}/backend/picture/${t}`;
+                        }
+                        return `<img src="${src}" alt="review-pic" onerror="this.style.display='none'">`;
+                    }).join('') : ''}
+                            </div>
+
+                            <p class="review-description">
+                                ${rev.review_text}
+                            </p>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                listElement.innerHTML = '<p style="text-align:center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchReviews('newest');
+
+            const customSelect = document.getElementById('customSelect');
+            const trigger = customSelect.querySelector('.select-trigger');
+            const options = customSelect.querySelectorAll('.option');
+            const selectedText = document.getElementById('selectedOption');
+
+            // คลิกเพื่อเปิด/ปิด Dropdown
+            trigger.addEventListener('click', () => {
+                customSelect.classList.toggle('open');
+            });
+
+            // คลิกเลือก Option
+            options.forEach(option => {
+                option.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+
+                    selectedText.textContent = text;
+
+                    customSelect.classList.remove('open');
+
+                    fetchReviews(value);
+                });
+            });
+
+            // คลิกข้างนอกเพื่อปิด
+            window.addEventListener('click', (e) => {
+                const customSelect = document.getElementById('customSelect');
+                if (customSelect && e.target instanceof Node) {
+                    if (!customSelect.contains(e.target)) {
+                        customSelect.classList.remove('open');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

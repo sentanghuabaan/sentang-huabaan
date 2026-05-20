@@ -1,0 +1,248 @@
+body {
+    background-color: #FBEDD6;
+    font-family: 'Noto Serif Thai', serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 0 20px 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 15px 0 5px;
+    border-bottom: 1px solid #B1A396;
+}
+
+h2 {
+    font-size: 23px;
+    font-weight: 400;
+}
+
+.back-btn {
+    font-size: 40px;
+    cursor: pointer;
+    color: #8B5E3C;
+    text-decoration: none;
+    border: none;
+    background: none;
+}
+
+.logo {
+    width: 180px;
+    height: auto;
+}
+
+/* Profile Image Section */
+
+.profile-img-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 20px auto 40px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ddd;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* กล้องแบบไอคอน  */
+
+.camera-icon-wrapper {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #B08968;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 3px solid #F9F4E8;
+}
+
+#fileInput {
+    display: none;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.save-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #A2C4D9;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+    cursor: pointer;
+    margin-top: 30px;
+}
+
+
+.my-swal-popup {
+    font-family: 'Noto Serif Thai', serif !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(139, 94, 60, 0.15) !important;
+
+    width: 85% !important;
+    max-width: 320px !important;
+    padding: 20px 15px !important;
+}
+
+/* ปรับขนาดตัวหนังสือ */
+.my-swal-popup .swal2-title {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    margin-bottom: 10px !important;
+}
+
+.my-swal-popup .swal2-html-container {
+    font-size: 16px !important;
+    margin: 5px 0 0 0 !important;
+}
+
+/* ปรับปุ่มตกลง */
+.my-swal-popup .swal2-styled.swal2-confirm {
+    border-radius: 8px !important;
+    padding: 8px 24px !important;
+    font-size: 16px !important;
+    margin-top: 15px !important;
+}
+
+/* ปรับขนาด (เครื่องหมายถูก/ผิด) */
+.my-swal-popup .swal2-icon {
+    transform: scale(0.75) !important;
+    margin: 10px auto 5px !important;
+}
+
+.my-swal-popup .swal2-loader {
+    border-width: 3px !important;
+    width: 30px !important;
+    height: 30px !important;
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    .app-container {
+        position: relative;
+        max-width: 600px;
+        background-color: #fff;
+        margin: 200px auto 50px;
+        padding: 20px 40px 50px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .header {
+        position: absolute;
+        top: -170px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        max-width: 800px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        border-bottom: none;
+    }
+
+    .back-btn {
+        position: absolute;
+        left: 40px;
+        top: 30px;
+        transform: translateY(-50%);
+        font-size: 35px;
+    }
+
+    .logo {
+        width: 200px;
+        display: block;
+    }
+
+    .header-spacer {
+        display: none;
+    }
+
+    h2 {
+        font-size: 30px;
+        margin-bottom: 40px;
+    }
+
+    .form-group label {
+        font-size: 18px;
+    }
+
+    input {
+        padding: 15px;
+        font-size: 18px;
+    }
+
+    .save-btn {
+        font-size: 20px;
+        padding: 18px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .save-btn:hover {
+        background-color: #8fb6ce;
+    }
+}
+
+/* ซ่อน spacer ในมือถือถ้าไม่ได้ใช้ */
+.header-spacer {
+    width: 30px;
+}

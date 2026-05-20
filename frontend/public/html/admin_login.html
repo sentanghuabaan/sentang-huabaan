@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - เส้นทางหัวบ้าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="../css/styleadmin-login.css">
+</head>
+
+<body>
+    <div class="login-card">
+        <img src="../image/logohuabaan2.png" class="logo">
+        <h2>Welcome Back!</h2>
+        <p>เข้าสู่ระบบ</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>อีเมล</label>
+                <input type="email" id="email" required placeholder="example@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>รหัสผ่าน</label>
+                <div class="password-wrapper"> <input type="password" id="password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <iconify-icon icon="ph:eye-slash-fill" id="eyeIcon"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.icon = 'ph:eye-fill';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.icon = 'ph:eye-slash-fill';
+            }
+        }
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.role === 'admin') {
+                    localStorage.setItem('adminToken', data.token || 'isLoggedIn');
+                    localStorage.setItem('adminName', data.username);
+                    localStorage.setItem('adminId', data.user_id);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ยินดีต้อนรับ',
+                        text: `สวัสดีคุณ ${data.username}`,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'admin_dashboard.html';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เข้าสู่ระบบไม่สำเร็จ',
+                        text: data.role !== 'admin' ? 'บัญชีนี้ไม่มีสิทธิ์เข้าถึงส่วนของ Admin' : data.message
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+            }
+        });
+    </script>
+</body>
+
+</html>

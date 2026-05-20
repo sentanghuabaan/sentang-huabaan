@@ -1,0 +1,172 @@
+:root {
+    --primary-brown: #BF7E46;
+    --bg-grey: #B6A99E;
+    --white: #FFFFFF;
+    --text-dark: #503620;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    justify-content: center;
+}
+
+/* ปุ่มย้อนกลับ */
+.back-btn {
+    position: fixed;
+    top: 25px;
+    left: 20px;
+    z-index: 999;
+    background: #FBEDD6;
+    color: var(--primary-brown);
+    border: none;
+    padding: 0;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(80, 54, 32, 0.2);
+    transition: all 0.3s ease;
+}
+
+.back-btn:active {
+    transform: scale(0.9);
+}
+
+.back-btn iconify-icon {
+    font-size: 20px;
+}
+
+/* แถบข้อความแนะนำการสแกน */
+#scanning-overlay {
+    position: fixed;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 998;
+    background: rgba(80, 54, 32, 0.85);
+    color: #FBEDD6;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 15px;
+    white-space: nowrap;
+    border: 1px solid var(--primary-brown);
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+    text-align: center;
+}
+
+.mobile-container {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background-color: #FBEDD6;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+    border-radius: inherit;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 80%;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content p {
+    font-size: 16px;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.modal-btn {
+    background: var(--primary-brown);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
+
+.intro-box {
+    width: 85%;
+    max-width: 350px;
+    padding: 30px;
+    background: #FBEDD6;
+    border-radius: 20px;
+    color: #503620;
+}
+
+.intro-icon {
+    font-size: 60px;
+    color: #BF7E46;
+    margin-bottom: 15px;
+}
+
+.intro-box h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.intro-box p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.start-btn {
+    background: #BF7E46;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+}

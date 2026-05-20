@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>สแกนสถานที่ - เส้นทางหัวบ้าน</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="stylesheet" href="../css/stylear.css">
+</head>
+
+<body>
+    <button class="back-btn" onclick="location.href='../index.html'">
+        <iconify-icon icon="material-symbols:arrow-back-ios-new-rounded"></iconify-icon>
+    </button>
+
+    <!-- หน้าต่างสอนใช้งาน (Intro Overlay) -->
+    <div id="intro-overlay" class="intro-overlay">
+        <div class="intro-box">
+            <iconify-icon icon="lucide:scan-eye" class="intro-icon"></iconify-icon>
+            <h2>ส่องเพื่อเปิดตำนาน</h2>
+            <p>1. มองหาป้ายสัญลักษณ์หรือหน้าร้านในชุมชน<br>
+                2. ส่องกล้องไปที่หน้าร้านให้เต็มเฟรม<br>
+                3. รอรับชมวิดีโอเรื่องราวของสถานที่นั้นๆ</p>
+            <button id="start-ar-btn" class="start-btn">เริ่มใช้งาน (แตะเพื่อเปิดเสียง)</button>
+        </div>
+    </div>
+
+    <div id="scanning-overlay">กำลังเตรียมระบบ...</div>
+
+    <a-scene id="ar-scene"
+        mindar-image="imageTargetSrc: ../mind/targets.mind; autoStart: true; uiScanning: #scanning-overlay;"
+        vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+
+        <a-assets>
+            <video id="main-video" src="../asset-video/thursdaycafe.mp4" loop="true" crossorigin="anonymous" playsinline
+                webkit-playsinline muted></video>
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    </a-scene>
+
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal-content">
+            <p id="alert-message"></p>
+            <button onclick="closeAlert()" class="modal-btn">ตกลง</button>
+        </div>
+    </div>
+
+    <script>
+
+        const API_BASE_URL = 'http://localhost:3000';
+
+        let isUnlocked = false;
+        let videoMap = {};
+        let shouldRedirect = false;
+
+        function getCurrentUser() {
+            const user = localStorage.getItem('user');
+            return user ? JSON.parse(user) : null;
+        }
+
+        document.getElementById('start-ar-btn').addEventListener('click', () => {
+            // ปลดล็อกวิดีโอ (แก้เรื่อง Unmuted Autoplay)
+            const v = document.querySelector('#main-video');
+            v.play().then(() => {
+                v.pause();
+            });
+
+            isUnlocked = true;
+
+            // ปิด popup สอนใช้งาน
+            document.getElementById('intro-overlay').style.display = 'none';
+
+            document.getElementById('scanning-overlay').innerHTML =
+                '<iconify-icon icon="lucide:scan-eye" style="vertical-align: middle; margin-right: 5px;"></iconify-icon> กำลังค้นหาสถานที่...';
+        });
+
+        async function loadAR() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/videoar`);
+                const data = await response.json();
+                const sceneEl = document.querySelector('#ar-scene');
+
+                data.forEach(item => {
+                    let safeVideoUrl = item.video_url.trim();
+
+                    if (!safeVideoUrl.startsWith('http')) {
+                        const cleanFile = safeVideoUrl.replace('asset-video/', '');
+                        safeVideoUrl = `${API_BASE_URL}/${cleanFile}`;
+                    }
+
+                    videoMap[item.target_index] = safeVideoUrl;
+
+                    const entity = document.createElement('a-entity');
+                    entity.setAttribute('mindar-image-target', `targetIndex: ${item.target_index}`);
+
+                    const aVideo = document.createElement('a-video');
+                    aVideo.setAttribute('src', '#main-video');
+                    aVideo.setAttribute('width', '1');
+                    aVideo.setAttribute('height', '0.6');
+                    aVideo.setAttribute('visible', 'false');
+                    aVideo.classList.add('video-plane');
+
+                    entity.appendChild(aVideo);
+                    sceneEl.appendChild(entity);
+
+                    entity.addEventListener("targetFound", () => {
+                        console.log("Found:", item.target_index);
+                        fetch(`${API_BASE_URL}/api/videoar/record-view/${item.video_id}`, { method: 'POST' }).catch(e => { });
+
+                        const v = document.querySelector('#main-video');
+                        const plane = entity.querySelector('a-video');
+
+                        v.src = videoMap[item.target_index];
+                        v.muted = false;
+                        v.load();
+                        v.play().then(() => {
+                            plane.setAttribute('visible', 'true');
+                            document.getElementById('scanning-overlay').style.display = 'none';
+                        }).catch(err => console.log("Play error:", err));
+                    });
+
+                    entity.addEventListener("targetLost", () => {
+                        const v = document.querySelector('#main-video');
+                        v.pause();
+                        entity.querySelector('.video-plane').setAttribute('visible', 'false');
+                        document.getElementById('scanning-overlay').style.display = 'block';
+                    });
+                });
+            } catch (e) { console.error("AR Load Failure:", e); }
+        }
+
+        window.onload = loadAR;
+    </script>
+</body>
+
+</html>

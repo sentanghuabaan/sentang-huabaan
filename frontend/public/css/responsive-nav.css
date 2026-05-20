@@ -1,0 +1,102 @@
+.nav-menu-desktop,
+.user-profile-header {
+    display: none;
+}
+
+@media (min-width: 768px) {
+
+    .mobile-container,
+    .container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .home-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0 40px !important;
+        height: 100px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .home-logo {
+        width: 130px !important;
+        height: auto !important;
+        margin: 0 !important;
+        flex-shrink: 0;
+        margin-left: 0 !important;
+    }
+
+    .nav-menu-desktop {
+        display: flex !important;
+        flex: 1;
+        justify-content: center;
+        min-width: 0;
+        padding: 0 10px;
+    }
+
+    .nav-menu-desktop ul {
+        display: flex !important;
+        gap: clamp(10px, 2vw, 25px) !important;
+        list-style: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 25px !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .nav-menu-desktop .menu-item {
+        text-decoration: none !important;
+        color: #BF7E46 !important;
+        font-weight: bold !important;
+        font-size: 16px !important;
+        white-space: nowrap !important;
+        border-bottom: 2px solid transparent;
+        padding-bottom: 5px;
+        transition: 0.3s;
+    }
+
+    .nav-menu-desktop .menu-item:hover,
+    .nav-menu-desktop .menu-item.active {
+        color: #503620 !important;
+        border-bottom: 2px solid #BF7E46 !important;
+    }
+
+    .user-profile-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-end;
+        width: auto !important;
+        flex-shrink: 0;
+    }
+
+    .user-profile-header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #BF7E46;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .user-profile-header img:hover {
+        transform: scale(1.1);
+    }
+
+    .login-trigger iconify-icon {
+        font-size: 40px;
+        color: #000000;
+    }
+
+    .menu-trigger {
+        display: none !important;
+    }
+}
