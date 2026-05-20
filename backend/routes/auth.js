@@ -158,7 +158,7 @@ router.post('/admin/update-role', verifyAdminToken, async (req, res) => {
 
 // ตั้งค่า Passport สำหรับ Google
 passport.use(new GoogleStrategy({
-    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "/api/auth/google/callback"
 },
