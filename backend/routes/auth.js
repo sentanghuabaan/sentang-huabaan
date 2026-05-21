@@ -231,14 +231,15 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, 
+    port: 587, 
+    secure: false, 
     auth: {
         user: 'sentanghuabaan@gmail.com',
-        pass: 'wrse lzeu tgwu crno' 
+        pass: 'wrse lzeu tgwu crno'
     },
     tls: {
-        rejectUnauthorized: false 
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
     }
 });
 
