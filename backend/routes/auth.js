@@ -472,7 +472,7 @@ function clearExpiredOTPs() {
 
     const sql = "DELETE FROM OTP_codes WHERE expires_at < NOW()";
     
-    db.query(sql, [email, otp], (err, result) => { 
+    db.query(sql, (err, result) => { 
         if (err) {
             console.error("⚠️ ไม่สามารถเคลียร์ OTP หมดอายุในรอบนี้ได้เนื่องจากเครือข่ายสะดุด:", err.message);
             return; 
@@ -482,9 +482,6 @@ function clearExpiredOTPs() {
         }
     });
 }
-
-setTimeout(clearExpiredOTPs, 3000);
-setInterval(clearExpiredOTPs, 3600000);
 
 setTimeout(clearExpiredOTPs, 3000);
 setInterval(clearExpiredOTPs, 3600000);
