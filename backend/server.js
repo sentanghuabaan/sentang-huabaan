@@ -35,7 +35,7 @@ app.use(passport.session());
 
 // เปิดการเชื่อมต่อข้ามโดเมนข้ามพอร์ต
 app.use(cors({
-  origin: true,
+  origin: ['https://sentanghuabaan.com'],
   credentials: true
 }));
 app.use(express.json());
