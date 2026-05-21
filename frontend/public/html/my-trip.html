@@ -7,6 +7,7 @@
     <title>ประวัติการวางแผนการเดินทาง - เส้นทางหัวบ้าน</title>
     <link rel="stylesheet" href="../css/style-mytrip.css">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="mobile-container">
@@ -74,6 +75,7 @@
                     listElement.innerHTML = '<p style="text-align:center; margin-top:50px;">ยังไม่มีประวัติการวางแผน</p>';
                     return;
                 }
+
                 listElement.innerHTML = data.map(trip => {
                     const formattedDate = new Date(trip.created_at).toLocaleDateString('th-TH', {
                         day: 'numeric',
@@ -82,58 +84,138 @@
                     });
 
                     return `
-                        <div class="trip-card" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                            <div class="trip-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                                <div class="trip-main-title" style="font-weight: bold; color: #333; font-size: 16px;">${trip.trip_name}</div>
-                                <div class="trip-created-date" style="font-size: 11px; color: #888;">สร้างเมื่อ ${formattedDate}</div>
-                        </div>
-
-                        <div class="timeline-container">
-                            ${trip.locations.map((loc, index) => {
-
-                        let srcUrl = "";
-                        if (loc.image) {
-                            srcUrl = loc.image.trim().startsWith('http')
-                                ? loc.image.trim()
-                                : `${API_BASE_URL}/${loc.image.trim()}`;
-                        }
-
-                        return `
-                                    <div class="timeline-item">
-                                        <div class="time-column">
-                                            <span class="time-text">${loc.time ? loc.time.substring(0, 5) : '--:--'}</span>
-                                            <div class="dot"></div>
-                                            ${index < trip.locations.length - 1 ? '<div class="line"></div>' : ''}
-                                        </div>
-                                        
-                                        <div class="info-column">
-                                            <p class="location-name">${loc.name || 'ไม่ทราบชื่อสถานที่'}</p>
-                                            
-                                            ${loc.image ? `
-                                                <div class="review-images-grid">
-                                                    <img src="${srcUrl}" 
-                                                        class="trip-preview-img" 
-                                                        onerror="this.src='../image/placeholder.png'">
-                                                </div>
-                                            ` : ''}
-                                        </div>
+                        <div class="trip-card trip-card-item">
+                            
+                            <div class="trip-card-header">
+                                <div class="trip-main-title">
+                                    ${trip.trip_name}
+                                </div>
+                                
+                                <div class="trip-action-zone">
+                                    <div class="trip-created-date">
+                                        สร้างเมื่อ ${formattedDate}
                                     </div>
-                                `;
-                    }).join('')}
-                        </div>
+                                    <button class="delete-trip-btn" onclick="deleteMyTrip('${trip.trip_id}')" title="ลบแผนการเดินทาง">
+                                        <iconify-icon icon="mdi:trash-can-outline"></iconify-icon>
+                                    </button>
+                                </div>
+                            </div>
 
-                        <div class="view-detail-text" onclick="location.href='trip-summary.html?id=${trip.trip_id}'" 
-                            style="text-align: center; color: #BF7E46; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px;">
-                            ดูรายละเอียดเต็มรูปแบบ ❯
+                            <div class="timeline-container">
+                                ${trip.locations.map((loc, index) => {
+                                    let srcUrl = "";
+                                    if (loc.image) {
+                                        srcUrl = loc.image.trim().startsWith('http')
+                                            ? loc.image.trim()
+                                            : `${API_BASE_URL}/${loc.image.trim()}`;
+                                    }
+
+                                    return `
+                                        <div class="timeline-item">
+                                            <div class="time-column">
+                                                <span class="time-text">${loc.time ? loc.time.substring(0, 5) : '--:--'}</span>
+                                                <div class="dot"></div>
+                                                ${index < trip.locations.length - 1 ? '<div class="line"></div>' : ''}
+                                            </div>
+                                            
+                                            <div class="info-column">
+                                                <p class="location-name">${loc.name || 'ไม่ทราบชื่อสถานที่'}</p>
+                                                ${loc.image ? `
+                                                    <div class="review-images-grid">
+                                                        <img src="${srcUrl}" class="trip-preview-img" onerror="this.src='../image/placeholder.png'">
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+
+                            <div class="trip-card-footer">
+                                <div class="view-detail-text" onclick="location.href='trip-summary.html?id=${trip.trip_id}'">
+                                    ดูรายละเอียดเต็มรูปแบบ ❯
+                                </div>
+                            </div>
+
                         </div>
-                    </div>
-                `;
+                    `;
                 }).join('');
 
             } catch (error) {
                 console.error("Fetch error:", error);
                 listElement.innerHTML = '<p style="text-align:center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
             }
+        }
+
+        // ฟังก์ชันส่งคำสั่งลบทริปเดินทางของเจ้าของบัญชี 
+        async function deleteMyTrip(tripId) {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            if (!userData) return;
+            const userId = userData.user_id || userData.id;
+
+            Swal.fire({
+                title: 'ยืนยันการลบทริปเดินทาง?',
+                html: 'ประวัติแผนการเดินทางนี้จะถูกลบออกจากบัญชีของคุณ<small style="color: #888;"></small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46', 
+                cancelButtonColor: '#7f8c8d',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                background: '#FBEDD6',
+                color: '#5C4033',
+                borderRadius: '20px',
+                customClass: {
+                    popup: 'custom-swal-font'
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/trips/my-trips/delete/${tripId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId })
+                        });
+
+                        const resData = await response.json();
+
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ลบประวัติแผนเรียบร้อย',
+                                text: 'ทำการย้ายทริปเดินทางของคุณลงถังขยะเสร็จสิ้น',
+                                confirmButtonColor: '#BF7E46',
+                                background: '#FBEDD6',
+                                color: '#5C4033',
+                                borderRadius: '20px'
+                            }).then(() => {
+                                const currentSelect = document.getElementById('selectedOption').textContent;
+                                const filterVal = currentSelect.includes("เก่า") ? 'oldest' : 'newest';
+                                fetchTrips(filterVal);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: resData.message || 'ไม่สามารถทำรายการลบทริปได้ในขณะนี้',
+                                confirmButtonColor: '#d9534f',
+                                background: '#FBEDD6',
+                                color: '#5C4033'
+                            });
+                        }
+                    } catch (err) {
+                        console.error("Delete trip logic error:", err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เชื่อมต่อล้มเหลว',
+                            text: 'เกิดปัญหาติดต่อประสานงานทางเทคนิคกับตัวเซิร์ฟเวอร์ฐานข้อมูลหลังบ้าน',
+                            confirmButtonColor: '#d9534f',
+                            background: '#FBEDD6',
+                            color: '#5C4033'
+                        });
+                    }
+                }
+            });
         }
 
         document.addEventListener("DOMContentLoaded", function () {

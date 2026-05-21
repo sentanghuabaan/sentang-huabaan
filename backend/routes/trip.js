@@ -172,6 +172,40 @@ router.delete('/:id', verifyAdminToken, async (req, res) => {
     }
 });
 
+// ผู้ใช้กดลบประวัติแผนการเดินทางของตัวเอง (Soft Delete)
+router.put('/my-trips/delete/:id', (req, res) => {
+    const tripId = req.params.id;
+    const { user_id } = req.body; 
+
+    if (!user_id) {
+        return res.status(400).json({ error: "ข้อมูลสิทธิ์ผู้ใช้ไม่ครบถ้วน" });
+    }
+
+    db.beginTransaction((err) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const sqlTrip = "UPDATE Trip SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ? AND user_id = ?";
+        const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ?";
+
+        db.query(sqlTrip, [tripId, user_id], (err, result) => {
+            if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+            
+            if (result.affectedRows === 0) {
+                return db.rollback(() => res.status(404).json({ error: "ไม่พบข้อมูลแผนการเดินทาง หรือคุณไม่มีสิทธิ์เข้าถึง" }));
+            }
+
+            db.query(sqlDetail, [tripId], (err) => {
+                if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+
+                db.commit((err) => {
+                    if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+                    res.json({ success: true, message: "ลบประวัติการเดินทางเรียบร้อยแล้ว" });
+                });
+            });
+        });
+    });
+});
+
 // ดึงผังรายละเอียดลำดับ Trip Detail
 router.get('/details', verifyAdminToken, (req, res) => {
     const sql = `SELECT td.* FROM Trip_Detail td 

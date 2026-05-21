@@ -2,40 +2,48 @@ const path = require('path');
 const mysql = require('mysql2');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-let db;
+let pool;
 let connectionType = "";
 
-// ดักจับตรวจสถานะรันระบบ หากอยู่บนคลาวด์ Railway หรืออยู่ในโหมด Production จริง
+const dbConfig = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    timezone: '+07:00',
+    multipleStatements: true,
+
+    waitForConnections: true,
+    connectionLimit: 15,      
+    queueLimit: 0,
+    enableKeepAlive: true,    
+    keepAliveInitialDelay: 10000 
+};
+
 if (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
-    connectionType = "Railway Cloud Database";
-
-    db = mysql.createConnection({
-        uri: process.env.DATABASE_URL,
-        multipleStatements: true,
-        timezone: '+07:00'
-    });
+    connectionType = "Aiven MySQL Cloud (Production)";
+    pool = mysql.createPool(dbConfig); 
 } else {
-    // สำหรับรันในเครื่อง Mac/Windows ผ่านเครื่องมือจำลอง XAMPP / MAMP
-    connectionType = "Local XAMPP MySQL";
+    connectionType = "Aiven MySQL Cloud (Local Test)";
     console.log(`Connecting to ${connectionType}...`);
-
-    db = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'sentang_huabaan',
-        timezone: '+07:00',
-        multipleStatements: true
-    });
+    pool = mysql.createPool(dbConfig); 
 }
 
-db.connect((err) => {
+pool.getConnection((err, connection) => {
     if (err) {
-        console.error(`❌ DB Connection Error (${connectionType}):`, err.message);
+        console.error(`❌ DB Connection Pool Error (${connectionType}):`, err.message);
     } else {
-        console.log(`✅ DB Connected Successfully! Running on: ${connectionType}`);
-        db.query("SET time_zone = '+07:00'");
+        console.log(`✅ DB Connected Successfully via Pool! Running on: ${connectionType}`);
+        
+        connection.query(`SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))`, (modeErr) => {
+            if (modeErr) console.error("❌ ไม่สามารถปรับ sql_mode ได้:", modeErr.message);
+        });
+
+        connection.query("SET time_zone = '+07:00'");
+        
+        connection.release(); 
     }
 });
 
-module.exports = db;
+module.exports = pool;

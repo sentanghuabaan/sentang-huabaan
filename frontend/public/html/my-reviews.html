@@ -7,6 +7,7 @@
     <title>ประวัติการแสดงความคิดเห็น - เส้นทางหัวบ้าน</title>
     <link rel="stylesheet" href="../css/style-myreviews.css">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="mobile-container">
@@ -94,6 +95,7 @@
                     return `
                         <div class="review-card" style="${rev.status === 'inactive' ? 'opacity: 0.8;' : ''}">
                             ${hiddenOverlay}
+                            
                             <div class="review-card-header">
                                 <div class="activity-title">${displayTitle}</div>
                                 <div class="review-date">รีวิวเมื่อวันที่ ${formattedDate}</div>
@@ -112,24 +114,21 @@
 
                             <div class="review-images-grid">
                                 ${rev.review_image_url ? rev.review_image_url.split(',').map(img => {
-                        const t = img.trim();
-                        if (!t) return '';
-
-                        let src = "";
-                        if (t.startsWith('http')) {
-                            src = t;
-                        } else if (t.startsWith('upload/') || t.startsWith('picture/') || t.startsWith('pic_map/')) {
-                            src = `${API_BASE_URL}/${t}`;
-                        } else {
-                            src = t.includes('backend/picture/') ? `${API_BASE_URL}/${t}` : `${API_BASE_URL}/backend/picture/${t}`;
-                        }
-                        return `<img src="${src}" alt="review-pic" onerror="this.style.display='none'">`;
-                    }).join('') : ''}
+                                    const t = img.trim();
+                                    if (!t) return '';
+                                    let src = t.startsWith('http') ? t : `${API_BASE_URL}/${t}`;
+                                    return `<img src="${src}" alt="review-pic" onerror="this.style.display='none'">`;
+                                }).join('') : ''}
                             </div>
 
-                            <p class="review-description">
-                                ${rev.review_text}
-                            </p>
+                            <div class="review-card-footer">
+                                <p class="review-description" style="margin: 0; flex: 1;">
+                                    ${rev.review_text}
+                                </p>
+                                <button class="delete-review-btn" onclick="deleteMyReview('${rev.review_id}')" title="ลบความคิดเห็น">
+                                    <iconify-icon icon="mdi:trash-can-outline"></iconify-icon>
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -138,6 +137,74 @@
                 console.error("Fetch error:", error);
                 listElement.innerHTML = '<p style="text-align:center;">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>';
             }
+        }
+
+        // ฟังก์ชันสั่งลบรีวิวฝั่งนักท่องเที่ยว
+        async function deleteMyReview(reviewId) {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            if (!userData) return;
+
+            Swal.fire({
+                title: 'คุณต้องการลบความคิดเห็นนี้ใช่หรือไม่?',
+                html: 'ข้อมูลนี้จะไม่แสดงผลบนหน้าเว็บไซต์อีกต่อไป<br><small style="color: #888;"></small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46', 
+                cancelButtonColor: '#7f8c8d',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                background: '#FBEDD6',    
+                color: '#5C4033',              
+                borderRadius: '20px'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/my-reviews/delete/${reviewId}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userData.user_id })
+                        });
+
+                        const resultData = await response.json();
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ลบความคิดเห็นสำเร็จ',
+                                text: 'ระบบทำการยกเลิกการแสดงผลรีวิวของคุณเรียบร้อยแล้ว',
+                                confirmButtonColor: '#BF7E46',
+                                background: '#FBEDD6',
+                                color: '#5C4033',
+                                borderRadius: '20px'
+                            }).then(() => {
+                                const currentSelect = document.getElementById('selectedOption').textContent;
+                                let filterVal = 'newest';
+                                if (currentSelect.includes("สูง")) filterVal = 'highest';
+                                if (currentSelect.includes("น้อย")) filterVal = 'lowest';
+                                fetchReviews(filterVal);
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: resultData.message || 'ไม่สามารถลบข้อมูลได้ในขณะนี้',
+                                confirmButtonColor: '#d9534f',
+                                background: '#FBEDD6',
+                                color: '#5C4033'
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Delete review error:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เชื่อมต่อล้มเหลว',
+                            text: 'เกิดข้อผิดพลาดในการส่งข้อมูลเชื่อมต่อเซิร์ฟเวอร์',
+                            confirmButtonColor: '#d9534f',
+                            background: '#FBEDD6',
+                            color: '#5C4033'
+                        });
+                    }
+                }
+            });
         }
 
         document.addEventListener("DOMContentLoaded", function () {

@@ -295,7 +295,10 @@ router.get('/trip-details/:id', (req, res) => {
             (tr.from_location_id = td_next.location_id AND tr.to_location_id = td.location_id)
         )
         WHERE td.trip_id = ?
-        GROUP BY td.visit_order
+        GROUP BY 
+            td.trip_id, td.location_id, td.visit_order, td.arrival_time, 
+            td.stay_duration, td.departure_time, l.location_name, 
+            l.opening_time, l.closing_time, l.operating_days, t.trip_name
         ORDER BY td.visit_order ASC
     `;
     db.query(sql, [tripId], (err, results) => {

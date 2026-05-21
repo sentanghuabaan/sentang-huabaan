@@ -426,14 +426,15 @@
                 if (bar) bar.style.display = count < 2 ? 'none' : 'block';
 
                 if (container) {
+                    const currentUser = getCurrentUser();
+                    const currentLoggedInId = currentUser ? currentUser.user_id : null;
+
                     container.innerHTML = reviews.map(rev => {
                         const images = rev.review_image_url ? rev.review_image_url.split(',') : [];
 
                         const imagesHTML = images.map(img => {
                             const t = img.trim();
                             if (!t) return '';
-
-                            //  รองรับ URL คลาวด์ และพาธ Local ดั้งเดิม
                             let src = t.startsWith('http') ? t : `${API_BASE_URL}/${t}`;
                             return `<img src="${src}" class="rev-img" onerror="this.style.display='none'">`;
                         }).join('');
@@ -450,14 +451,18 @@
                             profilePicHtml = `<img src="${avatarUrl}" class="avatar" style="width:40px; height:40px; border-radius:50%;">`;
                         }
 
+                        const isOwnReview = currentLoggedInId && String(currentLoggedInId) === String(rev.user_id);
+                        const reportMenuHTML = isOwnReview ? '' : `
+                        <div class="report-dropdown" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                            <button class="dropbtn" onclick="toggleReportMenu(event)" style="background:none; border:none; font-size:22px; cursor:pointer; color:#888; padding: 5px;">:</button>
+                            <div class="dropdown-content" style="display:none; position:absolute; right:0; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; min-width:130px; border: 1px solid #eee;">
+                                <a href="javascript:void(0)" onclick="openReportModal(${rev.user_id})" style="color:#d9534f; text-decoration:none; display:block; padding:12px; font-size:14px; font-weight: bold;">รายงานบัญชีนี้</a>
+                            </div>
+                        </div>`;
+
                         return `
                         <div class="review-box" style="position: relative; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #fff;">
-                            <div class="report-dropdown" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
-                                <button class="dropbtn" onclick="toggleReportMenu(event)" style="background:none; border:none; font-size:22px; cursor:pointer; color:#888; padding: 5px;">:</button>
-                                <div class="dropdown-content" style="display:none; position:absolute; right:0; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; min-width:130px; border: 1px solid #eee;">
-                                    <a href="javascript:void(0)" onclick="openReportModal(${rev.user_id})" style="color:#d9534f; text-decoration:none; display:block; padding:12px; font-size:14px; font-weight: bold;">รายงานบัญชีนี้</a>
-                                </div>
-                            </div>
+                            ${reportMenuHTML} <!-- นำตัวแปรโครงสร้างเมนูรายงานมาใช้งาน -->
                             <div class="user-header">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     ${profilePicHtml}
@@ -675,6 +680,13 @@
             const targetId = document.getElementById('reportedUserId').value;
             const desc = document.getElementById('additionalDetail').value;
             const currentUser = getCurrentUser();
+
+            if (currentUser && String(currentUser.user_id) === String(targetId)) {
+                alert("คุณไม่สามารถรายงานบัญชีของตัวเองได้");
+                closeReportModal();
+                return;
+            }
+
             const checkboxes = document.querySelectorAll('.report-reason:checked');
             if (checkboxes.length === 0) {
                 showValidationAlert();

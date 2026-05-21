@@ -21,9 +21,7 @@ body {
     align-items: stretch;
 }
 
-
-/* --- Header Style (Standardized) --- */
-
+/* HEADER STYLE */
 .login-header {
     position: relative;
     display: flex;
@@ -73,9 +71,7 @@ body {
     opacity: 0.6;
 }
 
-
-/* --- Content Layout --- */
-
+/* CONTENT LAYOUT & FILTER TABS */
 .review-content {
     padding: 0 20px;
 }
@@ -96,7 +92,6 @@ body {
     margin-top: -10px;
 }
 
-/* --- Filter / Dropdown Style --- */
 .review-filter-section {
     display: flex;
     justify-content: flex-end;
@@ -158,112 +153,82 @@ body {
     transform: rotate(180deg);
 }
 
-
-/* --- Card Style (หลัก) --- */
-
-.review-card {
+/* TRIP CARD STYLES */
+.trip-card-item {
+    margin-bottom: 25px;
+    padding: 20px;
     background: #ffffff;
     border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 25px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.review-card:active {
-    transform: scale(0.98);
-}
-
-.review-card-header {
+.trip-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
+    gap: 15px;
 }
 
-.activity-title {
+.trip-main-title {
     font-weight: bold;
+    color: #503620;
     font-size: 18px;
-    color: #333;
-    margin-top: 15px;
-    margin-bottom: 5px;
+    margin-top: 2px;
 }
 
-.review-date {
-    font-size: 12px;
+.trip-action-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.trip-created-date {
+    font-size: 11px;
     color: #888;
+    white-space: nowrap;
 }
 
-.location-info {
+.delete-trip-btn {
+    background: none;
+    border: none;
+    color: #d9534f;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 2px 4px;
     display: flex;
     align-items: center;
-    color: #BF7E46;
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 10px;
-    gap: 4px;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
-
-/* --- เฉพาะหน้า Trip History --- */
-
-.location-count-badge {
-    background: #FBEDD6;
-    color: #BF7E46;
-    padding: 6px 15px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin: 10px 0;
+.delete-trip-btn:hover {
+    transform: scale(1.15);
+    color: #c9302c;
 }
 
-
-/* --- Grid รูปภาพ --- */
-
-.review-images-grid {
+.trip-card-footer {
+    padding-top: 10px;
+    border-top: 1px solid #f9f9f9;
     display: flex;
-    gap: 10px;
-    margin: 12px 0;
-    justify-content: flex-start;
+    justify-content: center;
+}
+
+.view-detail-text {
+    color: #BF7E46;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
     width: 100%;
 }
 
-.review-images-grid img,
-.trip-preview-img {
-    width: 100% !important;   
-    max-width: 300px !important;  
-    height: 180px !important;      
-    object-fit: cover !important; 
-    border-radius: 12px;
-    margin-top: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    display: block;
-}
-
-.review-images-grid img {
-    width: 45%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    border-radius: 15px;
-}
-
-
-/* --- Footer Card Text --- */
-
-.review-description {
-    font-size: 14px;
-    color: #BF7E46;
-    font-weight: 500;
-    line-height: 1.6;
-    text-align: center;
-    margin-top: 10px;
-}
-
+/*  TIMELINE & PREVIEW IMAGES */
 .timeline-container {
     margin-top: 15px;
     padding-left: 10px;
@@ -304,10 +269,23 @@ body {
     margin: 5px 0;
 }
 
+.location-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
 
-/* ตกแต่งรูปภาพใน Timeline */
-.trip-preview-img {
+.review-images-grid {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0;
+    justify-content: flex-start;
     width: 100%;
+}
+
+.trip-preview-img {
+    width: 95%;
     max-width: 250px;
     aspect-ratio: 16 / 9;
     object-fit: cover;
@@ -317,13 +295,28 @@ body {
     display: block;
 }
 
+/*  SWEETALERT2 CUSTOM STYLE */
 
-/* ปรับระยะห่างของข้อความสถานที่ */
-.location-name {
-    font-size: 14px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
+.swal2-popup {
+    width: 85% !important;
+    max-width: 380px !important;
+    border-radius: 20px !important;
+    padding: 20px !important;
+}
+
+.swal2-title {
+    font-size: 18px !important;
+    font-weight: bold !important;
+}
+
+.swal2-html-container {
+    font-size: 13px !important;
+}
+
+.swal2-styled {
+    padding: 8px 22px !important;
+    font-size: 14px !important;
+    border-radius: 20px !important;
 }
 
 @media (min-width: 768px) {
@@ -333,7 +326,6 @@ body {
         background-color: #FBEDD6;
     }
 
-    /* Header และปุ่มปิด */
     .login-header {
         width: 100%;
         max-width: 1100px;
@@ -372,7 +364,7 @@ body {
         margin-bottom: 30px;
     }
 
-    /* รายการทริปแบ่งเป็น 2 ฝั่ง */
+    /* แสดงผลแบบ Grid แบ่งเป็น 2 คอลัมน์ฝั่งซ้ายขวา */
     .trip-grid-container {
         display: grid !important;
         grid-template-columns: repeat(2, 1fr) !important;
@@ -381,18 +373,17 @@ body {
         align-items: start !important;
     }
 
-    /* Card ของแต่ละ Trip */
-    .trip-card {
+    .trip-card-item {
         padding: 20px !important;
         margin-bottom: 0 !important;
         background: #ffffff !important;
         border-radius: 15px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
         border: 1px solid rgba(139, 90, 43, 0.1);
     }
 
     .trip-main-title {
-        font-size: 18px !important;
+        font-size: 25px !important;
     }
 
     .trip-created-date {
@@ -417,26 +408,43 @@ body {
         margin-bottom: 6px;
     }
 
-    /* ปรับขนาดรูปภาพประกอบ */
     .review-images-grid {
         display: block !important;
         width: 100% !important;
     }
 
     .trip-preview-img {
-        width: 100% !important;
+        width: 90% !important;
         max-width: 100% !important;
-        height: 180px !important;   
+        height: 180px !important;
         object-fit: cover !important;
         border-radius: 12px !important;
         margin-top: 5px !important;
     }
 
-    /* ปุ่มดูรายละเอียด */
     .view-detail-text {
         font-size: 15px !important;
         padding-top: 12px;
-        border-top: 1px solid #f0f0f0;
         margin-top: 15px !important;
+    }
+
+    .swal2-popup {
+        width: 70% !important;
+        max-width: 520px !important;
+        padding: 30px !important;
+        border-radius: 24px !important;
+    }
+
+    .swal2-title {
+        font-size: 22px !important;
+    }
+
+    .swal2-html-container {
+        font-size: 15px !important;
+    }
+
+    .swal2-styled {
+        padding: 10px 26px !important;
+        font-size: 16px !important;
     }
 }

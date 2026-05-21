@@ -7,6 +7,8 @@
     <title>ประวัติการลงโฆษณา - เส้นทางหัวบ้าน</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="../css/style-myads.css">
 </head>
@@ -115,13 +117,89 @@
                         </div>
                     ` : ''}
 
-                    <p style="font-size: 11px; margin-top: 8px; color: #999;">
-                        วันที่ลงประกาศ: ${new Date(ad.created_at).toLocaleDateString('th-TH')}
-                    </p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 8px;">
+                        <p style="font-size: 11px; margin: 0; color: #999;">
+                            วันที่ลงประกาศ: ${new Date(ad.created_at).toLocaleDateString('th-TH')}
+                        </p>
+                        <button class="delete-ad-btn" onclick="deleteMyAd('${ad.banner_id}', '${ad.status}')" title="ลบโฆษณา"
+                            style="background: none; border: none; color: #d9534f; cursor: pointer; font-size: 20px; padding: 0 4px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+                            <iconify-icon icon="mdi:trash-can-outline"></iconify-icon>
+                        </button>
+                    </div>
+
                 </div>
             </div>
         `;
             }).join('');
+        }
+
+        // ฟังก์ชันสั่งลบโฆษณาตนเอง
+        async function deleteMyAd(bannerId, currentStatus) {
+            const userData = localStorage.getItem('user');
+            if (!userData) return;
+            const user = JSON.parse(userData);"รายการคำขอนี้จะถูกยกเลิกและย้ายไปถังขยะระบบ";
+            if (currentStatus === 'approved') {
+                warningText = "⚠️ โฆษณานี้ได้รับการอนุมัติแล้ว หากลบออกแบนเนอร์จะหยุดแสดงผลบนหน้าแรกทันที!";
+            }
+
+            Swal.fire({
+                title: 'ยืนยันการลบโฆษณา?',
+                html: `${warningText}<br><small style="color: #888;">(ข้อมูลโฆษณาจะถูกซ่อนออกจากหน้าเว็บหลัก)</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#BF7E46',
+                cancelButtonColor: '#7f8c8d',
+                confirmButtonText: 'ตกลง',
+                cancelButtonText: 'ยกเลิก',
+                background: '#FBEDD6',
+                color: '#5C4033',
+                borderRadius: '20px'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/api/banners/user-delete/${bannerId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: user.user_id })
+                        });
+
+                        const resData = await response.json();
+
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'ลบรายการสำเร็จ',
+                                text: 'ยกเลิกการเผยแพร่แบนเนอร์ของคุณเรียบร้อยแล้ว',
+                                confirmButtonColor: '#BF7E46',
+                                background: '#FBEDD6',
+                                color: '#5C4033',
+                                borderRadius: '20px'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: resData.error || 'ไม่สามารถสั่งลบโฆษณาได้ในขณะนี้',
+                                confirmButtonColor: '#d9534f',
+                                background: '#FBEDD6',
+                                color: '#5C4033'
+                            });
+                        }
+                    } catch (err) {
+                        console.error("Delete Ad Request Error:", err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เชื่อมต่อล้มเหลว',
+                            text: 'เกิดปัญหาขัดข้องทางเทคนิคในการติดต่อเซิร์ฟเวอร์ฐานข้อมูล',
+                            confirmButtonColor: '#d9534f',
+                            background: '#FBEDD6',
+                            color: '#5C4033'
+                        });
+                    }
+                }
+            });
         }
     </script>
 </body>

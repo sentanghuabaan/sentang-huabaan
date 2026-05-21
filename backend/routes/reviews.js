@@ -63,7 +63,8 @@ router.get('/reviews', (req, res) => {
     let sql = `SELECT Review.*, User.username, User.profile_img 
                FROM Review 
                LEFT JOIN User ON Review.user_id = User.user_id 
-               WHERE (Review.status = 'active' OR Review.status IS NULL OR Review.status = '')`;
+               WHERE (Review.status = 'active' OR Review.status IS NULL OR Review.status = '')
+               AND Review.is_deleted = 0`;
 
     const params = [];
     if (act_id && act_id !== 'null' && act_id !== 'undefined') {
@@ -100,7 +101,7 @@ router.post('/save_review', upload.array('review_images', 5), (req, res) => {
 
         const imageUrls = req.files ? req.files.map(f => f.path).join(',') : '';
 
-        const sql = "INSERT INTO Review (review_id, user_id, location_id, activity_id, rating, review_text, review_image_url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+        const sql = "INSERT INTO Review (review_id, user_id, location_id, activity_id, rating, review_text, review_image_url, created_at, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 0)";
         db.query(sql, [nextId, user_id, location_id, activity_id, rating, review_text, imageUrls], (err) => {
             if (err) return res.status(500).json(err);
             res.status(200).json({ success: true, new_id: nextId });
@@ -178,6 +179,28 @@ router.put('/reviews/:id/status', verifyAdminToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "ดึงข้อมูลเดิมล้มเหลว" });
     }
+});
+
+// ผู้ใช้ทั่วไปกดลบประวัติรีวิวของตัวเอง (Soft Delete)
+router.delete('/my-reviews/delete/:id', (req, res) => {
+    const reviewId = req.params.id;
+    const { user_id } = req.body; 
+
+    if (!user_id) {
+        return res.status(400).json({ message: "ระบุตัวตนผู้ใช้ไม่ครบถ้วน" });
+    }
+
+    const sql = "UPDATE Review SET is_deleted = 1, deleted_at = NOW() WHERE review_id = ? AND user_id = ?";
+    db.query(sql, [reviewId, user_id], (err, result) => {
+        if (err) {
+            console.error("User Delete Review Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "ไม่พบข้อมูลรีวิว หรือคุณไม่มีสิทธิ์ลบรีวิวนี้" });
+        }
+        res.json({ success: true, message: "ลบประวัติความคิดเห็นเรียบร้อยแล้ว" });
+    });
 });
 
 // สั่ง Soft Delete ย้ายรีวิวไม่เหมาะสมลงถังขยะ

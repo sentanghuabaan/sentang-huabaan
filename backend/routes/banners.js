@@ -150,6 +150,28 @@ router.get('/banners/user/:user_id', (req, res) => {
     });
 });
 
+// ผู้ใช้กดลบประวัติโฆษณาของตนเอง (Soft Delete)
+router.put('/banners/user-delete/:banner_id', (req, res) => {
+    const bannerId = req.params.banner_id;
+    const { user_id } = req.body;
+
+    if (!user_id) {
+        return res.status(400).json({ error: "ข้อมูลผู้ใช้ไม่ครบถ้วน" });
+    }
+
+    const query = "UPDATE Banners SET is_deleted = 1, deleted_at = NOW() WHERE banner_id = ? AND user_id = ?";
+    db.query(query, [bannerId, user_id], (err, result) => {
+        if (err) {
+            console.error("User Delete Banner Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "ไม่พบข้อมูลโฆษณา หรือคุณไม่มีสิทธิ์ลบรายการนี้" });
+        }
+        res.json({ success: true, message: "ลบรายการโฆษณาเรียบร้อยแล้ว" });
+    });
+});
+
 // อัปเดตสถานะ (Approve / Reject)
 router.put('/banners/status/:banner_id', verifyAdminToken, async (req, res) => {
     const { status, admin_note, admin_id } = req.body;

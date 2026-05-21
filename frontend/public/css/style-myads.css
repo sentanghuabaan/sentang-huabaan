@@ -101,8 +101,8 @@ body {
 }
 
 .ad-img {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     border-radius: 10px;
     object-fit: cover;
 }
@@ -184,6 +184,38 @@ body {
 .tab.active {
     background: #8B5A2B;
     color: white;
+}
+
+.swal2-popup {
+    width: 85% !important;
+    max-width: 380px !important;
+    padding: 20px !important;
+    border-radius: 20px !important;
+}
+
+.swal2-title {
+    font-size: 18px !important;
+    font-weight: bold !important;
+    line-height: 1.4 !important;
+}
+
+.swal2-html-container {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin: 10px 0 0 0 !important;
+}
+
+.swal2-actions {
+    margin-top: 15px !important;
+    gap: 10px !important;
+}
+
+.swal2-styled {
+    padding: 8px 22px !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border-radius: 20px !important;
+    margin: 0 !important;
 }
 
 @media (min-width: 768px) {
@@ -315,6 +347,30 @@ body {
     .tab {
         padding: 10px 25px;
         font-size: 17px;
+    }
+    .swal2-popup {
+        width: 70% !important;
+        max-width: 520px !important; 
+        padding: 30px !important;
+        border-radius: 24px !important;
+    }
+
+    .swal2-title {
+        font-size: 22px !important;
+    }
+
+    .swal2-html-container {
+        font-size: 15px !important;
+    }
+
+    .swal2-styled {
+        padding: 10px 26px !important;
+        font-size: 16px !important;
+    }
+    
+    .swal2-icon {
+        transform: scale(1.1) !important;
+        margin-top: 10px !important;
     }
 
 }

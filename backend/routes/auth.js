@@ -169,11 +169,20 @@ passport.use(new GoogleStrategy({
 
         const sql = "SELECT * FROM User WHERE google_id = ? OR email = ?";
         db.query(sql, [googleId, email], (err, result) => {
+            if (err) return done(err);
+
             if (result.length > 0) {
                 return done(null, result[0]);
             } else {
                 const insertSql = "INSERT INTO User (username, email, google_id, role, status, is_verified) VALUES (?, ?, ?, 'user', 'active', 1)";
                 db.query(insertSql, [username, email, googleId], (err, resInsert) => {
+                    
+                    if (err) {
+                        console.error("❌ เกิดข้อผิดพลาดตอนสมัครสมาชิกด้วย Google บน Aiven:");
+                        console.error(err.message);
+                        return done(err);
+                    }
+
                     const newUser = { user_id: resInsert.insertId, username, email, role: 'user' };
                     return done(null, newUser);
                 });

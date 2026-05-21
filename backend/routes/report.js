@@ -61,6 +61,10 @@ router.post('/report-user', (req, res) => {
         return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
     }
 
+    if (String(reporter_id) === String(reported_user_id)) {
+        return res.status(400).json({ message: "คุณไม่สามารถรายงานบัญชีของตัวเองได้" });
+    }
+
     const sql = `
         INSERT INTO account_reports (reporter_id, reported_user_id, reason_type, description) 
         VALUES (?, ?, ?, ?)
