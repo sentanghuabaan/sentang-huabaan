@@ -181,7 +181,7 @@
         </div>
     </div>
     <script>
-        const API_BASE_URL = 'http://localhost:3000';
+        const API_BASE_URL = 'https://sentanghuabaan.com';
         const API_BASE = `${API_BASE_URL}/api`;
 
         let allImages = [];
@@ -668,7 +668,7 @@
                 closeReportModal();
                 return;
             }
-            
+
             const checkboxes = document.querySelectorAll('.report-reason:checked');
             if (checkboxes.length === 0) {
                 showValidationAlert();
