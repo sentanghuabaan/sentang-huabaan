@@ -228,28 +228,26 @@ passport.deserializeUser((id, done) => {
 });
 
 const nodemailer = require('nodemailer');
-
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    connectionTimeout: 10000, 
-    greetingTimeout: 10000,
+    service: 'gmail',
     auth: {
         user: 'sentanghuabaan@gmail.com',
-        pass: 'ctbgacznafewtcnd' 
+        pass: 'wrse lzeu tgwu crno'
     }
 });
 
-// API สำหรับลงทะเบียนและส่ง OTP
+// API สำหรับลงทะเบียนและส่ง OTP 
 router.post('/register-request', async (req, res) => {
     const { username, email, password } = req.body;
 
     const checkUserSql = "SELECT email FROM User WHERE email = ?";
     db.query(checkUserSql, [email], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล" });
+        if (err) {
+            console.error("❌ ตรวจสอบผู้ใช้ผิดพลาด:", err.message);
+            return res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล" });
+        }
 
-        if (results.length > 0) {
+        if (results && results.length > 0) {
             return res.status(400).json({ success: false, message: "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่นหรือเข้าสู่ระบบ" });
         }
 
@@ -257,10 +255,10 @@ router.post('/register-request', async (req, res) => {
         
         const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, NOW() + INTERVAL 5 MINUTE)";
         
-        db.query(sql, [email, otp], (err) => {
-            if (err) {
-                console.error("❌ SQL Insert OTP Error:", err.message);
-                return res.status(500).json({ success: false, message: "บันทึกรหัสในฐานข้อมูลไม่สำเร็จ" });
+        db.query(sql, [email, otp], (insertErr) => {
+            if (insertErr) {
+                console.error("❌ SQL Insert OTP Error:", insertErr.message);
+                return res.status(500).json({ success: false, message: "บันทึกรหัสลงฐานข้อมูลไม่สำเร็จ" });
             }
 
             const mailOptions = {
@@ -270,12 +268,14 @@ router.post('/register-request', async (req, res) => {
                 text: `รหัส OTP ของคุณคือ: ${otp} (ใช้งานได้ใน 5 นาที)`
             };
 
-            transporter.sendMail(mailOptions, (error) => {
+            // เรียกส่งเมล
+            transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
-                    console.error("❌ Nodemailer Error:", error.message);
-                    return res.status(500).json({ success: false, message: 'ส่งเมลไม่สำเร็จ' });
+                    console.error("❌ Nodemailer ส่งเมลไม่สำเร็จ:", error.message);
+                    return res.status(500).json({ success: false, message: 'บันทึกข้อมูลสำเร็จ แต่ระบบส่งเมลไปไม่ถึงปลายทาง' });
                 }
-                res.json({ success: true, message: 'ส่ง OTP แล้ว' });
+                console.log("✅ เมลรหัสยืนยันถูกส่งสำเร็จแล้ว:", info.response);
+                res.json({ success: true, message: 'ส่ง OTP ไปยังอีเมลเรียบร้อยแล้ว' });
             });
         });
     });
@@ -353,9 +353,8 @@ router.post('/forgot-password', (req, res) => {
 
         const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, NOW() + INTERVAL 5 MINUTE)";
-
-        db.query(sql, [email, otp], (err) => {
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, ?)";
+        db.query(sql, [email, otp, formattedTime], (err) => {
             if (err) {
                 console.error("❌ Database Error:", err);
                 return res.status(500).json({ success: false, message: "บันทึก OTP ไม่สำเร็จ" });
@@ -466,19 +465,18 @@ router.delete('/otp/:id', verifyAdminToken, async (req, res) => {
 
 function clearExpiredOTPs() {
     if (!db || typeof db.query !== 'function') {
-        console.log("⚠️ ฐานข้อมูลยังไม่พร้อมใช้งานในลูปรอบนี้ จะลองใหม่อีกครั้งในชั่วโมงถัดไป");
+        console.log("⚠️ ฐานข้อมูลยังไม่พร้อมใช้งานในลูปรอบนี้ จะลองทำความสะอาดใหม่ในรอบถัดไป");
         return;
     }
 
     const sql = "DELETE FROM OTP_codes WHERE expires_at < NOW()";
-    
-    db.query(sql, (err, result) => { 
+    db.query(sql, (err, result) => {
         if (err) {
             console.error("⚠️ ไม่สามารถเคลียร์ OTP หมดอายุในรอบนี้ได้เนื่องจากเครือข่ายสะดุด:", err.message);
-            return; 
+            return;
         }
         if (result && result.affectedRows > 0) {
-            console.log(`🧹 ระบบอัตโนมัติทำความสะอาดลบ OTP หมดอายุออกจากระบบแล้วจำนวน ${result.affectedRows} แถว`);
+            console.log(`🧹 ระบบอัตโนมัติลบ OTP หมดอายุออกจากระบบแล้วจำนวน ${result.affectedRows} แถว`);
         }
     });
 }

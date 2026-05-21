@@ -1,9 +1,9 @@
 const path = require('path');
 const mysql = require('mysql2');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 let pool;
-let connectionType = "";
+let connectionType = "Aiven MySQL Cloud (Local Test)";
 
 const dbConfig = {
     host: process.env.DB_HOST,
@@ -13,41 +13,17 @@ const dbConfig = {
     database: process.env.DB_NAME,
     timezone: '+07:00',
     multipleStatements: true,
-
     waitForConnections: true,
     connectionLimit: 15,      
     queueLimit: 0,
     enableKeepAlive: true,    
-    keepAliveInitialDelay: 10000,
-    
-    ssl: {
-        rejectUnauthorized: false
-    }
+    keepAliveInitialDelay: 10000 
 };
 
-if (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
-    connectionType = "Aiven MySQL Cloud (Production)";
-    pool = mysql.createPool(dbConfig); 
-} else {
-    connectionType = "Aiven MySQL Cloud (Local Test)";
-    console.log(`Connecting to ${connectionType}...`);
-    pool = mysql.createPool(dbConfig); 
-}
+console.log(`Connecting to ${connectionType}...`);
+pool = mysql.createPool(dbConfig); 
 
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error(`❌ DB Connection Pool Error (${connectionType}):`, err.message);
-    } else {
-        console.log(`✅ DB Connected Successfully via Pool! Running on: ${connectionType}`);
-        
-        connection.query(`SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))`, (modeErr) => {
-            if (modeErr) console.error("❌ ไม่สามารถปรับ sql_mode ได้:", modeErr.message);
-        });
-
-        connection.query("SET time_zone = '+07:00'");
-        
-        connection.release(); 
-    }
-});
+// ตัดสัญญาส่วน pool.getConnection ที่คอยพ่น Error และสั่งแครชออกไป
+console.log("⚠️ สตาร์ทระบบแบบ Bypass: ปล่อยให้ Express Server เปิดพอร์ตทำงานทันที");
 
 module.exports = pool;
