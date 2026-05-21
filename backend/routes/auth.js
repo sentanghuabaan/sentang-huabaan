@@ -251,20 +251,14 @@ router.post('/register-request', async (req, res) => {
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 5 * 60000);
-
-        const year = expiresAt.getFullYear();
-        const month = String(expiresAt.getMonth() + 1).padStart(2, '0');
-        const day = String(expiresAt.getDate()).padStart(2, '0');
-        const hours = String(expiresAt.getHours()).padStart(2, '0');
-        const minutes = String(expiresAt.getMinutes()).padStart(2, '0');
-        const seconds = String(expiresAt.getSeconds()).padStart(2, '0');
-
-        const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, ?)";
-        db.query(sql, [email, otp, formattedTime], (err) => {
-            if (err) return res.status(500).json({ success: false });
+        
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, NOW() + INTERVAL 5 MINUTE)";
+        
+        db.query(sql, [email, otp], (err) => {
+            if (err) {
+                console.error("❌ SQL Insert OTP Error:", err.message);
+                return res.status(500).json({ success: false, message: "บันทึกรหัสในฐานข้อมูลไม่สำเร็จ" });
+            }
 
             const mailOptions = {
                 from: '"เส้นทางหัวบ้าน" <sentanghuabaan@gmail.com>',
@@ -274,7 +268,10 @@ router.post('/register-request', async (req, res) => {
             };
 
             transporter.sendMail(mailOptions, (error) => {
-                if (error) return res.status(500).json({ success: false, message: 'ส่งเมลไม่สำเร็จ' });
+                if (error) {
+                    console.error("❌ Nodemailer Error:", error.message);
+                    return res.status(500).json({ success: false, message: 'ส่งเมลไม่สำเร็จ' });
+                }
                 res.json({ success: true, message: 'ส่ง OTP แล้ว' });
             });
         });
@@ -353,8 +350,9 @@ router.post('/forgot-password', (req, res) => {
 
         const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, ?)";
-        db.query(sql, [email, otp, formattedTime], (err) => {
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, NOW() + INTERVAL 5 MINUTE)";
+
+        db.query(sql, [email, otp], (err) => {
             if (err) {
                 console.error("❌ Database Error:", err);
                 return res.status(500).json({ success: false, message: "บันทึก OTP ไม่สำเร็จ" });
