@@ -18,7 +18,11 @@ const dbConfig = {
     connectionLimit: 15,      
     queueLimit: 0,
     enableKeepAlive: true,    
-    keepAliveInitialDelay: 10000 
+    keepAliveInitialDelay: 10000,
+    
+    ssl: {
+        rejectUnauthorized: false
+    }
 };
 
 if (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production') {
