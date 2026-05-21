@@ -228,13 +228,16 @@ passport.deserializeUser((id, done) => {
 });
 
 const nodemailer = require('nodemailer');
+
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
+    connectionTimeout: 10000, 
+    greetingTimeout: 10000,
     auth: {
         user: 'sentanghuabaan@gmail.com',
-        pass: 'ctbgacznafewtcnd'
+        pass: 'ctbgacznafewtcnd' 
     }
 });
 
@@ -469,16 +472,19 @@ function clearExpiredOTPs() {
 
     const sql = "DELETE FROM OTP_codes WHERE expires_at < NOW()";
     
-    db.query(sql, (err, result) => {
+    db.query(sql, [email, otp], (err, result) => { 
         if (err) {
             console.error("⚠️ ไม่สามารถเคลียร์ OTP หมดอายุในรอบนี้ได้เนื่องจากเครือข่ายสะดุด:", err.message);
-            return;
+            return; 
         }
-        if (result.affectedRows > 0) {
+        if (result && result.affectedRows > 0) {
             console.log(`🧹 ระบบอัตโนมัติทำความสะอาดลบ OTP หมดอายุออกจากระบบแล้วจำนวน ${result.affectedRows} แถว`);
         }
     });
 }
+
+setTimeout(clearExpiredOTPs, 3000);
+setInterval(clearExpiredOTPs, 3600000);
 
 setTimeout(clearExpiredOTPs, 3000);
 setInterval(clearExpiredOTPs, 3600000);
