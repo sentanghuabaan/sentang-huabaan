@@ -462,14 +462,20 @@ router.delete('/otp/:id', verifyAdminToken, async (req, res) => {
 });
 
 function clearExpiredOTPs() {
+    if (!db || typeof db.query !== 'function') {
+        console.log("⚠️ ฐานข้อมูลยังไม่พร้อมใช้งานในลูปรอบนี้ จะลองใหม่อีกครั้งในชั่วโมงถัดไป");
+        return;
+    }
+
     const sql = "DELETE FROM OTP_codes WHERE expires_at < NOW()";
+    
     db.query(sql, (err, result) => {
         if (err) {
-            console.error("Error clearing expired OTPs:", err);
+            console.error("⚠️ ไม่สามารถเคลียร์ OTP หมดอายุในรอบนี้ได้เนื่องจากเครือข่ายสะดุด:", err.message);
             return;
         }
         if (result.affectedRows > 0) {
-            console.log(`Cleaned up ${result.affectedRows} expired OTPs from the database.`);
+            console.log(`🧹 ระบบอัตโนมัติทำความสะอาดลบ OTP หมดอายุออกจากระบบแล้วจำนวน ${result.affectedRows} แถว`);
         }
     });
 }
