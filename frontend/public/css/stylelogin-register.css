@@ -259,12 +259,22 @@ body {
 .profile-avatar {
     font-size: 80px;
     color: #000;
-    width: 80px !important;
-    height: 80px !important;   
-    border-radius: 50% !important;
-    object-fit: cover;     
-    display: inline-block;
-    border: 2px solid #BF7E46;
+}
+
+img.profile-avatar {
+    width: 80px !important;   
+    height: 80px !important;       
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-radius: 50% !important; 
+    object-fit: cover !important; 
+    border: 2px solid #BF7E46;    
+    flex-shrink: 0;         
+}
+
+.user-details {
+    min-width: 0; 
+    flex: 1;   
 }
 
 .user-details h3 {
