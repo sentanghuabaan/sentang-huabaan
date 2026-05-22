@@ -78,7 +78,7 @@ function dateToTimeString(date) {
     const h = String(date.getHours()).padStart(2, '0');
     const m = String(date.getMinutes()).padStart(2, '0');
     const s = String(date.getSeconds()).padStart(2, '0');
-    return `${h}:${m}:${s}`;
+    return `${h}:${m}:${s}`; 
 }
 
 // จัดลำดับสถานที่ท่องเที่ยว
@@ -267,17 +267,17 @@ router.post('/create-trip', async (req, res) => {
 
                 let runningTime = startDateTime;
 
-                db.beginTransaction((err) => {
-                    if (err) {
-                        console.error("❌ Transaction Error:", err);
+                db.beginTransaction((transactionErr) => {
+                    if (transactionErr) {
+                        console.error("❌ Transaction Init Error:", transactionErr);
                         return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
                     }
                     
                     const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
-                    db.query(sqlTrip, [user_id, trip_name, trip_date], (err, result) => {
-                        if (err) {
-                            console.error("❌ Insert Trip Error:", err);
-                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ" }));
+                    db.query(sqlTrip, [user_id, trip_name, trip_date], (tripErr, result) => {
+                        if (tripErr) {
+                            console.error("❌ Insert Trip Error:", tripErr);
+                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จเนื่องจากข้อมูลไม่ตรงกับโครงสร้างตาราง" }));
                         }
 
                         const trip_id = result.insertId;
@@ -304,7 +304,9 @@ router.post('/create-trip', async (req, res) => {
                             const finalDepartureTimeDate = new Date(activityStartDate.getTime() + stayMin * 60000);
                             const departureTimeStr = dateToTimeString(finalDepartureTimeDate);
 
-                            detailValues.push([trip_id, loc.location_id, index + 1, arrivalTimeStr, stayMin, departureTimeStr]);
+                            const orderNumber = Number(index + 1);
+
+                            detailValues.push([trip_id, loc.location_id, orderNumber, arrivalTimeStr, stayMin, departureTimeStr]);
 
                             if (index < optimizedLocations.length - 1) {
                                 const nextLocId = optimizedLocations[index + 1].location_id;
@@ -319,20 +321,24 @@ router.post('/create-trip', async (req, res) => {
                         });
 
                         const sqlDetail = `INSERT INTO Trip_Detail (trip_id, location_id, visit_order, arrival_time, stay_duration, departure_time) VALUES ?`;
-                        db.query(sqlDetail, [detailValues], (err) => {
-                            if (err) {
-                                console.error("❌ Insert Trip_Detail Error:", err);
-                                return db.rollback(() => res.status(500).json({ error: "บันทึกรายละเอียดเส้นทางย่อยไม่สำเร็จ" }));
+                        db.query(sqlDetail, [detailValues], (detailErr) => {
+                            if (detailErr) {
+                                console.error("❌ Insert Trip_Detail Error:", detailErr);
+                                return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลย่อยลง Trip_Detail ล้มเหลว ตรวจสอบโครงสร้างข้อมูล" }));
                             }
-                            db.commit(() => res.json({ message: "Success", trip_id }));
+                            db.commit(() => {
+                                res.json({ message: "Success", trip_id });
+                            });
                         });
                     });
                 });
             });
         });
-    } catch (err) {
-        console.error("❌ Top Level Catch Error:", err);
-        res.status(500).json({ error: err.message });
+    } catch (runtimeErr) {
+        console.error("❌ เกิดข้อผิดพลาดแบบฉับพลัน:", runtimeErr);
+        if (!res.headersSent) {
+            res.status(500).json({ error: "เซิร์ฟเวอร์เกิดข้อผิดพลาดในการคำนวณทริป" });
+        }
     }
 });
 
