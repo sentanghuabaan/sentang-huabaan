@@ -101,13 +101,13 @@ async function sortLocations(locations, tripDate) {
                         return reject(err);
                     }
 
+                    const safeRoutes = routes || [];
+
                     let sorted = [];
                     let remaining = [...locs];
 
                     const now = new Date();
                     const isToday = now.toDateString() === new Date(tripDate).toDateString();
-
-                    // คำนวณเวลาเริ่มต้นทริป
                     let simTimeSec = isToday ? timeToSeconds(dateToTimeString(now)) : timeToSeconds("09:00:00");
 
                     let candidates = remaining.filter(loc => loc.location_type !== 'โรงแรม');
@@ -116,7 +116,7 @@ async function sortLocations(locations, tripDate) {
                         let bOpen = timeToSeconds(b.opening_time);
                         if (aOpen <= simTimeSec && bOpen > simTimeSec) return -1;
                         if (aOpen > simTimeSec && bOpen <= simTimeSec) return 1;
-                        return a.closing_time.localeCompare(b.closing_time);
+                        return (a.closing_time || "").localeCompare(b.closing_time || "");
                     });
 
                     let startLoc = candidates[0] || remaining[0];
@@ -129,17 +129,15 @@ async function sortLocations(locations, tripDate) {
                     if (!current) return resolve([]);
                     
                     sorted.push(current);
-
                     simTimeSec = Math.max(simTimeSec, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
 
-                    // ลูปจัดลำดับความเหมาะสมของพิกัดเส้นทาง
                     while (remaining.length > 0) {
                         let lastId = current.location_id;
                         let bestIdx = -1;
                         let minScore = Infinity;
 
                         remaining.forEach((dest, index) => {
-                            const route = routes.find(r =>
+                            const route = safeRoutes.find(r =>
                                 (r.from_location_id === lastId && r.to_location_id === dest.location_id) ||
                                 (r.from_location_id === dest.location_id && r.to_location_id === lastId)
                             );
@@ -167,6 +165,8 @@ async function sortLocations(locations, tripDate) {
                             let closedPenalty = (arrivalTimeSec > closeTimeSec) ? 5000000 : 0;
                             let totalScore = distanceScore + waitPenalty + hotelScore + closedPenalty;
 
+                            if (isNaN(totalScore)) totalScore = 9999999;
+
                             if (totalScore < minScore) {
                                 minScore = totalScore;
                                 bestIdx = index;
@@ -180,7 +180,7 @@ async function sortLocations(locations, tripDate) {
 
                         sorted.push(current);
 
-                        const routeBack = routes.find(r =>
+                        const routeBack = safeRoutes.find(r =>
                             (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
                             (r.from_location_id === current.location_id && r.to_location_id === lastId)
                         );
@@ -212,28 +212,37 @@ function timeToSeconds(time) {
 // Route สำหรับสร้างทริปใหม่่
 router.post('/create-trip', async (req, res) => {
     const { user_id, trip_name, trip_date, locations } = req.body;
-    if (!locations || locations.length === 0) return res.status(400).send("No locations selected");
+    
+    if (!user_id) return res.status(400).json({ error: "ไม่พบรหัสผู้ใช้งาน (user_id)" });
+    if (!locations || locations.length === 0) return res.status(400).json({ error: "กรุณาเลือกสถานที่อย่างน้อย 1 แห่ง" });
 
     try {
         const optimizedLocations = await sortLocations(locations, trip_date);
         
         if (!optimizedLocations || optimizedLocations.length === 0) {
-            return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้" });
+            return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้เนื่องจากข้อมูลไม่ครบถ้วน" });
         }
 
         const sqlGetFullInfo = `SELECT location_id, opening_time, closing_time, recommended_duration FROM Location WHERE location_id IN (?)`;
 
         db.query(sqlGetFullInfo, [locations], (err, locDetails) => {
-            if (err) return res.status(500).send("Fetch Info Err");
+            if (err) {
+                console.error("❌ Fetch Info Error:", err);
+                return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลสถานที่" });
+            }
 
             const infoMap = {};
-            locDetails.forEach(d => infoMap[d.location_id] = d);
+            (locDetails || []).forEach(d => infoMap[d.location_id] = d);
 
             const sqlAllRoutes = `SELECT * FROM Travel_Route WHERE from_location_id IN (?) OR to_location_id IN (?)`;
 
             db.query(sqlAllRoutes, [locations, locations], (err, allRoutes) => {
-                if (err) return res.status(500).send("Fetch Routes Err");
+                if (err) {
+                    console.error("❌ Fetch Routes Error:", err);
+                    return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลเส้นทางทริป" });
+                }
 
+                const safeAllRoutes = allRoutes || [];
                 const now = new Date();
                 const selectedDate = new Date(trip_date);
                 let startDateTime = new Date(trip_date);
@@ -241,7 +250,7 @@ router.post('/create-trip', async (req, res) => {
                 const firstLocId = optimizedLocations[0].location_id;
                 const firstLoc = infoMap[firstLocId];
 
-                if (!firstLoc) return res.status(500).send("First Location Data Missing");
+                if (!firstLoc) return res.status(500).json({ error: "ไม่พบข้อมูลรายละเอียดของสถานที่แห่งแรก" });
 
                 const openingTimeStr = String(firstLoc.opening_time);
                 const [openH, openM] = openingTimeStr.split(':');
@@ -259,10 +268,17 @@ router.post('/create-trip', async (req, res) => {
                 let runningTime = startDateTime;
 
                 db.beginTransaction((err) => {
-                    if (err) return res.status(500).send("Transaction Init Err");
+                    if (err) {
+                        console.error("❌ Transaction Error:", err);
+                        return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
+                    }
+                    
                     const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
                     db.query(sqlTrip, [user_id, trip_name, trip_date], (err, result) => {
-                        if (err) return db.rollback(() => res.status(500).send("Trip Err"));
+                        if (err) {
+                            console.error("❌ Insert Trip Error:", err);
+                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ" }));
+                        }
 
                         const trip_id = result.insertId;
                         const detailValues = [];
@@ -292,7 +308,7 @@ router.post('/create-trip', async (req, res) => {
 
                             if (index < optimizedLocations.length - 1) {
                                 const nextLocId = optimizedLocations[index + 1].location_id;
-                                const routeInfo = allRoutes.find(r =>
+                                const routeInfo = safeAllRoutes.find(r =>
                                     (r.from_location_id === loc.location_id && r.to_location_id === nextLocId) ||
                                     (r.from_location_id === nextLocId && r.to_location_id === loc.location_id)
                                 );
@@ -304,7 +320,10 @@ router.post('/create-trip', async (req, res) => {
 
                         const sqlDetail = `INSERT INTO Trip_Detail (trip_id, location_id, visit_order, arrival_time, stay_duration, departure_time) VALUES ?`;
                         db.query(sqlDetail, [detailValues], (err) => {
-                            if (err) return db.rollback(() => res.status(500).send("Detail Err"));
+                            if (err) {
+                                console.error("❌ Insert Trip_Detail Error:", err);
+                                return db.rollback(() => res.status(500).json({ error: "บันทึกรายละเอียดเส้นทางย่อยไม่สำเร็จ" }));
+                            }
                             db.commit(() => res.json({ message: "Success", trip_id }));
                         });
                     });
@@ -312,6 +331,7 @@ router.post('/create-trip', async (req, res) => {
             });
         });
     } catch (err) {
+        console.error("❌ Top Level Catch Error:", err);
         res.status(500).json({ error: err.message });
     }
 });

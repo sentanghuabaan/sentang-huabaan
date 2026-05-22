@@ -376,9 +376,16 @@
 
             if (btnCreateTrip) {
                 btnCreateTrip.addEventListener('click', async () => {
+                    const userId = user.user_id || user.id; 
+                    
+                    if (!userId) {
+                        showAlert("ไม่พบรหัสผู้ใช้งานในระบบ กรุณาลองเข้าสู่ระบบใหม่อีกครั้ง");
+                        return;
+                    }
+
                     const tripData = {
-                        user_id: user.user_id,
-                        trip_name: tripNameInput.value,
+                        user_id: userId,
+                        trip_name: tripNameInput.value.trim(),
                         trip_date: tripDateInput.value,
                         locations: selectedPlaces
                     };
@@ -390,14 +397,17 @@
                             body: JSON.stringify(tripData)
                         });
 
+                        const result = await response.json();
+
                         if (response.ok) {
-                            const result = await response.json();
                             showAlert("สร้างการเดินทางสำเร็จ!");
                             window.location.href = `trip-summary.html?id=${result.trip_id}`;
+                        } else {
+                            showAlert(`ล้มเหลว: ${result.error || "เกิดข้อผิดพลาดภายในระบบ"}`);
                         }
                     } catch (err) {
                         console.error("Save error:", err);
-                        showAlert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+                        showAlert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์หลักได้ในขณะนี้ (เครือข่ายขัดข้อง)");
                     }
                 });
             }
