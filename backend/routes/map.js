@@ -212,7 +212,7 @@ function timeToSeconds(time) {
 // Route สำหรับสร้างทริปใหม่่
 router.post('/create-trip', async (req, res) => {
     const { user_id, trip_name, trip_date, locations } = req.body;
-
+    
     console.log("📥 [Incoming Request] Data received:", { user_id, trip_name, trip_date, locations });
 
     if (!user_id) return res.status(400).json({ error: "ไม่พบรหัสผู้ใช้งาน (user_id)" });
@@ -220,7 +220,7 @@ router.post('/create-trip', async (req, res) => {
 
     try {
         const optimizedLocations = await sortLocations(locations, trip_date);
-
+        
         if (!optimizedLocations || optimizedLocations.length === 0) {
             console.log("⚠️ [Warning] Cannot optimize locations. Result is empty.");
             return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้เนื่องจากข้อมูลไม่ครบถ้วน" });
@@ -238,7 +238,7 @@ router.post('/create-trip', async (req, res) => {
             (locDetails || []).forEach(d => infoMap[d.location_id] = d);
 
             const sqlAllRoutes = `SELECT * FROM Travel_Route WHERE from_location_id IN (?) OR to_location_id IN (?)`;
-
+            
             db.query(sqlAllRoutes, [locations, locations], (routeErr, allRoutes) => {
                 if (routeErr) {
                     console.error("❌ [SQL Error] Fetch Routes Error:", routeErr);
@@ -273,80 +273,101 @@ router.post('/create-trip', async (req, res) => {
 
                 let runningTime = startDateTime;
 
-                db.beginTransaction((transactionErr) => {
-                    if (transactionErr) {
-                        console.error("❌ [Transaction Error] Init Failed:", transactionErr);
-                        return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
+                db.getConnection((connErr, connection) => {
+                    if (connErr) {
+                        console.error("❌ [Pool Error] Cannot get connection from pool:", connErr);
+                        return res.status(500).json({ error: "ไม่สามารถดึงสายเชื่อมต่อฐานข้อมูลย่อยได้" });
                     }
 
-                    const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
-                    db.query(sqlTrip, [user_id, trip_name, trip_date], (tripErr, result) => {
-                        if (tripErr) {
-                            console.error("❌ [SQL Error] Insert Trip Failed:", tripErr);
-                            return db.rollback(() => {
-                                res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ เช็คความถูกต้องของ user_id", details: tripErr.message });
-                            });
+                    connection.beginTransaction((transactionErr) => {
+                        if (transactionErr) {
+                            console.error("❌ [Transaction Error] Init Failed:", transactionErr);
+                            connection.release(); 
+                            return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
                         }
-
-                        const trip_id = result.insertId;
-                        const detailValues = [];
-
-                        optimizedLocations.forEach((loc, index) => {
-                            const info = infoMap[loc.location_id];
-                            const stayMin = info ? (info.recommended_duration || 30) : 30;
-
-                            const locOpenTimeStr = info ? String(info.opening_time) : "09:00:00";
-                            const openTimeSec = timeToSeconds(locOpenTimeStr);
-
-                            const arrivalTimeStr = dateToTimeString(runningTime);
-                            const arrivalTimeSec = timeToSeconds(arrivalTimeStr);
-
-                            let isWaiting = arrivalTimeSec < openTimeSec;
-                            let activityStartDate = new Date(runningTime);
-
-                            if (isWaiting && info) {
-                                const [h, m] = String(info.opening_time).split(':');
-                                activityStartDate.setHours(parseInt(h) || 9, parseInt(m) || 0, 0);
-                            }
-
-                            const finalDepartureTimeDate = new Date(activityStartDate.getTime() + stayMin * 60000);
-                            const departureTimeStr = dateToTimeString(finalDepartureTimeDate);
-
-                            const orderNumber = Number(index + 1);
-
-                            detailValues.push([
-                                trip_id,
-                                loc.location_id,
-                                orderNumber,
-                                arrivalTimeStr.trim(),
-                                parseInt(stayMin),
-                                departureTimeStr.trim()
-                            ]);
-
-                            if (index < optimizedLocations.length - 1) {
-                                const nextLocId = optimizedLocations[index + 1].location_id;
-                                const routeInfo = safeAllRoutes.find(r =>
-                                    (r.from_location_id === loc.location_id && r.to_location_id === nextLocId) ||
-                                    (r.from_location_id === nextLocId && r.to_location_id === loc.location_id)
-                                );
-
-                                const travelMin = routeInfo ? parseInt(routeInfo.travel_time_walk) : 5;
-                                runningTime = new Date(finalDepartureTimeDate.getTime() + travelMin * 60000);
-                            }
-                        });
-
-                        const sqlDetail = `INSERT INTO Trip_Detail (trip_id, location_id, visit_order, arrival_time, stay_duration, departure_time) VALUES ?`;
-                        db.query(sqlDetail, [detailValues], (detailErr) => {
-                            if (detailErr) {
-                                console.error("❌ [SQL Error] Insert Trip_Detail Failed:", detailErr);
-                                return db.rollback(() => {
-                                    res.status(400).json({ error: "รูปแบบข้อมูลชุดรายละเอียดขัดแย้งกับข้อจำกัดฐานข้อมูลระบบจริง", details: detailErr.message });
+                        
+                        const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
+                        
+                        connection.query(sqlTrip, [user_id, trip_name, trip_date], (tripErr, result) => {
+                            if (tripErr) {
+                                console.error("❌ [SQL Error] Insert Trip Failed:", tripErr);
+                                return connection.rollback(() => {
+                                    connection.release(); 
+                                    res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ", details: tripErr.message });
                                 });
                             }
 
-                            db.commit(() => {
-                                console.log(`🎉 [Success] Trip Created Successfully! ID: ${trip_id}`);
-                                res.json({ message: "Success", trip_id });
+                            const trip_id = result.insertId;
+                            const detailValues = [];
+
+                            optimizedLocations.forEach((loc, index) => {
+                                const info = infoMap[loc.location_id];
+                                const stayMin = info ? (info.recommended_duration || 30) : 30;
+
+                                const locOpenTimeStr = info ? String(info.opening_time) : "09:00:00";
+                                const openTimeSec = timeToSeconds(locOpenTimeStr);
+
+                                const arrivalTimeStr = dateToTimeString(runningTime);
+                                const arrivalTimeSec = timeToSeconds(arrivalTimeStr);
+
+                                let isWaiting = arrivalTimeSec < openTimeSec;
+                                let activityStartDate = new Date(runningTime);
+
+                                if (isWaiting && info) {
+                                    const [h, m] = String(info.opening_time).split(':');
+                                    activityStartDate.setHours(parseInt(h) || 9, parseInt(m) || 0, 0);
+                                }
+
+                                const finalDepartureTimeDate = new Date(activityStartDate.getTime() + stayMin * 60000);
+                                const departureTimeStr = dateToTimeString(finalDepartureTimeDate);
+
+                                const orderNumber = Number(index + 1);
+
+                                detailValues.push([
+                                    trip_id, 
+                                    loc.location_id, 
+                                    orderNumber, 
+                                    arrivalTimeStr.trim(), 
+                                    parseInt(stayMin), 
+                                    departureTimeStr.trim()
+                                ]);
+
+                                if (index < optimizedLocations.length - 1) {
+                                    const nextLocId = optimizedLocations[index + 1].location_id;
+                                    const routeInfo = safeAllRoutes.find(r =>
+                                        (r.from_location_id === loc.location_id && r.to_location_id === nextLocId) ||
+                                        (r.from_location_id === nextLocId && r.to_location_id === loc.location_id)
+                                    );
+
+                                    const travelMin = routeInfo ? parseInt(routeInfo.travel_time_walk) : 5;
+                                    runningTime = new Date(finalDepartureTimeDate.getTime() + travelMin * 60000);
+                                }
+                            });
+
+                            const sqlDetail = `INSERT INTO Trip_Detail (trip_id, location_id, visit_order, arrival_time, stay_duration, departure_time) VALUES ?`;
+                            
+                            connection.query(sqlDetail, [detailValues], (detailErr) => {
+                                if (detailErr) {
+                                    console.error("❌ [SQL Error] Insert Trip_Detail Failed:", detailErr);
+                                    return connection.rollback(() => {
+                                        connection.release();
+                                        res.status(400).json({ error: "รูปแบบข้อมูลชุดรายละเอียดขัดแย้งกับฐานข้อมูล", details: detailErr.message });
+                                    });
+                                }
+                                
+                                connection.commit((commitErr) => {
+                                    if (commitErr) {
+                                        console.error("❌ [Transaction Error] Commit Failed:", commitErr);
+                                        return connection.rollback(() => {
+                                            connection.release();
+                                            res.status(500).json({ error: "ยืนยันบันทึกข้อมูลธุรกรรมทริปล้มเหลว" });
+                                        });
+                                    }
+                                    
+                                    connection.release(); 
+                                    console.log(`🎉 [Success] Trip Created Successfully! ID: ${trip_id}`);
+                                    res.json({ message: "Success", trip_id });
+                                });
                             });
                         });
                     });
