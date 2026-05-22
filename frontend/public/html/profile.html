@@ -110,7 +110,7 @@
                         document.getElementById('displayUsername').textContent = user.username;
                         document.getElementById('displayEmail').textContent = user.email;
 
-                        // --- เริ่มต้นส่วนการดึงรูปโปรไฟล์จากหลังบ้านมาแสดง ---
+                        // ส่วนการดึงรูปโปรไฟล์จากหลังบ้านมาแสดง
                         const profileAvatar = document.querySelector('.profile-avatar');
 
                         // ตรวจสอบคัดกรองลิงก์รูปภาพโปรไฟล์จริงจากในเครื่อง
@@ -124,12 +124,6 @@
                                 const newImg = document.createElement('img');
                                 newImg.src = imgUrl;
                                 newImg.className = 'profile-avatar';
-
-                                newImg.style.width = '80px';
-                                newImg.style.height = '80px';
-                                newImg.style.borderRadius = '50%';
-                                newImg.style.objectFit = 'cover';
-                                newImg.style.border = '2px solid #BF7E46';
 
                                 profileAvatar.parentNode.replaceChild(newImg, profileAvatar);
                             } else {

@@ -259,6 +259,12 @@ body {
 .profile-avatar {
     font-size: 80px;
     color: #000;
+    width: 80px !important;
+    height: 80px !important;   
+    border-radius: 50% !important;
+    object-fit: cover;     
+    display: inline-block;
+    border: 2px solid #BF7E46;
 }
 
 .user-details h3 {
@@ -271,6 +277,9 @@ body {
     margin: 5px 0 20px;
     font-size: 14px;
     color: #444;
+    word-break: break-all;  
+    overflow-wrap: break-word;
+    max-width: 200px;
 }
 
 .edit-btn {
