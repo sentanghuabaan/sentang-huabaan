@@ -383,6 +383,11 @@
                         return;
                     }
 
+                    btnCreateTrip.disabled = true;
+                    btnCreateTrip.innerText = "กำลังสร้างแผนการเดินทาง...";
+                    btnCreateTrip.style.backgroundColor = '#B1A396';
+                    btnCreateTrip.style.cursor = 'not-allowed';
+
                     const tripData = {
                         user_id: userId,
                         trip_name: tripNameInput.value.trim(),
@@ -405,6 +410,11 @@
                             const errorText = await response.text();
                             console.error("❌ Server Error Response:", errorText);
 
+                            btnCreateTrip.disabled = false;
+                            btnCreateTrip.innerText = "สร้างการเดินทางของคุณ";
+                            btnCreateTrip.style.backgroundColor = '#BF7E46';
+                            btnCreateTrip.style.cursor = 'pointer';
+
                             try {
                                 const errorJson = JSON.parse(errorText);
                                 showAlert(`ล้มเหลว: ${errorJson.error || errorJson.message || "เกิดข้อผิดพลาดภายในระบบ"}`);
@@ -414,6 +424,12 @@
                         }
                     } catch (err) {
                         console.error("Save error:", err);
+
+                        btnCreateTrip.disabled = false;
+                        btnCreateTrip.innerText = "สร้างการเดินทางของคุณ";
+                        btnCreateTrip.style.backgroundColor = '#BF7E46';
+                        btnCreateTrip.style.cursor = 'pointer';
+
                         showAlert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์หลักได้ในขณะนี้ (เครือข่ายขัดข้อง)");
                     }
                 });
