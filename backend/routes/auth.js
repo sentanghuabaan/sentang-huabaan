@@ -246,7 +246,7 @@ router.post('/register-request', async (req, res) => {
         }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'), INTERVAL 5 MINUTE))";
         
         db.query(sql, [email, otp], (insertErr) => {
             if (insertErr) {
@@ -348,7 +348,7 @@ router.post('/forgot-password', (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'), INTERVAL 5 MINUTE))";
         
         db.query(sql, [email, otp], (insertErr) => {
             if (insertErr) {
