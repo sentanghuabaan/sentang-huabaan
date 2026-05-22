@@ -277,7 +277,7 @@ router.post('/create-trip', async (req, res) => {
                     db.query(sqlTrip, [user_id, trip_name, trip_date], (tripErr, result) => {
                         if (tripErr) {
                             console.error("❌ Insert Trip Error:", tripErr);
-                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จเนื่องจากข้อมูลไม่ตรงกับโครงสร้างตาราง" }));
+                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ" }));
                         }
 
                         const trip_id = result.insertId;
@@ -306,7 +306,14 @@ router.post('/create-trip', async (req, res) => {
 
                             const orderNumber = Number(index + 1);
 
-                            detailValues.push([trip_id, loc.location_id, orderNumber, arrivalTimeStr, stayMin, departureTimeStr]);
+                            detailValues.push([
+                                trip_id, 
+                                loc.location_id, 
+                                orderNumber, 
+                                arrivalTimeStr.trim(), 
+                                parseInt(stayMin), 
+                                departureTimeStr.trim()
+                            ]);
 
                             if (index < optimizedLocations.length - 1) {
                                 const nextLocId = optimizedLocations[index + 1].location_id;
@@ -324,7 +331,10 @@ router.post('/create-trip', async (req, res) => {
                         db.query(sqlDetail, [detailValues], (detailErr) => {
                             if (detailErr) {
                                 console.error("❌ Insert Trip_Detail Error:", detailErr);
-                                return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลย่อยลง Trip_Detail ล้มเหลว ตรวจสอบโครงสร้างข้อมูล" }));
+                                
+                                return db.rollback(() => {
+                                    res.status(400).json({ error: "รูปแบบข้อมูลวันเวลาไม่ถูกต้องตามเงื่อนไขของฐานข้อมูลระบบจริง" });
+                                });
                             }
                             db.commit(() => {
                                 res.json({ message: "Success", trip_id });
@@ -335,9 +345,9 @@ router.post('/create-trip', async (req, res) => {
             });
         });
     } catch (runtimeErr) {
-        console.error("❌ เกิดข้อผิดพลาดแบบฉับพลัน:", runtimeErr);
+        console.error("❌ เกิดข้อผิดพลาดแบบฉับพลันยามรันไทม์:", runtimeErr);
         if (!res.headersSent) {
-            res.status(500).json({ error: "เซิร์ฟเวอร์เกิดข้อผิดพลาดในการคำนวณทริป" });
+            res.status(500).json({ error: "ระบบประมวลผลอัลกอริทึมล้มเหลว" });
         }
     }
 });
