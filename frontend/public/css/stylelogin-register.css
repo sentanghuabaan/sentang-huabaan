@@ -268,6 +268,21 @@ body {
     display: inline-block;
 }
 
+iconify-icon.profile-avatar {
+    font-size: 80px;
+    color: #000;
+}
+
+img.profile-avatar {
+    width: 80px !important;
+    height: 80px !important;
+    max-width: 80px !important;
+    max-height: 80px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: inline-block !important;
+}
+
 .user-details h3 {
     margin: 0;
     font-size: 16px;

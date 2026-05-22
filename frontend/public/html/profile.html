@@ -120,14 +120,30 @@
                                 ? user.profile_img
                                 : `${API_BASE_URL}/${user.profile_img}`;
 
-                            if (profileAvatar.tagName === 'ICONIFY-ICON' || profileAvatar.tagName === 'I') {
-                                const newImg = document.createElement('img');
-                                newImg.src = imgUrl;
-                                newImg.className = 'profile-avatar';
+                            if (user.profile_img && profileAvatar) {
+                                const imgUrl = user.profile_img.startsWith('http')
+                                    ? user.profile_img
+                                    : `${API_BASE_URL}/${user.profile_img}`;
 
-                                profileAvatar.parentNode.replaceChild(newImg, profileAvatar);
-                            } else {
-                                profileAvatar.src = imgUrl;
+                                if (profileAvatar.tagName === 'ICONIFY-ICON' || profileAvatar.tagName === 'I') {
+                                    const newImg = document.createElement('img');
+                                    newImg.src = imgUrl;
+                                    newImg.className = 'profile-avatar';
+
+                                    // บังคับใส่สไตล์ตรงนี้เลย ได้ผลแน่นอนเหมือนหน้าเมนู
+                                    newImg.style.width = '80px';
+                                    newImg.style.height = '80px';
+                                    newImg.style.borderRadius = '50%';
+                                    newImg.style.objectFit = 'cover';
+
+                                    profileAvatar.parentNode.replaceChild(newImg, profileAvatar);
+                                } else {
+                                    profileAvatar.src = imgUrl;
+                                    profileAvatar.style.width = '80px';
+                                    profileAvatar.style.height = '80px';
+                                    profileAvatar.style.borderRadius = '50%';
+                                    profileAvatar.style.objectFit = 'cover';
+                                }
                             }
                         }
                     } else {
