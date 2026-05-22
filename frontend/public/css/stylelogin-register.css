@@ -289,6 +289,11 @@ img.profile-avatar {
     font-weight: 400;
 }
 
+.user-details {
+    flex-grow: 1;            
+    min-width: 0;        
+}
+
 .user-details p {
     margin: 5px 0 20px;
     font-size: 14px;
@@ -566,9 +571,9 @@ img.profile-avatar {
     }
 
     .user-details p {
-        max-width: 400px !important;
-        white-space: nowrap !important;    
-        word-break: normal !important;    
+        white-space: nowrap !important;   
+        word-break: normal !important;     
+        overflow-wrap: normal !important;  
         max-width: none !important;
     }
 }
