@@ -257,7 +257,7 @@ router.post('/register-request', async (req, res) => {
             console.log(`🎯 บันทึก OTP (${otp}) ลงตารางสำเร็จแล้ว! กำลังส่งผ่าน Resend...`);
 
             resend.emails.send({
-                from: 'เส้นทางหัวบ้าน <onboarding@resend.dev>', 
+                from: 'เส้นทางหัวบ้าน <noreply@sentanghuabaan.com>', 
                 to: email, 
                 subject: 'รหัสยืนยันการสมัครสมาชิก - เส้นทางหัวบ้าน',
                 html: `
@@ -359,7 +359,7 @@ router.post('/forgot-password', (req, res) => {
             console.log(`🎯 บันทึก OTP สำหรับรีเซ็ตรหัสผ่าน (${otp}) เรียบร้อย! กำลังยิงผ่าน Resend...`);
 
             resend.emails.send({
-                from: 'เส้นทางหัวบ้าน <onboarding@resend.dev>',
+                from: 'เส้นทางหัวบ้าน <security@sentanghuabaan.com>',
                 to: email,
                 subject: 'รหัสสำหรับรีเซ็ตรหัสผ่าน - เส้นทางหัวบ้าน',
                 html: `
