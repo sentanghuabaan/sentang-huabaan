@@ -73,6 +73,14 @@ router.get('/locations', (req, res) => {
     });
 });
 
+// 💡 เปลี่ยนฟังก์ชันแปลงเวลาสากลให้ปลอดภัยสูงสุด ไม่พึ่งพาระบบ String ของ OS
+function dateToTimeString(date) {
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    const s = String(date.getSeconds()).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+}
+
 // จัดลำดับสถานที่ท่องเที่ยว
 async function sortLocations(locations, db, tripDate) {
     return new Promise((resolve, reject) => {
@@ -89,23 +97,21 @@ async function sortLocations(locations, db, tripDate) {
 
                 const now = new Date();
                 const isToday = now.toDateString() === new Date(tripDate).toDateString();
-                let simTimeSec = isToday ? timeToSeconds(now.toTimeString().split(' ')[0]) : timeToSeconds("09:00:00");
+
+                // คำนวณเวลาเริ่มต้นทริป
+                let simTimeSec = isToday ? timeToSeconds(dateToTimeString(now)) : timeToSeconds("09:00:00");
 
                 let candidates = remaining.filter(loc => loc.location_type !== 'โรงแรม');
-
                 candidates.sort((a, b) => {
                     let aOpen = timeToSeconds(a.opening_time);
                     let bOpen = timeToSeconds(b.opening_time);
-                    let aIsAvailable = aOpen <= simTimeSec;
-                    let bIsAvailable = bOpen <= simTimeSec;
-
-                    if (aIsAvailable && !bIsAvailable) return -1;
-                    if (!aIsAvailable && bIsAvailable) return 1;
+                    if (aOpen <= simTimeSec && bOpen > simTimeSec) return -1;
+                    if (aOpen > simTimeSec && bOpen <= simTimeSec) return 1;
                     return a.closing_time.localeCompare(b.closing_time);
                 });
 
-                let startLoc = candidates[0];
-                if (!startLoc) startLoc = remaining[0]; // Fallback เผื่อเลือกมาเฉพาะโรงแรม
+                let startLoc = candidates[0] || remaining[0];
+                if (!startLoc) return resolve([]);
 
                 let startIndex = remaining.findIndex(l => l.location_id === startLoc.location_id);
                 let current = remaining.splice(startIndex, 1)[0];
@@ -115,7 +121,7 @@ async function sortLocations(locations, db, tripDate) {
 
                 while (remaining.length > 0) {
                     let lastId = current.location_id;
-                    let bestIdx = -1;
+                    let bestIdx = 0;
                     let minScore = Infinity;
 
                     remaining.forEach((dest, index) => {
@@ -154,14 +160,17 @@ async function sortLocations(locations, db, tripDate) {
                     });
 
                     current = remaining.splice(bestIdx, 1)[0];
-                    sorted.push(current);
-
-                    const routeBack = routes.find(r =>
-                        (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
-                        (r.from_location_id === current.location_id && r.to_location_id === lastId)
-                    );
-                    let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
-                    simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
+                    if (current) {
+                        sorted.push(current);
+                        const routeBack = routes.find(r =>
+                            (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
+                            (r.from_location_id === current.location_id && r.to_location_id === lastId)
+                        );
+                        let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
+                        simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
+                    } else {
+                        break;
+                    }
                 }
                 resolve(sorted);
             });
@@ -233,7 +242,7 @@ router.post('/create-trip', async (req, res) => {
                             const stayMin = info.recommended_duration || 30;
                             const openTimeSec = timeToSeconds(info.opening_time);
 
-                            const arrivalTimeStr = runningTime.toTimeString().split(' ')[0];
+                            const arrivalTimeStr = dateToTimeString(runningTime);
                             const arrivalTimeSec = timeToSeconds(arrivalTimeStr);
 
                             let isWaiting = arrivalTimeSec < openTimeSec;
@@ -245,13 +254,12 @@ router.post('/create-trip', async (req, res) => {
                             }
 
                             const finalDepartureTimeDate = new Date(activityStartDate.getTime() + stayMin * 60000);
-                            const departureTimeStr = finalDepartureTimeDate.toTimeString().split(' ')[0];
+                            const departureTimeStr = dateToTimeString(finalDepartureTimeDate);
 
                             detailValues.push([trip_id, loc.location_id, index + 1, arrivalTimeStr, stayMin, departureTimeStr]);
 
                             if (index < optimizedLocations.length - 1) {
                                 const nextLocId = optimizedLocations[index + 1].location_id;
-
                                 const routeInfo = allRoutes.find(r =>
                                     (r.from_location_id === loc.location_id && r.to_location_id === nextLocId) ||
                                     (r.from_location_id === nextLocId && r.to_location_id === loc.location_id)
