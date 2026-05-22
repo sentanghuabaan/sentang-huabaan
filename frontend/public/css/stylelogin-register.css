@@ -256,34 +256,15 @@ body {
     padding-bottom: 20px;
 }
 
-img.profile-avatar {
-    width: 80px !important;
-    height: 80px !important;
-    border-radius: 50% !important;
-    object-fit: cover !important;
-    display: inline-block !important;
-    vertical-align: middle;
-    border: 2px solid #BF7E46; 
+.profile-avatar {
+    width: 80px;        
+    height: 80px;       
+    font-size: 80px;    
+    color: #000;
+    border-radius: 50%; 
+    object-fit: cover; 
+    display: inline-block;
 }
-
-iconify-icon.profile-avatar {
-    font-size: 80px !important;
-    width: 80px !important;
-    height: 80px !important;
-    display: inline-block !important;
-}
-
-.profile-info-header {
-    display: flex;
-    align-items: center;
-    gap: 20px; 
-}
-
-.user-details {
-    min-width: 0;
-    flex: 1;
-}
-
 .user-details h3 {
     margin: 0;
     font-size: 16px;
