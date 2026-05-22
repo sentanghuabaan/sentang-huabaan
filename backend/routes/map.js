@@ -78,11 +78,11 @@ function dateToTimeString(date) {
     const h = String(date.getHours()).padStart(2, '0');
     const m = String(date.getMinutes()).padStart(2, '0');
     const s = String(date.getSeconds()).padStart(2, '0');
-    return `${h}:${m}:${s}`; 
+    return `${h}:${m}:${s}`;
 }
 
 // จัดลำดับสถานที่ท่องเที่ยว
-async function sortLocations(locations, tripDate) { 
+async function sortLocations(locations, tripDate) {
     return new Promise((resolve, reject) => {
         const sqlLoc = `SELECT location_id, location_name, location_type, opening_time, closing_time, recommended_duration FROM Location WHERE location_id IN (?)`;
         const sqlRoute = `SELECT from_location_id, to_location_id, distance, travel_time_walk FROM Travel_Route WHERE from_location_id IN (?) AND to_location_id IN (?)`;
@@ -127,7 +127,7 @@ async function sortLocations(locations, tripDate) {
 
                     let current = remaining.splice(startIndex, 1)[0];
                     if (!current) return resolve([]);
-                    
+
                     sorted.push(current);
                     simTimeSec = Math.max(simTimeSec, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
 
@@ -212,14 +212,17 @@ function timeToSeconds(time) {
 // Route สำหรับสร้างทริปใหม่่
 router.post('/create-trip', async (req, res) => {
     const { user_id, trip_name, trip_date, locations } = req.body;
-    
+
+    console.log("📥 [Incoming Request] Data received:", { user_id, trip_name, trip_date, locations });
+
     if (!user_id) return res.status(400).json({ error: "ไม่พบรหัสผู้ใช้งาน (user_id)" });
     if (!locations || locations.length === 0) return res.status(400).json({ error: "กรุณาเลือกสถานที่อย่างน้อย 1 แห่ง" });
 
     try {
         const optimizedLocations = await sortLocations(locations, trip_date);
-        
+
         if (!optimizedLocations || optimizedLocations.length === 0) {
+            console.log("⚠️ [Warning] Cannot optimize locations. Result is empty.");
             return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้เนื่องจากข้อมูลไม่ครบถ้วน" });
         }
 
@@ -227,8 +230,8 @@ router.post('/create-trip', async (req, res) => {
 
         db.query(sqlGetFullInfo, [locations], (err, locDetails) => {
             if (err) {
-                console.error("❌ Fetch Info Error:", err);
-                return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลสถานที่" });
+                console.error("❌ [SQL Error] Fetch Info Error:", err);
+                return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลสถานที่", details: err.message });
             }
 
             const infoMap = {};
@@ -236,10 +239,10 @@ router.post('/create-trip', async (req, res) => {
 
             const sqlAllRoutes = `SELECT * FROM Travel_Route WHERE from_location_id IN (?) OR to_location_id IN (?)`;
 
-            db.query(sqlAllRoutes, [locations, locations], (err, allRoutes) => {
-                if (err) {
-                    console.error("❌ Fetch Routes Error:", err);
-                    return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลเส้นทางทริป" });
+            db.query(sqlAllRoutes, [locations, locations], (routeErr, allRoutes) => {
+                if (routeErr) {
+                    console.error("❌ [SQL Error] Fetch Routes Error:", routeErr);
+                    return res.status(500).json({ error: "เกิดข้อผิดพลาดในการดึงข้อมูลเส้นทางทริป", details: routeErr.message });
                 }
 
                 const safeAllRoutes = allRoutes || [];
@@ -250,7 +253,10 @@ router.post('/create-trip', async (req, res) => {
                 const firstLocId = optimizedLocations[0].location_id;
                 const firstLoc = infoMap[firstLocId];
 
-                if (!firstLoc) return res.status(500).json({ error: "ไม่พบข้อมูลรายละเอียดของสถานที่แห่งแรก" });
+                if (!firstLoc) {
+                    console.error("❌ [Data Error] First Location Data Missing in infoMap!");
+                    return res.status(500).json({ error: "ไม่พบข้อมูลรายละเอียดของสถานที่แห่งแรก" });
+                }
 
                 const openingTimeStr = String(firstLoc.opening_time);
                 const [openH, openM] = openingTimeStr.split(':');
@@ -269,15 +275,17 @@ router.post('/create-trip', async (req, res) => {
 
                 db.beginTransaction((transactionErr) => {
                     if (transactionErr) {
-                        console.error("❌ Transaction Init Error:", transactionErr);
+                        console.error("❌ [Transaction Error] Init Failed:", transactionErr);
                         return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
                     }
-                    
+
                     const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
                     db.query(sqlTrip, [user_id, trip_name, trip_date], (tripErr, result) => {
                         if (tripErr) {
-                            console.error("❌ Insert Trip Error:", tripErr);
-                            return db.rollback(() => res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ" }));
+                            console.error("❌ [SQL Error] Insert Trip Failed:", tripErr);
+                            return db.rollback(() => {
+                                res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ เช็คความถูกต้องของ user_id", details: tripErr.message });
+                            });
                         }
 
                         const trip_id = result.insertId;
@@ -307,11 +315,11 @@ router.post('/create-trip', async (req, res) => {
                             const orderNumber = Number(index + 1);
 
                             detailValues.push([
-                                trip_id, 
-                                loc.location_id, 
-                                orderNumber, 
-                                arrivalTimeStr.trim(), 
-                                parseInt(stayMin), 
+                                trip_id,
+                                loc.location_id,
+                                orderNumber,
+                                arrivalTimeStr.trim(),
+                                parseInt(stayMin),
                                 departureTimeStr.trim()
                             ]);
 
@@ -330,13 +338,14 @@ router.post('/create-trip', async (req, res) => {
                         const sqlDetail = `INSERT INTO Trip_Detail (trip_id, location_id, visit_order, arrival_time, stay_duration, departure_time) VALUES ?`;
                         db.query(sqlDetail, [detailValues], (detailErr) => {
                             if (detailErr) {
-                                console.error("❌ Insert Trip_Detail Error:", detailErr);
-                                
+                                console.error("❌ [SQL Error] Insert Trip_Detail Failed:", detailErr);
                                 return db.rollback(() => {
-                                    res.status(400).json({ error: "รูปแบบข้อมูลวันเวลาไม่ถูกต้องตามเงื่อนไขของฐานข้อมูลระบบจริง" });
+                                    res.status(400).json({ error: "รูปแบบข้อมูลชุดรายละเอียดขัดแย้งกับข้อจำกัดฐานข้อมูลระบบจริง", details: detailErr.message });
                                 });
                             }
+
                             db.commit(() => {
+                                console.log(`🎉 [Success] Trip Created Successfully! ID: ${trip_id}`);
                                 res.json({ message: "Success", trip_id });
                             });
                         });
@@ -345,9 +354,9 @@ router.post('/create-trip', async (req, res) => {
             });
         });
     } catch (runtimeErr) {
-        console.error("❌ เกิดข้อผิดพลาดแบบฉับพลันยามรันไทม์:", runtimeErr);
+        console.error("❌ [Fatal Runtime Error]:", runtimeErr);
         if (!res.headersSent) {
-            res.status(500).json({ error: "ระบบประมวลผลอัลกอริทึมล้มเหลว" });
+            res.status(500).json({ error: "ระบบเกิดข้อผิดพลาดในการประมวลผลอัลกอริทึม" });
         }
     }
 });
