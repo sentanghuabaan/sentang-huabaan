@@ -73,7 +73,7 @@ router.get('/locations', (req, res) => {
     });
 });
 
-// 💡 เปลี่ยนฟังก์ชันแปลงเวลาสากลให้ปลอดภัยสูงสุด ไม่พึ่งพาระบบ String ของ OS
+// ฟังก์ชันแปลงเวลาสากล
 function dateToTimeString(date) {
     const h = String(date.getHours()).padStart(2, '0');
     const m = String(date.getMinutes()).padStart(2, '0');
@@ -82,6 +82,7 @@ function dateToTimeString(date) {
 }
 
 // จัดลำดับสถานที่ท่องเที่ยว
+
 async function sortLocations(locations, db, tripDate) {
     return new Promise((resolve, reject) => {
         const sqlLoc = `SELECT location_id, location_name, location_type, opening_time, closing_time, recommended_duration FROM Location WHERE location_id IN (?)`;
@@ -89,6 +90,8 @@ async function sortLocations(locations, db, tripDate) {
 
         db.query(sqlLoc, [locations], (err, locs) => {
             if (err) return reject(err);
+            if (!locs || locs.length === 0) return resolve([]);
+
             db.query(sqlRoute, [locations, locations], (err, routes) => {
                 if (err) return reject(err);
 
@@ -114,14 +117,20 @@ async function sortLocations(locations, db, tripDate) {
                 if (!startLoc) return resolve([]);
 
                 let startIndex = remaining.findIndex(l => l.location_id === startLoc.location_id);
+
+                if (startIndex === -1) startIndex = 0;
+
                 let current = remaining.splice(startIndex, 1)[0];
+                if (!current) return resolve([]);
+
                 sorted.push(current);
 
                 simTimeSec = Math.max(simTimeSec, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
 
+                // ลูปจัดลำดับสถานที่ท่องเที่ยว
                 while (remaining.length > 0) {
                     let lastId = current.location_id;
-                    let bestIdx = 0;
+                    let bestIdx = -1;
                     let minScore = Infinity;
 
                     remaining.forEach((dest, index) => {
@@ -159,19 +168,24 @@ async function sortLocations(locations, db, tripDate) {
                         }
                     });
 
+                    if (bestIdx === -1) bestIdx = 0;
+
                     current = remaining.splice(bestIdx, 1)[0];
-                    if (current) {
-                        sorted.push(current);
-                        const routeBack = routes.find(r =>
-                            (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
-                            (r.from_location_id === current.location_id && r.to_location_id === lastId)
-                        );
-                        let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
-                        simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
-                    } else {
+
+                    if (!current) {
                         break;
                     }
+
+                    sorted.push(current);
+
+                    const routeBack = routes.find(r =>
+                        (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
+                        (r.from_location_id === current.location_id && r.to_location_id === lastId)
+                    );
+                    let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
+                    simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
                 }
+
                 resolve(sorted);
             });
         });
@@ -190,15 +204,13 @@ function timeToSeconds(time) {
 }
 
 // Route สำหรับสร้างทริปใหม่่
-// Route สำหรับสร้างทริปใหม่ (เวอร์ชันแก้ปัญหา MySQL Time Type และดักแครช 502)
 router.post('/create-trip', async (req, res) => {
     const { user_id, trip_name, trip_date, locations } = req.body;
     if (!locations || locations.length === 0) return res.status(400).send("No locations selected");
 
     try {
         const optimizedLocations = await sortLocations(locations, db, trip_date);
-        
-        // 💡 ระบบเซฟตี้ดักแครช: ถ้าจัดเรียงแล้วได้ค่าว่าง ป้องกันไม่ให้หลังบ้านดับ
+
         if (!optimizedLocations || optimizedLocations.length === 0) {
             return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้" });
         }
@@ -225,11 +237,9 @@ router.post('/create-trip', async (req, res) => {
 
                 if (!firstLoc) return res.status(500).send("First Location Data Missing");
 
-                // 💡 ระบบเซฟตี้แปลงเวลา: บังคับแปลงค่าจาก MySQL ให้กลายเป็น String เสมอ เพื่อป้องกันบั๊ก .split() พัง
                 const openingTimeStr = String(firstLoc.opening_time);
                 const [openH, openM] = openingTimeStr.split(':');
-                
-                // ตรวจสอบโครงสร้างตัวเลขชั่วโมงและนาที ถ้าดึงมาไม่ได้ให้ใช้ค่าเริ่มต้นคือ 09:30 น.
+
                 const hours = parseInt(openH) || 9;
                 const minutes = parseInt(openM) || 0;
                 startDateTime.setHours(hours, minutes + 30, 0);
@@ -242,7 +252,6 @@ router.post('/create-trip', async (req, res) => {
 
                 let runningTime = startDateTime;
 
-                // 💡 (โค้ดดั้งเดิมในโปรเจกต์ของคุณอ้อมตั้งแต่บรรทัดนี้ลงไปจนจบคำสั่ง สามารถเปิดรันต่อได้เลยครับ)
                 db.beginTransaction((err) => {
                     if (err) return res.status(500).send("Transaction Init Err");
                     const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
@@ -255,8 +264,7 @@ router.post('/create-trip', async (req, res) => {
                         optimizedLocations.forEach((loc, index) => {
                             const info = infoMap[loc.location_id];
                             const stayMin = info ? (info.recommended_duration || 30) : 30;
-                            
-                            // บังคับแปลงเวลาของสถานที่ในตารางให้เป็น String ปลอดภัยไว้ก่อน
+
                             const locOpenTimeStr = info ? String(info.opening_time) : "09:00:00";
                             const openTimeSec = timeToSeconds(locOpenTimeStr);
 
