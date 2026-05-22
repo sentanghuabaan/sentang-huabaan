@@ -227,21 +227,9 @@ passport.deserializeUser((id, done) => {
     });
 });
 
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587, 
-    secure: false, 
-    auth: {
-        user: 'sentanghuabaan@gmail.com',
-        pass: 'wrse lzeu tgwu crno'
-    },
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    }
-});
+// ดึงไลบรารี Resend มาใช้งาน
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post('/register-request', async (req, res) => {
     const { username, email, password } = req.body;
@@ -257,9 +245,7 @@ router.post('/register-request', async (req, res) => {
             return res.status(400).json({ success: false, message: "อีเมลนี้ถูกใช้งานแล้ว กรุณาใช้อีเมลอื่น" });
         }
 
-        // สร้างรหัส OTP 6 หลัก
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
         const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
         
         db.query(sql, [email, otp], (insertErr) => {
@@ -268,28 +254,28 @@ router.post('/register-request', async (req, res) => {
                 return res.status(500).json({ success: false, message: "บันทึกรหัสลงฐานข้อมูลไม่สำเร็จ" });
             }
 
-            console.log(`🎯 บันทึก OTP (${otp}) สำหรับอีเมล ${email} ลงตารางสำเร็จแล้ว!`);
+            console.log(`🎯 บันทึก OTP (${otp}) ลงตารางสำเร็จแล้ว! กำลังส่งผ่าน Resend...`);
 
-            const mailOptions = {
-                from: '"เส้นทางหัวบ้าน" <sentanghuabaan@gmail.com>',
-                to: email,
-                subject: 'รหัสยืนยันการสมัครสมาชิก',
-                text: `รหัส OTP ของคุณคือ: ${otp} (ใช้งานได้ใน 5 นาที)`
-            };
-
-            // เรียกกระบวนการส่งอีเมล
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error("❌ Nodemailer ไม่สามารถส่งเมลได้เนื่องจากเครือข่ายบล็อก:", error.message);
-                    
-                    return res.status(200).json({ 
-                        success: true, 
-                        message: 'ระบบบันทึกรหัสลงฐานข้อมูลเรียบร้อยแล้ว (โหมดเลี่ยงเครือข่าย)',
-                        debug_otp: otp 
-                    });
-                }
-                console.log("✅ ส่งเมลรหัสยืนยันสำเร็จแล้ว:", info.response);
+            resend.emails.send({
+                from: 'เส้นทางหัวบ้าน <onboarding@resend.dev>', 
+                to: email, 
+                subject: 'รหัสยืนยันการสมัครสมาชิก - เส้นทางหัวบ้าน',
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                        <h2>รหัสยืนยันการสมัครสมาชิก</h2>
+                        <p>สวัสดีคุณ ${username}, รหัส OTP สำหรับยืนยันตัวตนของคุณคือ:</p>
+                        <h1 style="color: #97C2DD; letter-spacing: 5px;">${otp}</h1>
+                        <p style="color: #666; font-size: 12px;">(รหัสนี้มีอายุการใช้งาน 5 นาที หากไม่ได้ขอรหัสนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้)</p>
+                    </div>
+                `
+            })
+            .then((info) => {
+                console.log("✅ Resend ส่งอีเมลออกไปยังปลายทางสำเร็จแล้ว:", info);
                 res.json({ success: true, message: 'ส่ง OTP ไปยังอีเมลเรียบร้อยแล้ว' });
+            })
+            .catch((error) => {
+                console.error("❌ Resend API Error:", error.message);
+                res.status(500).json({ success: false, message: 'ระบบเครือข่ายส่งเมลปลายทางขัดข้อง' });
             });
         });
     });
@@ -352,38 +338,47 @@ router.post('/forgot-password', (req, res) => {
     const { email } = req.body;
 
     db.query("SELECT * FROM User WHERE email = ?", [email], (err, result) => {
-        if (err) return res.status(500).json({ success: false });
-        if (result.length === 0) return res.status(404).json({ success: false, message: "ไม่พบอีเมลนี้ในระบบ" });
+        if (err) {
+            console.error("❌ ตรวจสอบอีเมลรีเซ็ตผิดพลาด:", err.message);
+            return res.status(500).json({ success: false, message: "เกิดข้อผิดพลาดในระบบฐานข้อมูล" });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ success: false, message: "ไม่พบอีเมลนี้ในระบบ" });
+        }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 5 * 60000);
 
-        const year = expiresAt.getFullYear();
-        const month = String(expiresAt.getMonth() + 1).padStart(2, '0');
-        const day = String(expiresAt.getDate()).padStart(2, '0');
-        const hours = String(expiresAt.getHours()).padStart(2, '0');
-        const minutes = String(expiresAt.getMinutes()).padStart(2, '0');
-        const seconds = String(expiresAt.getSeconds()).padStart(2, '0');
-
-        const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, ?)";
-        db.query(sql, [email, otp, formattedTime], (err) => {
-            if (err) {
-                console.error("❌ Database Error:", err);
-                return res.status(500).json({ success: false, message: "บันทึก OTP ไม่สำเร็จ" });
+        const sql = "INSERT INTO OTP_codes (email, otp_code, expires_at) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE))";
+        
+        db.query(sql, [email, otp], (insertErr) => {
+            if (insertErr) {
+                console.error("❌ บันทึก OTP สำหรับรีเซ็ตรหัสผ่านไม่สำเร็จ:", insertErr.message);
+                return res.status(500).json({ success: false, message: "บันทึกรหัสในระบบฐานข้อมูลไม่สำเร็จ" });
             }
 
-            const mailOptions = {
-                from: '"เส้นทางหัวบ้าน" <sentanghuabaan@gmail.com>',
-                to: email,
-                subject: 'รหัสสำหรับรีเซ็ตรหัสผ่าน',
-                text: `รหัส OTP สำหรับตั้งรหัสผ่านใหม่ของคุณคือ: ${otp} (ใช้งานได้ใน 5 นาที)`
-            };
+            console.log(`🎯 บันทึก OTP สำหรับรีเซ็ตรหัสผ่าน (${otp}) เรียบร้อย! กำลังยิงผ่าน Resend...`);
 
-            transporter.sendMail(mailOptions, (error) => {
-                if (error) return res.status(500).json({ success: false, message: 'ส่งเมลไม่สำเร็จ' });
+            resend.emails.send({
+                from: 'เส้นทางหัวบ้าน <onboarding@resend.dev>',
+                to: email,
+                subject: 'รหัสสำหรับรีเซ็ตรหัสผ่าน - เส้นทางหัวบ้าน',
+                html: `
+                    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                        <h2>ขอรีเซ็ตรหัสผ่านใหม่</h2>
+                        <p>เราได้รับคำขอตั้งรหัสผ่านใหม่สำหรับบัญชีของคุณ รหัส OTP เพื่อใช้กรอกคือ:</p>
+                        <h1 style="color: #d9534f; letter-spacing: 5px;">${otp}</h1>
+                        <p>โปรดนำรหัสนี้ไปกรอกที่หน้าต่างหน้าเว็บภายใน 5 นาที</p>
+                        <p style="color: #666; font-size: 12px;">(หากคุณไม่ได้เป็นผู้ส่งคำขอนี้ กรุณาเปลี่ยนรหัสผ่านเพื่อความปลอดภัยหรือเพิกเฉยต่อข้อความ)</p>
+                    </div>
+                `
+            })
+            .then((info) => {
+                console.log("✅ Resend ส่งเมลรหัสรีเซ็ตผ่านสำเร็จแล้ว:", info);
                 res.json({ success: true, message: 'ส่ง OTP เรียบร้อย' });
+            })
+            .catch((error) => {
+                console.error("❌ Resend Forgot-Password Error:", error.message);
+                res.status(500).json({ success: false, message: 'ระบบส่งเมลภายนอกขัดข้อง' });
             });
         });
     });
