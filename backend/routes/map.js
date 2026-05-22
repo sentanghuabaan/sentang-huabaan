@@ -190,12 +190,19 @@ function timeToSeconds(time) {
 }
 
 // Route สำหรับสร้างทริปใหม่่
+// Route สำหรับสร้างทริปใหม่ (เวอร์ชันแก้ปัญหา MySQL Time Type และดักแครช 502)
 router.post('/create-trip', async (req, res) => {
     const { user_id, trip_name, trip_date, locations } = req.body;
     if (!locations || locations.length === 0) return res.status(400).send("No locations selected");
 
     try {
         const optimizedLocations = await sortLocations(locations, db, trip_date);
+        
+        // 💡 ระบบเซฟตี้ดักแครช: ถ้าจัดเรียงแล้วได้ค่าว่าง ป้องกันไม่ให้หลังบ้านดับ
+        if (!optimizedLocations || optimizedLocations.length === 0) {
+            return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้" });
+        }
+
         const sqlGetFullInfo = `SELECT location_id, opening_time, closing_time, recommended_duration FROM Location WHERE location_id IN (?)`;
 
         db.query(sqlGetFullInfo, [locations], (err, locDetails) => {
@@ -218,8 +225,14 @@ router.post('/create-trip', async (req, res) => {
 
                 if (!firstLoc) return res.status(500).send("First Location Data Missing");
 
-                const [openH, openM] = firstLoc.opening_time.split(':');
-                startDateTime.setHours(parseInt(openH), parseInt(openM) + 30, 0);
+                // 💡 ระบบเซฟตี้แปลงเวลา: บังคับแปลงค่าจาก MySQL ให้กลายเป็น String เสมอ เพื่อป้องกันบั๊ก .split() พัง
+                const openingTimeStr = String(firstLoc.opening_time);
+                const [openH, openM] = openingTimeStr.split(':');
+                
+                // ตรวจสอบโครงสร้างตัวเลขชั่วโมงและนาที ถ้าดึงมาไม่ได้ให้ใช้ค่าเริ่มต้นคือ 09:30 น.
+                const hours = parseInt(openH) || 9;
+                const minutes = parseInt(openM) || 0;
+                startDateTime.setHours(hours, minutes + 30, 0);
 
                 if (selectedDate.toDateString() === now.toDateString()) {
                     if (now > startDateTime) {
@@ -229,7 +242,9 @@ router.post('/create-trip', async (req, res) => {
 
                 let runningTime = startDateTime;
 
+                // 💡 (โค้ดดั้งเดิมในโปรเจกต์ของคุณอ้อมตั้งแต่บรรทัดนี้ลงไปจนจบคำสั่ง สามารถเปิดรันต่อได้เลยครับ)
                 db.beginTransaction((err) => {
+                    if (err) return res.status(500).send("Transaction Init Err");
                     const sqlTrip = `INSERT INTO Trip (user_id, trip_name, trip_date, created_at) VALUES (?, ?, ?, NOW())`;
                     db.query(sqlTrip, [user_id, trip_name, trip_date], (err, result) => {
                         if (err) return db.rollback(() => res.status(500).send("Trip Err"));
@@ -239,8 +254,11 @@ router.post('/create-trip', async (req, res) => {
 
                         optimizedLocations.forEach((loc, index) => {
                             const info = infoMap[loc.location_id];
-                            const stayMin = info.recommended_duration || 30;
-                            const openTimeSec = timeToSeconds(info.opening_time);
+                            const stayMin = info ? (info.recommended_duration || 30) : 30;
+                            
+                            // บังคับแปลงเวลาของสถานที่ในตารางให้เป็น String ปลอดภัยไว้ก่อน
+                            const locOpenTimeStr = info ? String(info.opening_time) : "09:00:00";
+                            const openTimeSec = timeToSeconds(locOpenTimeStr);
 
                             const arrivalTimeStr = dateToTimeString(runningTime);
                             const arrivalTimeSec = timeToSeconds(arrivalTimeStr);
@@ -248,9 +266,9 @@ router.post('/create-trip', async (req, res) => {
                             let isWaiting = arrivalTimeSec < openTimeSec;
                             let activityStartDate = new Date(runningTime);
 
-                            if (isWaiting) {
-                                const [h, m] = info.opening_time.split(':');
-                                activityStartDate.setHours(parseInt(h), parseInt(m), 0);
+                            if (isWaiting && info) {
+                                const [h, m] = String(info.opening_time).split(':');
+                                activityStartDate.setHours(parseInt(h) || 9, parseInt(m) || 0, 0);
                             }
 
                             const finalDepartureTimeDate = new Date(activityStartDate.getTime() + stayMin * 60000);
