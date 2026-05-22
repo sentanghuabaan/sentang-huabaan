@@ -15,7 +15,6 @@
         <iconify-icon icon="material-symbols:arrow-back-ios-new-rounded"></iconify-icon>
     </button>
 
-    <!-- หน้าต่างสอนใช้งาน (Intro Overlay) -->
     <div id="intro-overlay" class="intro-overlay">
         <div class="intro-box">
             <iconify-icon icon="lucide:scan-eye" class="intro-icon"></iconify-icon>
@@ -34,8 +33,7 @@
         vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
 
         <a-assets>
-            <video id="main-video" src="../asset-video/thursdaycafe.mp4" loop="true" crossorigin="anonymous" playsinline
-                webkit-playsinline muted></video>
+            <video id="main-video" loop="true" crossorigin="anonymous" playsinline webkit-playsinline></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -50,28 +48,13 @@
     </div>
 
     <script>
-
         const API_BASE_URL = 'https://sentanghuabaan.com';
 
         let isUnlocked = false;
         let videoMap = {};
-        let shouldRedirect = false;
-
-        function getCurrentUser() {
-            const user = localStorage.getItem('user');
-            return user ? JSON.parse(user) : null;
-        }
 
         document.getElementById('start-ar-btn').addEventListener('click', () => {
-            // ปลดล็อกวิดีโอ (แก้เรื่อง Unmuted Autoplay)
-            const v = document.querySelector('#main-video');
-            v.play().then(() => {
-                v.pause();
-            });
-
             isUnlocked = true;
-
-            // ปิด popup สอนใช้งาน
             document.getElementById('intro-overlay').style.display = 'none';
 
             document.getElementById('scanning-overlay').innerHTML =
@@ -88,8 +71,7 @@
                     let safeVideoUrl = item.video_url.trim();
 
                     if (!safeVideoUrl.startsWith('http')) {
-                        const cleanFile = safeVideoUrl.replace('asset-video/', '');
-                        safeVideoUrl = `${API_BASE_URL}/${cleanFile}`;
+                        safeVideoUrl = `${API_BASE_URL}/${safeVideoUrl}`;
                     }
 
                     videoMap[item.target_index] = safeVideoUrl;
@@ -108,25 +90,34 @@
                     sceneEl.appendChild(entity);
 
                     entity.addEventListener("targetFound", () => {
-                        console.log("Found:", item.target_index);
+                        console.log("Found Target Index:", item.target_index);
                         fetch(`${API_BASE_URL}/api/videoar/record-view/${item.video_id}`, { method: 'POST' }).catch(e => { });
 
                         const v = document.querySelector('#main-video');
                         const plane = entity.querySelector('a-video');
 
+                        // โหลดไฟล์วิดีโอจาก Cloudinary ลงแผ่นระนาบ AR
                         v.src = videoMap[item.target_index];
-                        v.muted = false;
+                        v.muted = false; // เปิดระบบเสียงเต็มรูปแบบ
                         v.load();
+                        
                         v.play().then(() => {
                             plane.setAttribute('visible', 'true');
                             document.getElementById('scanning-overlay').style.display = 'none';
-                        }).catch(err => console.log("Play error:", err));
+                        }).catch(err => {
+                            console.log("Play error:", err);
+     
+                            v.muted = true;
+                            v.play();
+                            plane.setAttribute('visible', 'true');
+                        });
                     });
 
                     entity.addEventListener("targetLost", () => {
                         const v = document.querySelector('#main-video');
                         v.pause();
-                        entity.querySelector('.video-plane').setAttribute('visible', 'false');
+                        const plane = entity.querySelector('.video-plane');
+                        if (plane) plane.setAttribute('visible', 'false');
                         document.getElementById('scanning-overlay').style.display = 'block';
                     });
                 });
