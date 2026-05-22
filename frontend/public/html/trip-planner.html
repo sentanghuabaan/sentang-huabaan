@@ -376,8 +376,8 @@
 
             if (btnCreateTrip) {
                 btnCreateTrip.addEventListener('click', async () => {
-                    const userId = user.user_id || user.id; 
-                    
+                    const userId = user.user_id || user.id;
+
                     if (!userId) {
                         showAlert("ไม่พบรหัสผู้ใช้งานในระบบ กรุณาลองเข้าสู่ระบบใหม่อีกครั้ง");
                         return;
@@ -397,13 +397,20 @@
                             body: JSON.stringify(tripData)
                         });
 
-                        const result = await response.json();
-
                         if (response.ok) {
+                            const result = await response.json();
                             showAlert("สร้างการเดินทางสำเร็จ!");
                             window.location.href = `trip-summary.html?id=${result.trip_id}`;
                         } else {
-                            showAlert(`ล้มเหลว: ${result.error || "เกิดข้อผิดพลาดภายในระบบ"}`);
+                            const errorText = await response.text();
+                            console.error("❌ Server Error Response:", errorText);
+
+                            try {
+                                const errorJson = JSON.parse(errorText);
+                                showAlert(`ล้มเหลว: ${errorJson.error || errorJson.message || "เกิดข้อผิดพลาดภายในระบบ"}`);
+                            } catch (e) {
+                                showAlert(`เกิดข้อผิดพลาดจากเซิร์ฟเวอร์หลัก (รหัสสถานะ: ${response.status})`);
+                            }
                         }
                     } catch (err) {
                         console.error("Save error:", err);
@@ -411,7 +418,7 @@
                     }
                 });
             }
-        };
+        }
 
         window.addEventListener('click', function (event) {
             const modal = document.getElementById('custom-alert');
