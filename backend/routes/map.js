@@ -82,113 +82,119 @@ function dateToTimeString(date) {
 }
 
 // จัดลำดับสถานที่ท่องเที่ยว
-
-async function sortLocations(locations, db, tripDate) {
+async function sortLocations(locations, tripDate) { 
     return new Promise((resolve, reject) => {
         const sqlLoc = `SELECT location_id, location_name, location_type, opening_time, closing_time, recommended_duration FROM Location WHERE location_id IN (?)`;
         const sqlRoute = `SELECT from_location_id, to_location_id, distance, travel_time_walk FROM Travel_Route WHERE from_location_id IN (?) AND to_location_id IN (?)`;
 
-        db.query(sqlLoc, [locations], (err, locs) => {
-            if (err) return reject(err);
-            if (!locs || locs.length === 0) return resolve([]);
+        try {
+            db.query(sqlLoc, [locations], (err, locs) => {
+                if (err) {
+                    console.error("❌ SQL sqlLoc Error:", err.message);
+                    return reject(err);
+                }
+                if (!locs || locs.length === 0) return resolve([]);
 
-            db.query(sqlRoute, [locations, locations], (err, routes) => {
-                if (err) return reject(err);
-
-                let sorted = [];
-                let remaining = [...locs];
-
-                const now = new Date();
-                const isToday = now.toDateString() === new Date(tripDate).toDateString();
-
-                // คำนวณเวลาเริ่มต้นทริป
-                let simTimeSec = isToday ? timeToSeconds(dateToTimeString(now)) : timeToSeconds("09:00:00");
-
-                let candidates = remaining.filter(loc => loc.location_type !== 'โรงแรม');
-                candidates.sort((a, b) => {
-                    let aOpen = timeToSeconds(a.opening_time);
-                    let bOpen = timeToSeconds(b.opening_time);
-                    if (aOpen <= simTimeSec && bOpen > simTimeSec) return -1;
-                    if (aOpen > simTimeSec && bOpen <= simTimeSec) return 1;
-                    return a.closing_time.localeCompare(b.closing_time);
-                });
-
-                let startLoc = candidates[0] || remaining[0];
-                if (!startLoc) return resolve([]);
-
-                let startIndex = remaining.findIndex(l => l.location_id === startLoc.location_id);
-
-                if (startIndex === -1) startIndex = 0;
-
-                let current = remaining.splice(startIndex, 1)[0];
-                if (!current) return resolve([]);
-
-                sorted.push(current);
-
-                simTimeSec = Math.max(simTimeSec, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
-
-                // ลูปจัดลำดับสถานที่ท่องเที่ยว
-                while (remaining.length > 0) {
-                    let lastId = current.location_id;
-                    let bestIdx = -1;
-                    let minScore = Infinity;
-
-                    remaining.forEach((dest, index) => {
-                        const route = routes.find(r =>
-                            (r.from_location_id === lastId && r.to_location_id === dest.location_id) ||
-                            (r.from_location_id === dest.location_id && r.to_location_id === lastId)
-                        );
-
-                        let distance = route ? parseFloat(route.distance) : 1000;
-                        let travelSec = route ? (parseInt(route.travel_time_walk) * 60) : 300;
-                        let arrivalTimeSec = simTimeSec + travelSec;
-                        let openTimeSec = timeToSeconds(dest.opening_time);
-                        let closeTimeSec = timeToSeconds(dest.closing_time);
-
-                        let distanceScore = distance * 2.0;
-
-                        let waitPenalty = 0;
-                        if (arrivalTimeSec < openTimeSec) {
-                            let waitTime = openTimeSec - arrivalTimeSec;
-                            waitPenalty = waitTime > 900 ? 1000000 + (waitTime * 100) : (waitTime * 10);
-                        }
-
-                        let hotelScore = 0;
-                        const hasOtherOptions = remaining.some(loc => loc.location_type !== 'โรงแรม');
-                        if (dest.location_type === 'โรงแรม') {
-                            hotelScore = hasOtherOptions ? 10000000 : (arrivalTimeSec < timeToSeconds("14:00:00") ? 500000 : 0);
-                        }
-
-                        let closedPenalty = (arrivalTimeSec > closeTimeSec) ? 5000000 : 0;
-                        let totalScore = distanceScore + waitPenalty + hotelScore + closedPenalty;
-
-                        if (totalScore < minScore) {
-                            minScore = totalScore;
-                            bestIdx = index;
-                        }
-                    });
-
-                    if (bestIdx === -1) bestIdx = 0;
-
-                    current = remaining.splice(bestIdx, 1)[0];
-
-                    if (!current) {
-                        break;
+                db.query(sqlRoute, [locations, locations], (err, routes) => {
+                    if (err) {
+                        console.error("❌ SQL sqlRoute Error:", err.message);
+                        return reject(err);
                     }
 
+                    let sorted = [];
+                    let remaining = [...locs];
+
+                    const now = new Date();
+                    const isToday = now.toDateString() === new Date(tripDate).toDateString();
+
+                    // คำนวณเวลาเริ่มต้นทริป
+                    let simTimeSec = isToday ? timeToSeconds(dateToTimeString(now)) : timeToSeconds("09:00:00");
+
+                    let candidates = remaining.filter(loc => loc.location_type !== 'โรงแรม');
+                    candidates.sort((a, b) => {
+                        let aOpen = timeToSeconds(a.opening_time);
+                        let bOpen = timeToSeconds(b.opening_time);
+                        if (aOpen <= simTimeSec && bOpen > simTimeSec) return -1;
+                        if (aOpen > simTimeSec && bOpen <= simTimeSec) return 1;
+                        return a.closing_time.localeCompare(b.closing_time);
+                    });
+
+                    let startLoc = candidates[0] || remaining[0];
+                    if (!startLoc) return resolve([]);
+
+                    let startIndex = remaining.findIndex(l => l.location_id === startLoc.location_id);
+                    if (startIndex === -1) startIndex = 0;
+
+                    let current = remaining.splice(startIndex, 1)[0];
+                    if (!current) return resolve([]);
+                    
                     sorted.push(current);
 
-                    const routeBack = routes.find(r =>
-                        (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
-                        (r.from_location_id === current.location_id && r.to_location_id === lastId)
-                    );
-                    let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
-                    simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
-                }
+                    simTimeSec = Math.max(simTimeSec, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
 
-                resolve(sorted);
+                    // ลูปจัดลำดับความเหมาะสมของพิกัดเส้นทาง
+                    while (remaining.length > 0) {
+                        let lastId = current.location_id;
+                        let bestIdx = -1;
+                        let minScore = Infinity;
+
+                        remaining.forEach((dest, index) => {
+                            const route = routes.find(r =>
+                                (r.from_location_id === lastId && r.to_location_id === dest.location_id) ||
+                                (r.from_location_id === dest.location_id && r.to_location_id === lastId)
+                            );
+
+                            let distance = route ? parseFloat(route.distance) : 1000;
+                            let travelSec = route ? (parseInt(route.travel_time_walk) * 60) : 300;
+                            let arrivalTimeSec = simTimeSec + travelSec;
+                            let openTimeSec = timeToSeconds(dest.opening_time);
+                            let closeTimeSec = timeToSeconds(dest.closing_time);
+
+                            let distanceScore = distance * 2.0;
+
+                            let waitPenalty = 0;
+                            if (arrivalTimeSec < openTimeSec) {
+                                let waitTime = openTimeSec - arrivalTimeSec;
+                                waitPenalty = waitTime > 900 ? 1000000 + (waitTime * 100) : (waitTime * 10);
+                            }
+
+                            let hotelScore = 0;
+                            const hasOtherOptions = remaining.some(loc => loc.location_type !== 'โรงแรม');
+                            if (dest.location_type === 'โรงแรม') {
+                                hotelScore = hasOtherOptions ? 10000000 : (arrivalTimeSec < timeToSeconds("14:00:00") ? 500000 : 0);
+                            }
+
+                            let closedPenalty = (arrivalTimeSec > closeTimeSec) ? 5000000 : 0;
+                            let totalScore = distanceScore + waitPenalty + hotelScore + closedPenalty;
+
+                            if (totalScore < minScore) {
+                                minScore = totalScore;
+                                bestIdx = index;
+                            }
+                        });
+
+                        if (bestIdx === -1) bestIdx = 0;
+
+                        current = remaining.splice(bestIdx, 1)[0];
+                        if (!current) break;
+
+                        sorted.push(current);
+
+                        const routeBack = routes.find(r =>
+                            (r.from_location_id === lastId && r.to_location_id === current.location_id) ||
+                            (r.from_location_id === current.location_id && r.to_location_id === lastId)
+                        );
+                        let travelSecBack = routeBack ? (parseInt(routeBack.travel_time_walk) * 60) : 300;
+                        simTimeSec = Math.max(simTimeSec + travelSecBack, timeToSeconds(current.opening_time)) + ((current.recommended_duration || 30) * 60);
+                    }
+
+                    resolve(sorted);
+                });
             });
-        });
+        } catch (queryError) {
+            console.error("❌ Critical Runtime Error Inside sortLocations:", queryError);
+            reject(queryError);
+        }
     });
 }
 
@@ -209,8 +215,8 @@ router.post('/create-trip', async (req, res) => {
     if (!locations || locations.length === 0) return res.status(400).send("No locations selected");
 
     try {
-        const optimizedLocations = await sortLocations(locations, db, trip_date);
-
+        const optimizedLocations = await sortLocations(locations, trip_date);
+        
         if (!optimizedLocations || optimizedLocations.length === 0) {
             return res.status(400).json({ error: "ไม่สามารถจัดเรียงลำดับสถานที่ได้" });
         }
