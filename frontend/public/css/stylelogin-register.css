@@ -566,7 +566,8 @@ img.profile-avatar {
     }
 
     .user-details p {
-    white-space: nowrap;      
-    word-break: normal;  
-}
+        white-space: nowrap;    
+        word-break: normal;    
+        max-width: none;
+    }
 }
