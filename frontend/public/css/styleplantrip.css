@@ -404,6 +404,33 @@ body {
     z-index: 100;
 }
 
+/* เมื่อผู้ใช้เอาเมาส์ไปชี้ (Hover) ที่หมุดที่เคยเลือกไปแล้ว */
+.location-pin.selected:not(.street-art-pin):hover .selection-wrapper::after {
+    content: '✕'; 
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #FF3636;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 500 !important;
+    animation: fadeIn 0.2s ease;
+}
+
+.location-pin.selected:not(.street-art-pin):hover {
+    opacity: 0.85;
+    transform: scale(1.05) !important;
+    z-index: 600 !important;
+}
+
 .pin-default {
     font-size: 28px !important;
     color: #FFFFFF !important;
@@ -609,31 +636,6 @@ body {
     background: #BF7E46 !important;
     color: #FFF !important;
     border-radius: 15px 15px 0 0;
-}
-
-/* เมื่อผู้ใช้เอาเมาส์ไปชี้ (Hover) ที่หมุดที่เคยเลือกไปแล้ว */
-.location-pin.selected:not(.street-art-pin):hover .selection-wrapper::after {
-    content: '✕'; 
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: #FF3636;
-    color: white;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    font-size: 11px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    animation: fadeIn 0.2s ease;
-}
-
-.location-pin.selected:not(.street-art-pin):hover {
-    opacity: 0.85;
-    transform: scale(1.05) !important;
 }
 
 /* login ก่อน */
