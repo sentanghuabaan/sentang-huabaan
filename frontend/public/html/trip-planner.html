@@ -52,6 +52,20 @@
             </div>
         </div>
 
+        <div class="trip-instruction-banner">
+            <div class="ins-content">
+                <iconify-icon icon="ph:info-bold" class="ins-icon"></iconify-icon>
+                <div class="ins-text">
+                    กรุณาเลือกสถานที่ท่องเที่ยวบนแผนที่ 
+                    <span>(เลือกได้สูงสุด <strong class="limit-highlight">5</strong> สถานที่สำหรับการเดินทาง ONE DAY)</span>
+                </div>
+            </div>
+            <div class="trip-counter-badge">
+                <iconify-icon icon="material-symbols:map-legend-rounded"></iconify-icon>
+                เลือกแล้ว: <span id="selected-count">0</span>/5
+            </div>
+        </div>
+
         <div id="map-container" class="map-container">
             <img src="../image/Map.png" alt="Map Background" class="map-bg">
             <div id="pin-layer"></div>
@@ -251,6 +265,8 @@
                                 pin.classList.add('selected');
                                 selectedPlaces.push(loc.location_id);
                             }
+                            
+                            updateCounterUI(); 
                             checkInput();
                         });
                     }
@@ -259,6 +275,22 @@
                 setTimeout(updatePinStatus, 100);
             } catch (err) {
                 console.error("Fetch error:", err);
+            }
+        }
+
+        // ฟังก์ชันคำนวณและฟีดตัวเลขจำนวนสถานที่สะสมที่ผู้ใช้เลือก
+        function updateCounterUI() {
+            const countEl = document.getElementById('selected-count');
+            const badgeEl = document.querySelector('.trip-counter-badge');
+            if (!countEl || !badgeEl) return;
+
+            const currentLength = selectedPlaces.length;
+            countEl.innerText = currentLength;
+
+            if (currentLength >= 5) {
+                badgeEl.classList.add('full-slot');
+            } else {
+                badgeEl.classList.remove('full-slot');
             }
         }
 
@@ -313,6 +345,7 @@
                 }
             });
             checkInput();
+            updateCounterUI();
         }
 
         function loadFooter() {
