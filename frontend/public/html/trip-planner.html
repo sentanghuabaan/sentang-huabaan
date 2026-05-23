@@ -56,8 +56,9 @@
             <div class="ins-content">
                 <iconify-icon icon="ph:info-bold" class="ins-icon"></iconify-icon>
                 <div class="ins-text">
-                    กรุณาเลือกสถานที่ท่องเที่ยวบนแผนที่ 
-                    <span>เลือกได้สูงสุด <strong class="limit-highlight">5</strong> สถานที่สำหรับการเดินทาง ONE DAY</span>
+                    กรุณาเลือกสถานที่ท่องเที่ยวบนแผนที่
+                    <span>เลือกได้สูงสุด <strong class="limit-highlight">5</strong> สถานที่สำหรับการเดินทาง ONE
+                        DAY</span>
                 </div>
             </div>
             <div class="trip-counter-badge">
@@ -70,6 +71,8 @@
             <img src="../image/Map.png" alt="Map Background" class="map-bg">
             <div id="pin-layer"></div>
         </div>
+
+        <div id="selected-places-list" class="selected-places-preview-list"></div>
 
         <div class="action-zone">
             <input type="text" id="trip_name" placeholder="กรอกชื่อแผนการเดินทางของคุณ">
@@ -265,9 +268,10 @@
                                 pin.classList.add('selected');
                                 selectedPlaces.push(loc.location_id);
                             }
-                            
-                            updateCounterUI(); 
+
+                            updateCounterUI();
                             checkInput();
+                            renderSelectedPlacesList();
                         });
                     }
                     pinLayer.appendChild(pin);
@@ -346,6 +350,44 @@
             });
             checkInput();
             updateCounterUI();
+        }
+
+        // วาดรายการสถานที่ที่เลือกไว้ด้านล่างแผนที่ พร้อมปุ่มกากบาทกดลบ
+        function renderSelectedPlacesList() {
+            const listContainer = document.getElementById('selected-places-list');
+            if (!listContainer) return;
+
+            if (selectedPlaces.length === 0) {
+                listContainer.innerHTML = '';
+                return;
+            }
+
+            // วาดรายการการ์ดสถานที่ตามพิกัดไอดีที่เก็บสะสมอยู่ใน Array
+            listContainer.innerHTML = selectedPlaces.map((id, index) => {
+                const pinEl = document.querySelector(`.location-pin[data-id="${id}"]`);
+                const locName = pinEl ? pinEl.getAttribute('data-name') : `สถานที่ที่ ${index + 1}`;
+
+                return `
+            <div class="selected-place-item">
+                <span class="selected-place-name">${index + 1}. ${locName}</span>
+                <button class="btn-remove-place" onclick="removePlaceById('${id}')" title="นำสถานที่นี้ออก">
+                    <iconify-icon icon="material-symbols:cancel-rounded"></iconify-icon>
+                </button>
+            </div>
+        `;
+            }).join('');
+        }
+
+        // ฟังก์ชันเมื่อผู้ใช้กดกากบาท (x) ที่รายชื่อด้านล่าง เพื่อสั่งเอาหมุดบนแผนที่ออก
+        function removePlaceById(id) {
+            const pinEl = document.querySelector(`.location-pin[data-id="${id}"]`);
+            if (pinEl) pinEl.classList.remove('selected');
+
+            selectedPlaces = selectedPlaces.filter(placeId => placeId !== id);
+
+            updateCounterUI();
+            checkInput();
+            renderSelectedPlacesList();
         }
 
         function loadFooter() {
