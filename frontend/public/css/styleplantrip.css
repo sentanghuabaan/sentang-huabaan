@@ -887,7 +887,22 @@ body {
         transform: translateX(-50%) !important;
         position: absolute !important;
         display: block !important;
+    }
 
+    .location-pin .pin-info {
+        z-index: 90 !important;
+    }
+
+    .location-pin.selected:not(.street-art-pin) {
+        z-index: 200 !important; 
+    }
+
+    .location-pin.selected:not(.street-art-pin):hover .selection-wrapper::after {
+        z-index: 500 !important;
+    }
+
+    .location-pin.selected:not(.street-art-pin):hover {
+        z-index: 600 !important;
     }
 
     .selection-wrapper {
