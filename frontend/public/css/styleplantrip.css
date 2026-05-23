@@ -82,7 +82,7 @@ body {
 .planner-wrapper p {
     font-size: 26px;
     font-weight: bolder;
-    margin-top: 0;
+    margin-top: -10px;
     color: #BF7E46;
 }
 
@@ -722,9 +722,12 @@ body {
     }
 
     .ins-text span {
-        font-size: 13px;
-        display: inline;  
-        margin-left: 4px;
+        display: block !important;  
+        font-size: 13px !important;  
+        color: #666 !important;
+        font-weight: normal !important;
+        margin-top: 4px !important;
+        margin-left: 0 !important;
     }
     
     .ins-icon {
@@ -732,8 +735,17 @@ body {
     }
 
     .trip-counter-badge {
-        font-size: 14px;
-        padding: 6px 18px;
+        font-size: 15px !important;    
+        padding: 8px 20px !important;  
+        border-radius: 25px !important;
+        white-space: nowrap !important;  
+        display: inline-flex !important; 
+        align-items: center !important;
+        gap: 8px !important;             
+    }
+    
+    .trip-counter-badge iconify-icon {
+        font-size: 18px !important;
     }
 
     /* ปรับขนาดรูปภาพสถานที่บนแผนที่ */
