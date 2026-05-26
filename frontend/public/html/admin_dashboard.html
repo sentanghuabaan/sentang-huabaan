@@ -545,13 +545,20 @@
                 const res = await fetch(`${API_BASE_URL}/api/recent-activities`, {
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
-                const logs = await res.json();
 
+                if (!res.ok) {
+                    console.error("Failed to fetch activities, status:", res.status);
+                    document.querySelector('.activity-list.log').innerHTML = '<li><p style="color: red; margin:0;">ระบบหลังบ้านคิวรีฐานข้อมูลผิดพลาด</p></li>';
+                    return;
+                }
+
+                const logs = await res.json();
                 const logList = document.querySelector('.activity-list.log');
+                if (!logList) return;
                 logList.innerHTML = '';
 
-                if (logs.length === 0) {
-                    logList.innerHTML = '<li><p>ยังไม่มีกิจกรรมล่าสุดในระบบ</p></li>';
+                if (!logs || !Array.isArray(logs) || logs.length === 0) {
+                    logList.innerHTML = '<li><p style="color:#888; margin:0;">ยังไม่มีกิจกรรมล่าสุดในระบบ</p></li>';
                     return;
                 }
 
@@ -571,19 +578,19 @@
                         iconClass = 'text-dark';
                     }
 
-                    const timeFormatted = timeAgo(new Date(log.Log_Time));
+                    const timeFormatted = timeAgo(new Date(log.created_at));
 
                     li.innerHTML = `
-                        <div class="log-content" style="display: flex; align-items: start; gap: 10px; margin-bottom: 8px;">
-                            <iconify-icon icon="${icon}" class="${iconClass}" style="font-size: 1.2rem; margin-top: 3px;"></iconify-icon> 
-                            <div style="flex: 1;">
-                                <p style="margin: 0; font-size: 14px; line-height: 1.4;">
-                                    <strong>${log.admin_name || 'แอดมิน'}</strong>: ${log.description}
-                                </p>
-                                <small style="color: #888; font-size: 12px;">ตาราง: ${log.table_name} • ${timeFormatted}</small>
-                            </div>
-                        </div>
-                    `;
+                <div class="log-content" style="display: flex; align-items: start; gap: 10px; margin-bottom: 8px;">
+                    <iconify-icon icon="${icon}" class="${iconClass}" style="font-size: 1.2rem; margin-top: 3px;"></iconify-icon> 
+                    <div style="flex: 1;">
+                        <p style="margin: 0; font-size: 14px; line-height: 1.4;">
+                            <strong>${log.admin_name || 'แอดมิน'}</strong>: ${log.description || 'ไม่ได้ระบุรายละเอียด'}
+                        </p>
+                        <small style="color: #888; font-size: 12px;">ตาราง: ${log.table_name || 'ไม่ระบุ'} • ${timeFormatted}</small>
+                    </div>
+                </div>
+            `;
                     logList.appendChild(li);
                 });
             } catch (error) {

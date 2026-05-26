@@ -34,9 +34,9 @@ router.get('/dashboard-stats', verifyAdminToken, (req, res) => {
     const q4 = "SELECT COUNT(*) as total FROM Trip";
     const q5 = "SELECT COUNT(*) as total FROM Review";
     const q6 = "SELECT SUM(view_count) as total_views FROM VideoAR WHERE is_deleted = 0";
-    
-    const q7 = "SELECT COUNT(*) as total FROM Banners WHERE status = 'pending'"; 
-    
+
+    const q7 = "SELECT COUNT(*) as total FROM Banners WHERE status = 'pending'";
+
     const q8 = "SELECT COUNT(*) as total FROM User WHERE status = 'banned'";
 
     db.query(`${q1}; ${q2}; ${q3}; ${q4}; ${q5}; ${q6}; ${q7}; ${q8}`, (err, results) => {
@@ -44,7 +44,7 @@ router.get('/dashboard-stats', verifyAdminToken, (req, res) => {
             console.error("Dashboard Stats Error:", err);
             return res.status(500).json({ error: err.message });
         }
-        
+
         res.json({
             users: results[0][0].total,
             locations: results[1][0].total,
@@ -184,13 +184,13 @@ router.get('/trash-count', verifyAdminToken, (req, res) => {
 
 // ดึงสถิติ AR Engagement แยกตามหมวดหมู่สถานที่
 router.get('/ar-engagement', verifyAdminToken, (req, res) => {
-    let category = req.query.category ? decodeURIComponent(req.query.category).trim() : 'all'; 
-    
+    let category = req.query.category ? decodeURIComponent(req.query.category).trim() : 'all';
+
     let categoryCondition = "";
     let queryParams = [];
 
     if (category && category !== 'all' && category !== 'undefined' && category !== '') {
-        categoryCondition = "AND l.location_type LIKE ?"; 
+        categoryCondition = "AND l.location_type LIKE ?";
         queryParams.push(`%${category}%`);
     }
 
@@ -230,7 +230,7 @@ router.get('/top-trip-locations', verifyAdminToken, (req, res) => {
             console.error("SQL Error in top-trip-locations:", err.message);
             return res.status(500).json({ error: err.message });
         }
-        
+
         res.json({
             labels: (results && results.length > 0) ? results.map(row => row.location_name) : [],
             values: (results && results.length > 0) ? results.map(row => row.select_count) : []
@@ -286,14 +286,24 @@ router.get('/recent-reports', verifyAdminToken, (req, res) => {
 // ดึงประวัติกิจกรรมแอดมิน 5 รายการล่าสุด
 router.get('/recent-activities', verifyAdminToken, (req, res) => {
     const sql = `
-        SELECT admin_name, action_type, table_name, description, Log_Time 
-        FROM Activity_Logs 
-        ORDER BY Log_Time DESC 
+        SELECT 
+            u.username AS admin_name, 
+            al.action_type, 
+            al.table_name, 
+            al.description, 
+            al.created_at
+        FROM Activity_Logs al
+        LEFT JOIN User u ON al.admin_id = u.user_id
+        ORDER BY al.created_at DESC 
         LIMIT 5
     `;
+
     db.query(sql, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
+        if (err) {
+            console.error("❌ SQL ERROR IN RECENT-ACTIVITIES:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results || []);
     });
 });
 
