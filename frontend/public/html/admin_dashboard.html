@@ -196,7 +196,15 @@
                         </div>
 
                         <div class="chart-box">
-                            <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
+                            <div class="chart-header">
+                                <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
+                                <select id="ar-period" class="month-dropdown"
+                                    onchange="renderARChart('?period=' + this.value)">
+                                    <option value="all" selected>ทั้งหมด (All-Time)</option>
+                                    <option value="30days">30 วันที่ผ่านมา</option>
+                                    <option value="7days">7 วันที่ผ่านมา</option>
+                                </select>
+                            </div>
                             <div class="chart-container ar-chart-size">
                                 <canvas id="arEngagementChart"></canvas>
                             </div>
@@ -382,90 +390,89 @@
             });
         }
 
-        // 1. ประกาศตัวแปรไว้ชั้นนอกสุด (ห้ามใส่ const/let ซ้ำข้างในฟังก์ชันเด็ดขาด)
         if (typeof window.popularChartInst === 'undefined') {
             window.popularChartInst = null;
         }
 
         async function renderPopularChart(category = 'all') {
-    try {
+            try {
 
-        const query =
-            category && category !== 'all'
-                ? `?category=${encodeURIComponent(category)}`
-                : '';
+                const query =
+                    category && category !== 'all'
+                        ? `?category=${encodeURIComponent(category)}`
+                        : '';
 
-        console.log("CATEGORY =", category);
-        console.log("QUERY =", query);
+                console.log("CATEGORY =", category);
+                console.log("QUERY =", query);
 
-        const res = await fetch(
-            `${API_BASE_URL}/api/popular-locations${query}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${adminToken}`
-                }
-            }
-        );
-
-        const data = await res.json();
-
-        console.log("DATA =", data);
-
-        const canvas = document.getElementById('popularLocationChart');
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-
-        // ลบกราฟเก่า
-        if (window.popularChartInst) {
-            window.popularChartInst.destroy();
-        }
-
-        // สร้างกราฟใหม่
-        window.popularChartInst = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.labels || [],
-                datasets: [{
-                    label: 'จำนวนรีวิว (ครั้ง)',
-                    data: data.values || [],
-                    backgroundColor: [
-                        'rgba(255, 159, 64, 0.8)',
-                        'rgba(255, 205, 86, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ],
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
+                const res = await fetch(
+                    `${API_BASE_URL}/api/popular-locations${query}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`
                         }
                     }
+                );
+
+                const data = await res.json();
+
+                console.log("DATA =", data);
+
+                const canvas = document.getElementById('popularLocationChart');
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+
+                // ลบกราฟเก่า
+                if (window.popularChartInst) {
+                    window.popularChartInst.destroy();
                 }
+
+                // สร้างกราฟใหม่
+                window.popularChartInst = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels || [],
+                        datasets: [{
+                            label: 'จำนวนรีวิว (ครั้ง)',
+                            data: data.values || [],
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.8)',
+                                'rgba(255, 205, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(153, 102, 255, 0.8)'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Popular chart error:", error);
             }
-        });
+        }
 
-    } catch (error) {
-        console.error("Popular chart error:", error);
-    }
-}
-
-        // ฟังก์ชันดึงประวัติกิจกรรม 5 รายการล่าสุดแบบเพียวๆ ไม่ใช้ฟิลเตอร์แล้ว
+        // ฟังก์ชันดึงประวัติกิจกรรม 5 รายการล่าสุด
         async function fetchRecentActivities() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/recent-activities`, {
@@ -530,9 +537,13 @@
             } catch (e) { console.error(e); }
         }
 
-        async function renderARChart() {
+        if (typeof window.arChartInst === 'undefined') {
+            window.arChartInst = null;
+        }
+
+        async function renderARChart(queryParams = '') {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/ar-engagement`, {
+                const res = await fetch(`${API_BASE_URL}/api/ar-engagement${queryParams}`, {
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 const data = await res.json();
@@ -542,8 +553,8 @@
                 const insightText = document.getElementById('ar-insight-text');
 
                 if (!data || values.length === 0 || totalViews === 0) {
-                    insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในขณะนี้";
-                    if (window.arChartInst) { window.arChartInst.destroy(); }
+                    insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในช่วงเวลานี้";
+                    if (window.arChartInst) { window.arChartInst.destroy(); window.arChartInst = null; }
                     return;
                 }
 
@@ -551,13 +562,16 @@
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
+                // หาค่าสถานที่สูงสุดมาแสดงในกล่อง Insight สรุปด้านล่าง
                 const topLocation = data.labels[0] || "ไม่ระบุชื่อ";
                 const topViews = values[0] || 0;
                 const percentage = ((topViews / totalViews) * 100).toFixed(1);
 
-                insightText.innerHTML = `สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของยอดวิวทั้งหมด)`;
+                insightText.innerHTML = `สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของยอดวิวทั้งหมดในช่วงเวลานี้)`;
 
-                if (window.arChartInst) { window.arChartInst.destroy(); }
+                if (window.arChartInst) {
+                    window.arChartInst.destroy();
+                }
 
                 const locationColors = {
                     "Grandma's House": '#9966FF', 'Rest & Roll Cafe': '#AC92EC',

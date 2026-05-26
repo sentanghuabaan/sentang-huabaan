@@ -85,11 +85,11 @@ router.post('/record-view', (req, res) => {
     });
 });
 
-// อันดับสถานที่ยอดนิยมแยกตามประเภทกลุ่มท่องเที่ยว 
+// อันดับสถานที่ยอดนิยม
 router.get('/popular-locations', verifyAdminToken, (req, res) => {
 
     console.log("=== POPULAR LOCATION API CALLED ===");
-    
+
     let category = req.query.category
         ? decodeURIComponent(req.query.category).trim()
         : 'all';
@@ -177,16 +177,40 @@ router.get('/trash-count', verifyAdminToken, (req, res) => {
 
 // ดึงสถิติ AR Engagement
 router.get('/ar-engagement', verifyAdminToken, (req, res) => {
+    const period = req.query.period;
+    let dateCondition = "";
+    let queryParams = [];
+
+    // ดึงวันเวลาปัจจุบัน
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+
+    if (period === '7days') {
+        const pastDate = new Date();
+        pastDate.setDate(today.getDate() - 7);
+        const formattedPastDate = pastDate.toISOString().split('T')[0];
+
+        dateCondition = "AND v.updated_at BETWEEN ? AND ?";
+        queryParams.push(formattedPastDate + ' 00:00:00', formattedToday + ' 23:59:59');
+    } else if (period === '30days') {
+        const pastDate = new Date();
+        pastDate.setDate(today.getDate() - 30);
+        const formattedPastDate = pastDate.toISOString().split('T')[0];
+
+        dateCondition = "AND v.updated_at BETWEEN ? AND ?";
+        queryParams.push(formattedPastDate + ' 00:00:00', formattedToday + ' 23:59:59');
+    }
+
     const sql = `
         SELECT l.location_name AS location_name, SUM(v.view_count) as total_views
         FROM VideoAR v
         JOIN Location l ON v.location_id = l.location_id
-        WHERE v.is_deleted = 0
-        GROUP BY l.location_id
+        WHERE v.is_deleted = 0 ${dateCondition}
+        GROUP BY l.location_id, l.location_name
         ORDER BY total_views DESC
     `;
 
-    db.query(sql, (err, results) => {
+    db.query(sql, queryParams, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
 
         res.json({
@@ -196,7 +220,7 @@ router.get('/ar-engagement', verifyAdminToken, (req, res) => {
     });
 });
 
-// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ (คงเดิม เป็นแบบ 5 รายการล่าสุดไม่มีฟิลเตอร์)
+// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ
 router.get('/recent-reports', verifyAdminToken, (req, res) => {
     const sql = `
         SELECT 
