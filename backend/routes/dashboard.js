@@ -35,7 +35,7 @@ router.get('/dashboard-stats', verifyAdminToken, (req, res) => {
     const q5 = "SELECT COUNT(*) as total FROM Review";
     const q6 = "SELECT SUM(view_count) as total_views FROM VideoAR WHERE is_deleted = 0";
     
-    const q7 = "SELECT COUNT(*) as total FROM banner WHERE status = 'pending'"; 
+    const q7 = "SELECT COUNT(*) as total FROM Banners WHERE status = 'pending'"; 
     
     const q8 = "SELECT COUNT(*) as total FROM User WHERE status = 'banned'";
 

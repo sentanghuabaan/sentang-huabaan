@@ -294,16 +294,22 @@
                     return;
                 }
 
-                const data = await response.json();
+                if (!response.ok) {
+                    console.error("Backend returned an error status:", response.status);
+                    return;
+                }
 
-                document.getElementById('count-users').innerText = data.users.toLocaleString();
-                document.getElementById('count-locations').innerText = data.locations.toLocaleString();
-                document.getElementById('count-activities').innerText = data.activities.toLocaleString();
-                document.getElementById('count-trips').innerText = data.trips.toLocaleString();
-                document.getElementById('count-reviews').innerText = data.reviews.toLocaleString();
+                const data = await response.json();
+                if (!data) return;
+
+                document.getElementById('count-users').innerText = (data.users || 0).toLocaleString();
+                document.getElementById('count-locations').innerText = (data.locations || 0).toLocaleString();
+                document.getElementById('count-activities').innerText = (data.activities || 0).toLocaleString();
+                document.getElementById('count-trips').innerText = (data.trips || 0).toLocaleString();
+                document.getElementById('count-reviews').innerText = (data.reviews || 0).toLocaleString();
 
                 if (data.ar_views !== undefined) {
-                    document.getElementById('count-ar-views').innerText = data.ar_views.toLocaleString();
+                    document.getElementById('count-ar-views').innerText = (data.ar_views || 0).toLocaleString();
                 }
 
                 if (document.getElementById('stat-pending-ads')) {
