@@ -243,7 +243,7 @@ router.get('/recent-banners', verifyAdminToken, (req, res) => {
     const sql = `
         SELECT 
             banner_id,
-            banner_name, 
+            title, 
             status, 
             created_at 
         FROM Banners
@@ -277,6 +277,20 @@ router.get('/recent-reports', verifyAdminToken, (req, res) => {
         LIMIT 5
     `;
 
+    db.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
+
+// ดึงประวัติกิจกรรมแอดมิน 5 รายการล่าสุด
+router.get('/recent-activities', verifyAdminToken, (req, res) => {
+    const sql = `
+        SELECT admin_name, action_type, table_name, description, Log_Time 
+        FROM Activity_Logs 
+        ORDER BY Log_Time DESC 
+        LIMIT 5
+    `;
     db.query(sql, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(results);

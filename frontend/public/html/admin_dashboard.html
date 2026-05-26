@@ -270,7 +270,7 @@
                         <div class="info-card">
                             <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)
                             </h3>
-                            <ul class="activity-list">
+                            <ul id="recent-report-list" class="activity-list">
                             </ul>
                             <a href="admin_report.html" class="view-all">ดูรายงานทั้งหมด</a>
                         </div>
@@ -701,7 +701,7 @@
                     li.style.padding = '6px 0';
                     li.style.fontSize = '14px';
                     li.style.fontWeight = i === 0 ? 'bold' : 'normal';
-                    li.style.color = i === 0 ? '#BF7E46' : '#333';
+                    li.style.color = i === 0 ? '#2A8EC6' : '#333';
 
                     li.innerHTML = `<span>${data.labels[i]}</span> <strong style="float: right; color: #888;">${data.values[i]} ครั้ง</strong>`;
                     listContainer.appendChild(li);
@@ -718,13 +718,19 @@
                 const res = await fetch(`${API_BASE_URL}/api/recent-banners`, {
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
-                const banners = await res.json();
 
+                if (!res.ok) {
+                    console.error("Failed to fetch recent banners:", res.status);
+                    document.getElementById('recent-banner-list').innerHTML = '<li><p style="color: red; margin:0;">เซิร์ฟเวอร์ตอบสนองผิดพลาด</p></li>';
+                    return;
+                }
+
+                const banners = await res.json();
                 const bannerList = document.getElementById('recent-banner-list');
                 if (!bannerList) return;
                 bannerList.innerHTML = '';
 
-                if (!banners || banners.length === 0) {
+                if (!banners || !Array.isArray(banners) || banners.length === 0) {
                     bannerList.innerHTML = '<li><p style="color: #888; margin: 0;">ไม่มีคำขอโฆษณาใหม่ที่รออนุมัติ</p></li>';
                     return;
                 }
@@ -737,7 +743,7 @@
                 <div class="banner-req-item">
                     <p class="banner-req-text">
                         <iconify-icon icon="mdi:bulletin-board" class="banner-req-icon"></iconify-icon>
-                        <strong>${banner.banner_name}</strong> 
+                        <strong>${banner.title || 'โฆษณาไม่มีชื่อ'}</strong> 
                         <br>
                         <small class="banner-req-time">ส่งคำขอเมื่อ: ${timeFormatted}</small>
                     </p>
@@ -748,7 +754,7 @@
                 });
             } catch (error) {
                 console.error('Error fetching recent banners:', error);
-                document.getElementById('recent-banner-list').innerHTML = '<li><p style="color: red;">ไม่สามารถโหลดข้อมูลโฆษณาได้</p></li>';
+                document.getElementById('recent-banner-list').innerHTML = '<li><p style="color: red; margin:0;">ไม่สามารถโหลดข้อมูลโฆษณาได้</p></li>';
             }
         }
 
@@ -759,11 +765,12 @@
                 });
                 const reports = await res.json();
 
-                const reportList = document.querySelector('.side-info-section .info-card:first-child .activity-list');
+                const reportList = document.getElementById('recent-report-list');
+                if (!reportList) return;
                 reportList.innerHTML = '';
 
-                if (reports.length === 0) {
-                    reportList.innerHTML = '<li><p>ไม่มีรายงานปัญหาค้างคาในขณะนี้</p></li>';
+                if (!reports || reports.length === 0) {
+                    reportList.innerHTML = '<li><p style="color: #888; margin:0;">ไม่มีรายงานปัญหาค้างคาในขณะนี้</p></li>';
                     return;
                 }
 
@@ -772,13 +779,13 @@
                     const timeFormatted = timeAgo(new Date(report.created_at));
 
                     li.innerHTML = `
-                        <span class="status-badge pending">รอดำเนินการ</span>
-                        <p>
-                            <strong>${report.reason_type}</strong>: ${report.description || 'ไม่มีรายละเอียด'} 
-                            <br>
-                            <small style="color: #888;">โดย: ${report.reporter_name} - <span>${timeFormatted}</span></small>
-                        </p>
-                    `;
+                <span class="status-badge pending">รอดำเนินการ</span>
+                <p style="margin:0; display:inline-block; vertical-align:middle;">
+                    <strong>${report.reason_type}</strong>: ${report.description || 'ไม่มีรายละเอียด'} 
+                    <br>
+                    <small style="color: #888;">โดย: ${report.reporter_name} - <span>${timeFormatted}</span></small>
+                </p>
+            `;
                     reportList.appendChild(li);
                 });
             } catch (error) {
