@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const jwt = require('jsonwebtoken'); // ดึงใช้งานไลบรารี JWT สำหรับตรวจสอบสิทธิ์ตั๋วแอดมิน
+const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key';
 
@@ -85,48 +85,66 @@ router.post('/record-view', (req, res) => {
     });
 });
 
-// อันดับสถานที่ยอดนิยมจากรีวิว
+// อันดับสถานที่ยอดนิยมแยกตามประเภทกลุ่มท่องเที่ยว 
 router.get('/popular-locations', verifyAdminToken, (req, res) => {
-    const sql = `
-        SELECT l.location_name, COUNT(r.review_id) as review_count
-        FROM Location l
-        LEFT JOIN Review r ON l.location_id = r.location_id
-        GROUP BY l.location_id
-        ORDER BY review_count DESC
-        LIMIT 5
-    `;
 
-    db.query(sql, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
+    console.log("=== POPULAR LOCATION API CALLED ===");
+    
+    let category = req.query.category
+        ? decodeURIComponent(req.query.category).trim()
+        : 'all';
 
-        res.json({
-            labels: results.map(row => row.location_name),
-            values: results.map(row => row.review_count)
-        });
-    });
-});
+    console.log("CATEGORY =", category);
 
-// บันทึกประวัติกิจกรรมล่าสุดของแอดมิน
-router.get('/recent-activities', verifyAdminToken, (req, res) => {
-    const sql = `
+    let sql = `
         SELECT 
-            al.action_type, 
-            al.table_name, 
-            al.description, 
-            al.created_at as Log_Time,
-            u.username as admin_name
-        FROM Activity_Logs al
-        LEFT JOIN User u ON al.admin_id = u.user_id
-        ORDER BY al.created_at DESC 
+            l.location_name,
+            l.location_type,
+            COUNT(r.review_id) as review_count
+        FROM Location l
+        LEFT JOIN Review r 
+            ON l.location_id = r.location_id
+            AND r.is_deleted = 0
+        WHERE l.is_deleted = 0
+    `;
+
+    let queryParams = [];
+
+    if (
+        category &&
+        category !== 'all' &&
+        category !== 'undefined'
+    ) {
+
+        sql += `
+            AND LOWER(l.location_type) LIKE LOWER(?)
+        `;
+
+        queryParams.push(`%${category}%`);
+    }
+
+    sql += `
+        GROUP BY l.location_id
+        ORDER BY review_count DESC, l.location_name ASC
         LIMIT 5
     `;
 
-    db.query(sql, (err, results) => {
+    console.log("SQL =", sql);
+    console.log("PARAMS =", queryParams);
+
+    db.query(sql, queryParams, (err, results) => {
+
         if (err) {
-            console.error("Dashboard Activity Log Error:", err);
+            console.error("SQL ERROR:", err);
             return res.status(500).json({ error: err.message });
         }
-        res.json(results);
+
+        console.log("RESULTS =", results);
+
+        res.json({
+            labels: results.map(r => r.location_name),
+            values: results.map(r => r.review_count)
+        });
     });
 });
 
@@ -147,9 +165,11 @@ router.get('/trash-count', verifyAdminToken, (req, res) => {
         }
 
         let totalTrash = 0;
-        results.forEach(result => {
-            totalTrash += result[0].total;
-        });
+        if (Array.isArray(results)) {
+            results.forEach(result => {
+                if (result && result[0]) totalTrash += result[0].total;
+            });
+        }
 
         res.json({ total: totalTrash });
     });
@@ -170,13 +190,13 @@ router.get('/ar-engagement', verifyAdminToken, (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
 
         res.json({
-            labels: results.map(row => row.location_name),
-            values: results.map(row => row.total_views || 0)
+            labels: Array.isArray(results) ? results.map(row => row.location_name) : [],
+            values: Array.isArray(results) ? results.map(row => row.total_views || 0) : []
         });
     });
 });
 
-// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ
+// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ (คงเดิม เป็นแบบ 5 รายการล่าสุดไม่มีฟิลเตอร์)
 router.get('/recent-reports', verifyAdminToken, (req, res) => {
     const sql = `
         SELECT 

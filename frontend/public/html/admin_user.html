@@ -257,9 +257,11 @@
                     return `
                     <tr>
                         <td>${user.user_id}</td>
-                        <td class="user-cell" style="display: flex; align-items: center;">
-                            ${profileDisplay}
-                            <span>${user.username}</span>
+                        <td class="user-cell">
+                            <div class="user-cell-wrapper">
+                                ${profileDisplay}
+                                <span class="username-text">${user.username}</span>
+                            </div>
                         </td>
                         <td>${user.email}</td>
                         <td>

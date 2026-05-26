@@ -49,12 +49,28 @@
     text-overflow: ellipsis;
 }
 
+
 .user-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    display: table-cell !important; 
+    vertical-align: middle !important;
 }
 
+
+.user-cell-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px;
+    width: 100%;
+}
+
+.username-text {
+    display: inline-block;
+    white-space: nowrap;     
+    overflow: hidden;        
+    text-overflow: ellipsis;   
+    font-family: 'Noto Serif Thai', serif;
+    color: #000000;    
+}
 .avatar-icon {
     width: 40px;
     height: 40px;

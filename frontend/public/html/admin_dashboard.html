@@ -77,7 +77,6 @@
                             <h2>ภาพรวมระบบจัดการเส้นทางหัวบ้าน</h2>
                             <p>ยินดีต้อนรับ, แอดมิน</p>
                         </div>
-                        <!-- Quick Actions -->
                         <div class="quick-actions">
                             <button onclick="window.location.href='admin_location.html'" class="btn-quick add-loc">
                                 <iconify-icon icon="ic:baseline-add-location"></iconify-icon> เพิ่มสถานที่
@@ -88,7 +87,6 @@
                         </div>
                     </div>
 
-                    <!-- Trash Alert -->
                     <div id="trash-alert" class="trash-notification" style="display: none;">
                         <iconify-icon icon="mdi:trash-can-alert" style="font-size: 24px;"></iconify-icon>
                         <div class="trash-text">
@@ -100,7 +98,6 @@
                     </div>
                 </header>
 
-                <!-- Summary Statistics Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon user"><iconify-icon icon="basil:user-solid"></iconify-icon></div>
@@ -152,46 +149,47 @@
                 </div>
 
                 <div class="dashboard-main-content">
-                    <!-- Analytics Charts -->
                     <div class="chart-section">
                         <div class="chart-box">
                             <div class="chart-header">
-                                <h3>สถิติการเข้าชม (Monthly Visitors)</h3>
-                                <span class="chart-year">ปี 2026</span>
+                                <h3>สถิติการเข้าชม (Monthly Visitors) - ปี 2026</h3>
+                                <select id="visitor-range" class="month-dropdown"
+                                    onchange="changeVisitorRange(this.value)">
+                                    <option value="all" selected>ดูทุกเดือน (ม.ค. - ธ.ค.)</option>
+                                    <option value="h1">ครึ่งปีแรก (ม.ค. - มิ.ย.)</option>
+                                    <option value="q1">ไตรมาส 1 (ม.ค. - มี.ค.)</option>
+                                    <option value="q2">ไตรมาส 2 (เม.ย. - มิ.ย.)</option>
+                                </select>
                             </div>
 
                             <div class="chart-container visitor-chart-size">
                                 <canvas id="visitorChart"></canvas>
                             </div>
 
-                            <!-- ส่วนสรุปยอดรวม Dropdown -->
                             <div class="chart-summary">
                                 <select id="month-selector" onchange="updateMonthlySummary()" class="month-dropdown">
-                                    <option value="all">ดูทุกเดือน</option>
-                                    <option value="0">มกราคม</option>
-                                    <option value="1">กุมภาพันธ์</option>
-                                    <option value="2">มีนาคม</option>
-                                    <option value="3">เมษายน</option>
-                                    <option value="4">พฤษภาคม</option>
-                                    <option value="5">มิถุนายน</option>
-                                    <option value="6">กรกฎาคม</option>
-                                    <option value="7">สิงหาคม</option>
-                                    <option value="8">กันยายน</option>
-                                    <option value="9">ตุลาคม</option>
-                                    <option value="10">พฤศจิกายน</option>
-                                    <option value="11">ธันวาคม</option>
                                 </select>
 
-                                <!-- ข้อความแสดงผลสรุป -->
                                 <p class="summary-text">
-                                    <span id="summary-label">รวมการเข้าชมในปีนี้</span>:
+                                    <span id="summary-label">รวมการเข้าชม</span>:
                                     <strong id="total-view-display">0</strong> คน
                                 </p>
                             </div>
                         </div>
 
                         <div class="chart-box">
-                            <h3>5 อันดับสถานที่ยอดนิยม</h3>
+                            <div class="chart-header">
+                                <h3>5 อันดับสถานที่ยอดนิยม</h3>
+                                <select id="popular-category" class="month-dropdown"
+                                    onchange="renderPopularChart(this.value)">
+                                    <option value="all" selected>ทั้งหมดทุกประเภท</option>
+                                    <option value="ร้านอาหาร">กลุ่มร้านอาหาร</option>
+                                    <option value="คาเฟ่">กลุ่มคาเฟ่</option>
+                                    <option value="โรงแรม">กลุ่มโรงแรม</option>
+                                    <option value="เกสต์เฮ้าส์">กลุ่มเกสต์เฮ้าส์</option>
+                                    <option value="ประวัติศาสตร์">กลุ่มประวัติศาสตร์</option>
+                                </select>
+                            </div>
                             <div class="chart-container popular-chart-size">
                                 <canvas id="popularLocationChart"></canvas>
                             </div>
@@ -209,31 +207,20 @@
                         </div>
                     </div>
 
-                    <!-- Action Required & Recent Activity -->
                     <div class="side-info-section">
                         <div class="info-card">
                             <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)
                             </h3>
                             <ul class="activity-list">
-                                <li>
-                                    <span class="status-badge pending">รอดำเนินการ</span>
-                                    <p>พิกัดร้านขายของที่ระลึกไม่ตรง - <span>2 ชม. ที่แล้ว</span></p>
-                                </li>
-                                <li>
-                                    <span class="status-badge pending">รอดำเนินการ</span>
-                                    <p>รูปภาพ AR ไม่แสดงผล - <span>5 ชม. ที่แล้ว</span></p>
-                                </li>
                             </ul>
                             <a href="admin_report.html" class="view-all">ดูรายงานทั้งหมด</a>
                         </div>
 
                         <div class="info-card">
-                            <h3><iconify-icon icon="mdi:history"></iconify-icon> กิจกรรมล่าสุด</h3>
+                            <div class="chart-header" style="margin-bottom: 10px;">
+                                <h3><iconify-icon icon="mdi:history"></iconify-icon> กิจกรรมล่าสุด</h3>
+                            </div>
                             <ul class="activity-list log">
-                                <li><iconify-icon icon="mdi:edit"></iconify-icon> อัปเดตข้อมูล "เส้นทางริมน้ำ" <span>10
-                                        นาทีที่แล้ว</span></li>
-                                <li><iconify-icon icon="mdi:trash-can" class="text-danger"></iconify-icon>
-                                    ลบรีวิวไม่เหมาะสมไปยังถังขยะ <span>1 วันที่แล้ว</span></li>
                             </ul>
                             <a href="admin_activity_logs.html" class="view-all"
                                 style="display: block; text-align: center; margin-top: 15px; color: #BF7E46; font-weight: bold; text-decoration: none;">
@@ -257,7 +244,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchStats();
             renderVisitorChart();
-            renderPopularChart();
+            renderPopularChart('all');
             fetchRecentActivities();
             fetchTrashCount();
             renderARChart();
@@ -293,7 +280,16 @@
             }
         }
 
-        let globalVisitorData = [];
+        let rawLabels = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        let rawValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        let currentRangeType = 'all';
+
+        const monthMapping = {
+            "all": { label: "รวมการเข้าชมในปีนี้", months: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+            "h1": { label: "รวมการเข้าชมครึ่งปีแรก", months: [0, 1, 2, 3, 4, 5] },
+            "q1": { label: "รวมการเข้าชมช่วง ไตรมาส 1", months: [0, 1, 2] },
+            "q2": { label: "รวมการเข้าชมช่วง ไตรมาส 2", months: [3, 4, 5] }
+        };
 
         async function renderVisitorChart() {
             try {
@@ -302,124 +298,174 @@
                 });
                 const data = await res.json();
 
-                globalVisitorData = data.values;
+                if (data.labels) rawLabels = data.labels;
+                if (data.values) rawValues = data.values;
 
-                updateMonthlySummary();
+                changeVisitorRange('all');
 
-                const ctx = document.getElementById('visitorChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'จำนวนผู้เข้าชม',
-                            data: data.values,
-                            borderColor: '#BF7E46',
-                            tension: 0.4,
-                            fill: true,
-                            backgroundColor: 'rgba(191, 126, 70, 0.1)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    precision: 0,
-                                    callback: (value) => value.toLocaleString()
-                                }
-                            }
-                        }
-                    }
-                });
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error fetching visitor data:', error);
             }
         }
 
-        // ฟังก์ชันทำงานเมื่อมีการเปลี่ยนตัวเลือกใน Dropdown
+        function changeVisitorRange(rangeType) {
+            currentRangeType = rangeType;
+            const config = monthMapping[rangeType];
+
+            const monthSelector = document.getElementById('month-selector');
+            monthSelector.innerHTML = `<option value="range-total">ดูภาพรวมช่วงที่เลือก</option>`;
+
+            config.months.forEach(index => {
+                monthSelector.innerHTML += `<option value="${index}">เฉพาะเดือน ${rawLabels[index]}</option>`;
+            });
+
+            updateChartAndData();
+        }
+
         function updateMonthlySummary() {
-            const selector = document.getElementById('month-selector');
-            const display = document.getElementById('total-view-display');
-            const label = document.getElementById('summary-label');
-
-            const selectedValue = selector.value;
-
-            if (selectedValue === "all") {
-                // คำนวณรวมทั้งปี
-                const total = globalVisitorData.reduce((a, b) => a + b, 0);
-                label.innerText = "รวมการเข้าชมในปีนี้";
-                display.innerText = total.toLocaleString();
-            } else {
-                // ดึงเฉพาะเดือนที่เลือก
-                const monthIndex = parseInt(selectedValue);
-                const monthName = selector.options[selector.selectedIndex].text;
-                const monthlyTotal = globalVisitorData[monthIndex];
-
-                label.innerText = `ยอดการเข้าชมเดือน ${monthName}`;
-                display.innerText = monthlyTotal.toLocaleString();
-            }
+            updateChartAndData();
         }
 
-        async function renderPopularChart() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/popular-locations`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
-                });
-                const data = await res.json();
+        function updateChartAndData() {
+            const monthSelector = document.getElementById('month-selector');
+            const selectedValue = monthSelector ? monthSelector.value : 'range-total';
 
-                const ctx = document.getElementById('popularLocationChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar', // ใช้กราฟแท่ง
-                    data: {
-                        labels: data.labels,
-                        datasets: [{
-                            label: 'จำนวนรีวิว (ครั้ง)',
-                            data: data.values,
-                            backgroundColor: [
-                                'rgba(255, 159, 64, 0.8)',
-                                'rgba(255, 205, 86, 0.8)',
-                                'rgba(75, 192, 192, 0.8)',
-                                'rgba(54, 162, 235, 0.8)',
-                                'rgba(153, 102, 255, 0.8)'
-                            ],
-                            borderColor: [
-                                'rgb(255, 159, 64)',
-                                'rgb(255, 205, 86)',
-                                'rgb(75, 192, 192)',
-                                'rgb(54, 162, 235)',
-                                'rgb(153, 102, 255)'
-                            ],
-                            borderWidth: 1,
-                            borderRadius: 5
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                beginAtZero: true,
-                                ticks: { precision: 0 },
-                                title: { display: true, text: 'จำนวนรีวิว', font: { family: 'Noto Serif Thai' } }
-                            },
-                            y: {
-                                ticks: { font: { family: 'Noto Serif Thai' } }
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false }
+            let displayLabels = [];
+            let displayValues = [];
+            let labelText = "";
+            let chartType = 'line';
+
+            const config = monthMapping[currentRangeType];
+
+            if (selectedValue === 'range-total') {
+                displayLabels = config.months.map(i => rawLabels[i]);
+                displayValues = config.months.map(i => rawValues[i]);
+                labelText = config.label;
+                chartType = 'line';
+            } else {
+                const monthIndex = parseInt(selectedValue);
+                displayLabels = [`เดือน ${rawLabels[monthIndex]}`];
+                displayValues = [rawValues[monthIndex]];
+                labelText = `ยอดการเข้าชมเดือน ${rawLabels[monthIndex]}`;
+                chartType = 'bar';
+            }
+
+            const total = displayValues.reduce((a, b) => a + (Number(b) || 0), 0);
+            document.getElementById('summary-label').innerText = labelText;
+            document.getElementById('total-view-display').innerText = total.toLocaleString();
+
+            const ctx = document.getElementById('visitorChart').getContext('2d');
+            if (window.visitorChartInst) { window.visitorChartInst.destroy(); }
+
+            window.visitorChartInst = new Chart(ctx, {
+                type: chartType,
+                data: {
+                    labels: displayLabels,
+                    datasets: [{
+                        label: 'จำนวนผู้เข้าชม',
+                        data: displayValues,
+                        borderColor: '#BF7E46',
+                        backgroundColor: chartType === 'line' ? 'rgba(191, 126, 70, 0.1)' : 'rgba(191, 126, 70, 0.8)',
+                        borderWidth: chartType === 'line' ? 2 : 0,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } },
+                        x: { maxBarThickness: 100 }
+                    }
+                }
+            });
+        }
+
+        // 1. ประกาศตัวแปรไว้ชั้นนอกสุด (ห้ามใส่ const/let ซ้ำข้างในฟังก์ชันเด็ดขาด)
+        if (typeof window.popularChartInst === 'undefined') {
+            window.popularChartInst = null;
+        }
+
+        async function renderPopularChart(category = 'all') {
+    try {
+
+        const query =
+            category && category !== 'all'
+                ? `?category=${encodeURIComponent(category)}`
+                : '';
+
+        console.log("CATEGORY =", category);
+        console.log("QUERY =", query);
+
+        const res = await fetch(
+            `${API_BASE_URL}/api/popular-locations${query}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        console.log("DATA =", data);
+
+        const canvas = document.getElementById('popularLocationChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        // ลบกราฟเก่า
+        if (window.popularChartInst) {
+            window.popularChartInst.destroy();
+        }
+
+        // สร้างกราฟใหม่
+        window.popularChartInst = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels || [],
+                datasets: [{
+                    label: 'จำนวนรีวิว (ครั้ง)',
+                    data: data.values || [],
+                    backgroundColor: [
+                        'rgba(255, 159, 64, 0.8)',
+                        'rgba(255, 205, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
                         }
                     }
-                });
-            } catch (error) {
-                console.error('Error rendering popular chart:', error);
+                }
             }
-        }
+        });
 
+    } catch (error) {
+        console.error("Popular chart error:", error);
+    }
+}
+
+        // ฟังก์ชันดึงประวัติกิจกรรม 5 รายการล่าสุดแบบเพียวๆ ไม่ใช้ฟิลเตอร์แล้ว
         async function fetchRecentActivities() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/recent-activities`, {
@@ -437,8 +483,6 @@
 
                 logs.forEach(log => {
                     const li = document.createElement('li');
-
-                    // เลือกไอคอนตามประเภทการกระทำ
                     let icon = 'mdi:pencil';
                     let iconClass = 'text-warning';
 
@@ -456,24 +500,23 @@
                     const timeFormatted = timeAgo(new Date(log.Log_Time));
 
                     li.innerHTML = `
-                <div class="log-content" style="display: flex; align-items: start; gap: 10px; margin-bottom: 8px;">
-                    <iconify-icon icon="${icon}" class="${iconClass}" style="font-size: 1.2rem; margin-top: 3px;"></iconify-icon> 
-                    <div style="flex: 1;">
-                        <p style="margin: 0; font-size: 14px; line-height: 1.4;">
-                            <strong>${log.admin_name || 'แอดมิน'}</strong>: 
-                            ${log.description}
-                        </p>
-                        <small style="color: #888; font-size: 12px;">ตาราง: ${log.table_name} • ${timeFormatted}</small>
-                    </div>
-                </div>
-            `;
+                        <div class="log-content" style="display: flex; align-items: start; gap: 10px; margin-bottom: 8px;">
+                            <iconify-icon icon="${icon}" class="${iconClass}" style="font-size: 1.2rem; margin-top: 3px;"></iconify-icon> 
+                            <div style="flex: 1;">
+                                <p style="margin: 0; font-size: 14px; line-height: 1.4;">
+                                    <strong>${log.admin_name || 'แอดมิน'}</strong>: ${log.description}
+                                </p>
+                                <small style="color: #888; font-size: 12px;">ตาราง: ${log.table_name} • ${timeFormatted}</small>
+                            </div>
+                        </div>
+                    `;
                     logList.appendChild(li);
                 });
             } catch (error) {
                 console.error('Error fetching recent activities:', error);
             }
         }
-        // ฟังก์ชันนับถังขยะ
+
         async function fetchTrashCount() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/trash-count`, {
@@ -487,7 +530,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // ฟังก์ชันวาดกราฟ AR (Pie Chart)
         async function renderARChart() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/ar-engagement`, {
@@ -495,7 +537,6 @@
                 });
                 const data = await res.json();
 
-                // ตรวจสอบข้อมูลและคำนวณยอดรวม
                 const values = data.values ? data.values.map(v => Number(v) || 0) : [];
                 const totalViews = values.reduce((a, b) => a + b, 0);
                 const insightText = document.getElementById('ar-insight-text');
@@ -510,15 +551,12 @@
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
-                // หาค่าสูงสุด 
                 const topLocation = data.labels[0] || "ไม่ระบุชื่อ";
                 const topViews = values[0] || 0;
                 const percentage = ((topViews / totalViews) * 100).toFixed(1);
 
-                // แสดงสรุปใต้กราฟ
                 insightText.innerHTML = `สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของยอดวิวทั้งหมด)`;
 
-                // วาดกราฟ
                 if (window.arChartInst) { window.arChartInst.destroy(); }
 
                 const locationColors = {
@@ -555,7 +593,6 @@
             }
         }
 
-        // ฟังก์ชันดึงข้อมูลรายงาน
         async function fetchRecentReports() {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/recent-reports`, {
@@ -563,7 +600,7 @@
                 });
                 const reports = await res.json();
 
-                const reportList = document.querySelector('.activity-list');
+                const reportList = document.querySelector('.side-info-section .info-card:first-child .activity-list');
                 reportList.innerHTML = '';
 
                 if (reports.length === 0) {
@@ -576,13 +613,13 @@
                     const timeFormatted = timeAgo(new Date(report.created_at));
 
                     li.innerHTML = `
-                <span class="status-badge pending">รอดำเนินการ</span>
-                <p>
-                    <strong>${report.reason_type}</strong>: ${report.description || 'ไม่มีรายละเอียด'} 
-                    <br>
-                    <small style="color: #888;">โดย: ${report.reporter_name} - <span>${timeFormatted}</span></small>
-                </p>
-            `;
+                        <span class="status-badge pending">รอดำเนินการ</span>
+                        <p>
+                            <strong>${report.reason_type}</strong>: ${report.description || 'ไม่มีรายละเอียด'} 
+                            <br>
+                            <small style="color: #888;">โดย: ${report.reporter_name} - <span>${timeFormatted}</span></small>
+                        </p>
+                    `;
                     reportList.appendChild(li);
                 });
             } catch (error) {
@@ -590,7 +627,6 @@
             }
         }
 
-        // ฟังก์ชันคำนวณเวลา 
         function timeAgo(date) {
             const seconds = Math.floor((new Date() - date) / 1000);
             let interval = seconds / 31536000;
