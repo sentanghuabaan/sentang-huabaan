@@ -198,11 +198,14 @@
                         <div class="chart-box">
                             <div class="chart-header">
                                 <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
-                                <select id="ar-period" class="month-dropdown"
-                                    onchange="renderARChart('?period=' + this.value)">
-                                    <option value="all" selected>ทั้งหมด (All-Time)</option>
-                                    <option value="30days">30 วันที่ผ่านมา</option>
-                                    <option value="7days">7 วันที่ผ่านมา</option>
+                                <select id="ar-category" class="month-dropdown"
+                                    onchange="renderARChart('?category=' + this.value)">
+                                    <option value="all" selected>ทั้งหมดทุกประเภท</option>
+                                    <option value="ร้านอาหาร">กลุ่มร้านอาหาร</option>
+                                    <option value="คาเฟ่">กลุ่มคาเฟ่</option>
+                                    <option value="โรงแรม">กลุ่มโรงแรม</option>
+                                    <option value="เกสต์เฮ้าส์">กลุ่มเกสต์เฮ้าส์</option>
+                                    <option value="ประวัติศาสตร์">กลุ่มประวัติศาสตร์</option>
                                 </select>
                             </div>
                             <div class="chart-container ar-chart-size">
@@ -552,9 +555,13 @@
                 const totalViews = values.reduce((a, b) => a + b, 0);
                 const insightText = document.getElementById('ar-insight-text');
 
+                // หากกลุ่มที่เลือกไม่มีสถานที่ไหนทำ AR ไว้เลย ให้เคลียร์กราฟและแสดงข้อความแจ้งเตือน
                 if (!data || values.length === 0 || totalViews === 0) {
-                    insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในช่วงเวลานี้";
-                    if (window.arChartInst) { window.arChartInst.destroy(); window.arChartInst = null; }
+                    insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในหมวดหมู่นี้";
+                    if (window.arChartInst) {
+                        window.arChartInst.destroy();
+                        window.arChartInst = null;
+                    }
                     return;
                 }
 
@@ -562,13 +569,14 @@
                 if (!canvas) return;
                 const ctx = canvas.getContext('2d');
 
-                // หาค่าสถานที่สูงสุดมาแสดงในกล่อง Insight สรุปด้านล่าง
                 const topLocation = data.labels[0] || "ไม่ระบุชื่อ";
                 const topViews = values[0] || 0;
                 const percentage = ((topViews / totalViews) * 100).toFixed(1);
 
-                insightText.innerHTML = `สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของยอดวิวทั้งหมดในช่วงเวลานี้)`;
+                // แสดงข้อความสรุปตามกลุ่มที่เลือก
+                insightText.innerHTML = `ในหมวดหมู่นี้ สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของกลุ่มนี้)`;
 
+                // ทำลายกราฟวงกลมตัวเก่าก่อนวาดใหม่
                 if (window.arChartInst) {
                     window.arChartInst.destroy();
                 }
