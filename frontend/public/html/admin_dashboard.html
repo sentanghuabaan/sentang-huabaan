@@ -138,12 +138,32 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon ar-view" style="background: #e0f2f1; color: #009688;">
+                        <div class="stat-icon ar-view">
                             <iconify-icon icon="tdesign:view-in-ar-filled"></iconify-icon>
                         </div>
                         <div class="stat-details">
                             <h3 id="count-ar-views">0</h3>
                             <p>ยอดเข้าชม AR รวม</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card ad-clickable" onclick="window.location.href='admin_banners.html'">
+                        <div class="stat-icon banner-pending">
+                            <iconify-icon icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-pending-ads">0</h3>
+                            <p>โฆษณาที่รออนุมัติ <small class="click-hint">คลิกเพื่อไปตรวจสอบ ↗</small></p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon user-banned">
+                            <iconify-icon icon="mdi:account-cancel"></iconify-icon>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-banned-users">0</h3>
+                            <p>ผู้ใช้ที่ถูกแบนทั้งหมด</p>
                         </div>
                     </div>
                 </div>
@@ -299,6 +319,29 @@
             "q1": { label: "รวมการเข้าชมช่วง ไตรมาส 1", months: [0, 1, 2] },
             "q2": { label: "รวมการเข้าชมช่วง ไตรมาส 2", months: [3, 4, 5] }
         };
+
+        async function loadDashboardStats() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
+
+                document.getElementById('stat-users').innerText = data.users.toLocaleString();
+
+
+                if (document.getElementById('stat-pending-ads')) {
+                    document.getElementById('stat-pending-ads').innerText = (data.pending_ads || 0).toLocaleString();
+                }
+
+                if (document.getElementById('stat-banned-users')) {
+                    document.getElementById('stat-banned-users').innerText = (data.banned_users || 0).toLocaleString();
+                }
+
+            } catch (e) {
+                console.error("Error loading dashboard stats:", e);
+            }
+        }
 
         async function renderVisitorChart() {
             try {

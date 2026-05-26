@@ -110,6 +110,47 @@
     color: #e91e63;
 }
 
+.stat-icon.ar-view {
+    background: #e0f2f1;
+    color: #009688;
+}
+
+.stat-icon.banner-pending {
+    background-color: #FFF3CD;
+    color: #856404;
+}
+
+.stat-icon.user-banned {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.stat-card.ad-clickable {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid transparent;
+}
+
+.stat-card.ad-clickable:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(133, 100, 4, 0.1);
+    border-color: #ffe082;
+}
+
+.click-hint {
+    display: block;
+    color: #6c757d;
+    font-size: 11px;
+    margin-top: 4px;
+    transition: color 0.2s;
+}
+
+.stat-card.ad-clickable:hover .click-hint {
+    color: #856404;
+    font-weight: bold;
+}
+
 
 /* Chart & Lists Layout */
 .chart-section {

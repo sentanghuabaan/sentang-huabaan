@@ -34,19 +34,26 @@ router.get('/dashboard-stats', verifyAdminToken, (req, res) => {
     const q4 = "SELECT COUNT(*) as total FROM Trip";
     const q5 = "SELECT COUNT(*) as total FROM Review";
     const q6 = "SELECT SUM(view_count) as total_views FROM VideoAR WHERE is_deleted = 0";
+    
+    const q7 = "SELECT COUNT(*) as total FROM banner WHERE status = 'pending'"; 
+    
+    const q8 = "SELECT COUNT(*) as total FROM User WHERE status = 'banned'";
 
-    db.query(`${q1}; ${q2}; ${q3}; ${q4}; ${q5}; ${q6}`, (err, results) => {
+    db.query(`${q1}; ${q2}; ${q3}; ${q4}; ${q5}; ${q6}; ${q7}; ${q8}`, (err, results) => {
         if (err) {
-            console.error(err);
+            console.error("Dashboard Stats Error:", err);
             return res.status(500).json({ error: err.message });
         }
+        
         res.json({
             users: results[0][0].total,
             locations: results[1][0].total,
             activities: results[2][0].total,
             trips: results[3][0].total,
             reviews: results[4][0].total,
-            ar_views: results[5][0].total_views || 0
+            ar_views: results[5][0].total_views || 0,
+            pending_ads: results[6][0].total,
+            banned_users: results[7][0].total
         });
     });
 });
