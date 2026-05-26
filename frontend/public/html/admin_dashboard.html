@@ -149,7 +149,8 @@
 
                     <div class="stat-card ad-clickable" onclick="window.location.href='admin_banners.html'">
                         <div class="stat-icon banner-pending">
-                            <iconify-icon icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
+                            <iconify-icon
+                                icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
                         </div>
                         <div class="stat-details">
                             <h3 id="stat-pending-ads">0</h3>
@@ -280,6 +281,7 @@
             fetchRecentReports();
         });
 
+        // ฟังก์ชันดึงสถิติภาพรวม
         async function fetchStats() {
             try {
                 const response = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
@@ -304,6 +306,13 @@
                     document.getElementById('count-ar-views').innerText = data.ar_views.toLocaleString();
                 }
 
+                if (document.getElementById('stat-pending-ads')) {
+                    document.getElementById('stat-pending-ads').innerText = (data.pending_ads || 0).toLocaleString();
+                }
+                if (document.getElementById('stat-banned-users')) {
+                    document.getElementById('stat-banned-users').innerText = (data.banned_users || 0).toLocaleString();
+                }
+
             } catch (error) {
                 console.error('Error fetching stats:', error);
             }
@@ -319,29 +328,6 @@
             "q1": { label: "รวมการเข้าชมช่วง ไตรมาส 1", months: [0, 1, 2] },
             "q2": { label: "รวมการเข้าชมช่วง ไตรมาส 2", months: [3, 4, 5] }
         };
-
-        async function loadDashboardStats() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/dashboard-stats`, {
-                    headers: { 'Authorization': `Bearer ${adminToken}` }
-                });
-                const data = await res.json();
-
-                document.getElementById('stat-users').innerText = data.users.toLocaleString();
-
-
-                if (document.getElementById('stat-pending-ads')) {
-                    document.getElementById('stat-pending-ads').innerText = (data.pending_ads || 0).toLocaleString();
-                }
-
-                if (document.getElementById('stat-banned-users')) {
-                    document.getElementById('stat-banned-users').innerText = (data.banned_users || 0).toLocaleString();
-                }
-
-            } catch (e) {
-                console.error("Error loading dashboard stats:", e);
-            }
-        }
 
         async function renderVisitorChart() {
             try {
