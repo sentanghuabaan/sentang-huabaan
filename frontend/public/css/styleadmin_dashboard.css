@@ -453,7 +453,7 @@
 
 .trip-mini-list li::marker {
     font-weight: bold;
-    color: #BF7E46;
+    color: #2A8EC6;
 }
 
 .trip-loading-text {
@@ -465,4 +465,54 @@
 .view-all.trip-view-all {
     margin-top: 10px;
     font-size: 13px;
+}
+
+/* Recent Banners List Item */
+.info-card.banner-request-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.info-card.banner-request-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(133, 100, 4, 0.12);
+    border-color: #ffe082;
+}
+
+.banner-loading-text {
+    color: #888;
+    font-size: 14px;
+    list-style: none;
+}
+
+
+.banner-req-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.banner-req-text {
+    margin: 0;
+    font-size: 14px;
+}
+
+.banner-req-icon {
+    color: #BF7E46;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.banner-req-time {
+    color: #888;
+    padding-left: 20px;
+}
+
+.status-badge.banner-status-pending {
+    background-color: #FFF3CD;
+    color: #856404;
+    font-size: 11px;
+    font-weight: bold;
 }

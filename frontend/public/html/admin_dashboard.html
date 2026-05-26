@@ -149,7 +149,8 @@
 
                     <div class="stat-card ad-clickable" onclick="window.location.href='admin_banners.html'">
                         <div class="stat-icon banner-pending">
-                            <iconify-icon icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
+                            <iconify-icon
+                                icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
                         </div>
                         <div class="stat-details">
                             <h3 id="stat-pending-ads">0</h3>
@@ -237,19 +238,33 @@
                     </div>
 
                     <div class="side-info-section">
-                        <div class="info-card trip-preview-card" onclick="window.location.href='admin_trip_detail.html'">
+                        <div class="info-card trip-preview-card"
+                            onclick="window.location.href='admin_trip_detail.html'">
                             <div class="chart-header trip-preview-header">
-                                <h3><iconify-icon icon="streamline-ultimate:trip-road-bold"></iconify-icon> สถานที่ฮิตในทริป</h3>
+                                <h3><iconify-icon icon="streamline-ultimate:trip-road-bold"></iconify-icon>
+                                    สถานที่ฮิตในทริป</h3>
                                 <span class="badge-hot">HOT</span>
                             </div>
-                            
+
                             <ol id="top-trip-list" class="trip-mini-list">
                                 <li class="trip-loading-text">กำลังโหลดอันดับสถานที่...</li>
                             </ol>
-                            
+
                             <a href="admin_trip_detail.html" class="view-all trip-view-all">
-                                ดูสถิติกราฟและตารางทริปทั้งหมด <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon>
+                                ดูสถิติกราฟและตารางทริปทั้งหมด <iconify-icon
+                                    icon="mingcute:arrow-right-line"></iconify-icon>
                             </a>
+                        </div>
+
+                        <div class="info-card banner-request-card" onclick="window.location.href='admin_banners.html'">
+                            <div class="chart-header">
+                                <h3><iconify-icon icon="material-symbols:ad-units"></iconify-icon> คำขอโฆษณาล่าสุด
+                                    (Recent Banners)</h3>
+                            </div>
+                            <ul id="recent-banner-list" class="activity-list banner-req">
+                                <li class="banner-loading-text">กำลังโหลดคำขอโฆษณา...</li>
+                            </ul>
+                            <a href="admin_banners.html" class="view-all">จัดการโฆษณา ทั้งหมด</a>
                         </div>
 
                         <div class="info-card">
@@ -292,8 +307,9 @@
             fetchRecentActivities();
             fetchTrashCount();
             renderARChart();
-            fetchRecentReports();
             fetchTopTripPreview();
+            fetchRecentBanners();
+            fetchRecentReports();
         });
 
         // ฟังก์ชันดึงสถิติภาพรวม
@@ -664,37 +680,77 @@
         }
 
         // ฟังก์ชันดึงรายชื่อสถานที่ในทริปยอดนิยม
-async function fetchTopTripPreview() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/api/top-trip-locations`, {
-            headers: { 'Authorization': `Bearer ${adminToken}` }
-        });
-        const data = await res.json();
+        async function fetchTopTripPreview() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/top-trip-locations`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const data = await res.json();
 
-        const listContainer = document.getElementById('top-trip-list');
-        if (!listContainer) return;
-        listContainer.innerHTML = ''; 
+                const listContainer = document.getElementById('top-trip-list');
+                if (!listContainer) return;
+                listContainer.innerHTML = '';
 
-        if (!data.labels || data.labels.length === 0) {
-            listContainer.innerHTML = '<li style="color:#888; list-style:none;">ยังไม่มีข้อมูลการสร้างทริป</li>';
-            return;
+                if (!data.labels || data.labels.length === 0) {
+                    listContainer.innerHTML = '<li style="color:#888; list-style:none;">ยังไม่มีข้อมูลการสร้างทริป</li>';
+                    return;
+                }
+                const maxItems = Math.min(data.labels.length, 3);
+                for (let i = 0; i < maxItems; i++) {
+                    const li = document.createElement('li');
+                    li.style.padding = '6px 0';
+                    li.style.fontSize = '14px';
+                    li.style.fontWeight = i === 0 ? 'bold' : 'normal';
+                    li.style.color = i === 0 ? '#BF7E46' : '#333';
+
+                    li.innerHTML = `<span>${data.labels[i]}</span> <strong style="float: right; color: #888;">${data.values[i]} ครั้ง</strong>`;
+                    listContainer.appendChild(li);
+                }
+
+            } catch (error) {
+                console.error("Error loading trip preview:", error);
+            }
         }
-        const maxItems = Math.min(data.labels.length, 3);
-        for (let i = 0; i < maxItems; i++) {
-            const li = document.createElement('li');
-            li.style.padding = '6px 0';
-            li.style.fontSize = '14px';
-            li.style.fontWeight = i === 0 ? 'bold' : 'normal'; 
-            li.style.color = i === 0 ? '#BF7E46' : '#333'; 
-            
-            li.innerHTML = `<span>${data.labels[i]}</span> <strong style="float: right; color: #888;">${data.values[i]} ครั้ง</strong>`;
-            listContainer.appendChild(li);
-        }
 
-    } catch (error) {
-        console.error("Error loading trip preview:", error);
-    }
-}
+        // ฟังก์ชันดึงคำขอโฆษณาใหม่ล่าสุดมาแสดงผล
+        async function fetchRecentBanners() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/recent-banners`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const banners = await res.json();
+
+                const bannerList = document.getElementById('recent-banner-list');
+                if (!bannerList) return;
+                bannerList.innerHTML = '';
+
+                if (!banners || banners.length === 0) {
+                    bannerList.innerHTML = '<li><p style="color: #888; margin: 0;">ไม่มีคำขอโฆษณาใหม่ที่รออนุมัติ</p></li>';
+                    return;
+                }
+
+                banners.forEach(banner => {
+                    const li = document.createElement('li');
+                    const timeFormatted = timeAgo(new Date(banner.created_at));
+
+                    li.innerHTML = `
+                <div class="banner-req-item">
+                    <p class="banner-req-text">
+                        <iconify-icon icon="mdi:bulletin-board" class="banner-req-icon"></iconify-icon>
+                        <strong>${banner.banner_name}</strong> 
+                        <br>
+                        <small class="banner-req-time">ส่งคำขอเมื่อ: ${timeFormatted}</small>
+                    </p>
+                    <span class="status-badge banner-status-pending">รออนุมัติ</span>
+                </div>
+            `;
+                    bannerList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching recent banners:', error);
+                document.getElementById('recent-banner-list').innerHTML = '<li><p style="color: red;">ไม่สามารถโหลดข้อมูลโฆษณาได้</p></li>';
+            }
+        }
 
         async function fetchRecentReports() {
             try {

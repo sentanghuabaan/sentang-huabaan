@@ -238,6 +238,29 @@ router.get('/top-trip-locations', verifyAdminToken, (req, res) => {
     });
 });
 
+// ดึงคำขอโฆษณาใหม่ล่าสุดที่รอดำเนินการ 3 รายการแรก
+router.get('/recent-banners', verifyAdminToken, (req, res) => {
+    const sql = `
+        SELECT 
+            banner_id,
+            banner_name, 
+            status, 
+            created_at 
+        FROM Banners
+        WHERE status = 'pending'
+        ORDER BY created_at DESC
+        LIMIT 3
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("SQL Error in recent-banners:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
 // ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ
 router.get('/recent-reports', verifyAdminToken, (req, res) => {
     const sql = `
