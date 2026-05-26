@@ -416,3 +416,53 @@
     color: #BF7E46;
     font-weight: 700;
 }
+
+/* Trip Preview Card */
+
+.info-card.trip-preview-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.info-card.trip-preview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(191, 126, 70, 0.12);
+    border-color: #ffe082;
+}
+
+.trip-preview-header {
+    margin-bottom: 10px;
+}
+
+.badge-hot {
+    background-color: #ff3d00;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.trip-mini-list {
+    padding-left: 20px;
+    margin: 10px 0;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.trip-mini-list li::marker {
+    font-weight: bold;
+    color: #BF7E46;
+}
+
+.trip-loading-text {
+    color: #888;
+    font-size: 14px;
+    list-style: none;
+}
+
+.view-all.trip-view-all {
+    margin-top: 10px;
+    font-size: 13px;
+}

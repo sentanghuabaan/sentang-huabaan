@@ -237,6 +237,21 @@
                     </div>
 
                     <div class="side-info-section">
+                        <div class="info-card trip-preview-card" onclick="window.location.href='admin_trip_detail.html'">
+                            <div class="chart-header trip-preview-header">
+                                <h3><iconify-icon icon="streamline-ultimate:trip-road-bold"></iconify-icon> สถานที่ฮิตในทริป</h3>
+                                <span class="badge-hot">HOT</span>
+                            </div>
+                            
+                            <ol id="top-trip-list" class="trip-mini-list">
+                                <li class="trip-loading-text">กำลังโหลดอันดับสถานที่...</li>
+                            </ol>
+                            
+                            <a href="admin_trip_detail.html" class="view-all trip-view-all">
+                                ดูสถิติกราฟและตารางทริปทั้งหมด <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon>
+                            </a>
+                        </div>
+
                         <div class="info-card">
                             <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)
                             </h3>
@@ -278,6 +293,7 @@
             fetchTrashCount();
             renderARChart();
             fetchRecentReports();
+            fetchTopTripPreview();
         });
 
         // ฟังก์ชันดึงสถิติภาพรวม
@@ -646,6 +662,39 @@
                 document.getElementById('ar-insight-text').innerText = "ไม่สามารถโหลดข้อมูล AR ได้ในขณะนี้";
             }
         }
+
+        // ฟังก์ชันดึงรายชื่อสถานที่ในทริปยอดนิยม
+async function fetchTopTripPreview() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/top-trip-locations`, {
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+
+        const listContainer = document.getElementById('top-trip-list');
+        if (!listContainer) return;
+        listContainer.innerHTML = ''; 
+
+        if (!data.labels || data.labels.length === 0) {
+            listContainer.innerHTML = '<li style="color:#888; list-style:none;">ยังไม่มีข้อมูลการสร้างทริป</li>';
+            return;
+        }
+        const maxItems = Math.min(data.labels.length, 3);
+        for (let i = 0; i < maxItems; i++) {
+            const li = document.createElement('li');
+            li.style.padding = '6px 0';
+            li.style.fontSize = '14px';
+            li.style.fontWeight = i === 0 ? 'bold' : 'normal'; 
+            li.style.color = i === 0 ? '#BF7E46' : '#333'; 
+            
+            li.innerHTML = `<span>${data.labels[i]}</span> <strong style="float: right; color: #888;">${data.values[i]} ครั้ง</strong>`;
+            listContainer.appendChild(li);
+        }
+
+    } catch (error) {
+        console.error("Error loading trip preview:", error);
+    }
+}
 
         async function fetchRecentReports() {
             try {

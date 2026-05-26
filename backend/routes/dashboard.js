@@ -213,7 +213,32 @@ router.get('/ar-engagement', verifyAdminToken, (req, res) => {
     });
 });
 
-// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ (คงเดิม เป็นแบบ 5 รายการล่าสุดไม่มีฟิลเตอร์)
+// API สำหรับดึงอันดับสถานที่ที่ถูกเลือกใส่ในทริปมากที่สุด
+router.get('/top-trip-locations', verifyAdminToken, (req, res) => {
+    const sql = `
+        SELECT l.location_name, COUNT(td.location_id) as select_count
+        FROM Location l
+        JOIN Trip_Detail td ON l.location_id = td.location_id
+        WHERE l.is_deleted = 0
+        GROUP BY l.location_id, l.location_name
+        ORDER BY select_count DESC
+        LIMIT 5
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("SQL Error in top-trip-locations:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        
+        res.json({
+            labels: (results && results.length > 0) ? results.map(row => row.location_name) : [],
+            values: (results && results.length > 0) ? results.map(row => row.select_count) : []
+        });
+    });
+});
+
+// ดึงรายงานปัญหาล่าสุดที่รอดำเนินการ
 router.get('/recent-reports', verifyAdminToken, (req, res) => {
     const sql = `
         SELECT 
