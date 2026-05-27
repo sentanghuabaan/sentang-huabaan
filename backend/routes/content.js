@@ -657,7 +657,7 @@ router.get('/community-gallery', (req, res) => {
 
 // ส่องตรวจสอบดูค่ารหัส ID ถัดไปของคลังภาพชุมชน
 router.get('/community-gallery/next-id', verifyAdminToken, (req, res) => {
-    db.query("SELECT MAX(CAST(SUBSTRING(image_id, 5) AS UNSIGNED)) as max_id FROM Community_Gallery WHERE is_deleted = 0", (err, result) => {
+    db.query("SELECT MAX(CAST(SUBSTRING(image_id, 5) AS UNSIGNED)) as max_id FROM Community_Gallery", (err, result) => {
         if (err) return res.status(500).json(err);
         const nextNum = (result[0].max_id || 0) + 1;
         const nextId = `IMG-${nextNum.toString().padStart(3, '0')}`;
