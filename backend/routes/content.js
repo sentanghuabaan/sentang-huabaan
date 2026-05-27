@@ -787,7 +787,7 @@ router.get('/trash/:table', verifyAdminToken, (req, res) => {
 // สั่งรันกู้คืนข้อมูลจากถังขยะกลับคืนระบบ
 router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
     const table = req.params.table;
-    const id = req.params.id;
+    let id = req.params.id;
     
     let admin_id = req.body.admin_id;
     if (!admin_id && req.admin && req.admin.user_id) {
@@ -804,20 +804,38 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
         'Review': 'review_id', 'Map': 'map_id', 'Travel_Route': 'travel_route_id',
         'Trip': 'trip_id', 'Trip_Detail': 'detail_id'
     };
+    
     const idCol = idColumns[table];
-    if (!idCol) return res.status(400).json({ error: "ไม่พบตารางนี้" });
+    if (!idCol) return res.status(400).json({ error: "ไม่พบตารางนี้ในระบบ" });
+
+    if (idCol === 'image_id' || idCol === 'video_id' || idCol === 'banner_id' || idCol === 'review_id' || idCol === 'map_id' || idCol === 'travel_route_id' || idCol === 'detail_id') {
+        id = parseInt(id);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: "รูปแบบ ID ไม่ถูกต้องสำหรับตารางนี้" });
+        }
+    }
 
     db.beginTransaction((err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        let sql = `UPDATE ${table} SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE ${idCol} = ?`;
+        if (err) {
+            console.error("❌ Transaction Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        
+        let sql = `UPDATE ?? SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE ?? = ?`;
 
-        db.query(sql, [id], (err, result) => {
-            if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+        db.query(sql, [table, idCol, id], (err, result) => {
+            if (err) {
+                console.error(`❌ SQL Execute Error ตาราง ${table}:`, err);
+                return db.rollback(() => res.status(500).json({ error: "เกิดข้อผิดพลาดในการรัน SQL: " + err.message }));
+            }
 
             if (table === 'Trip') {
                 const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE trip_id = ?";
                 db.query(sqlDetail, [id], (err) => {
-                    if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+                    if (err) {
+                        console.error("❌ SQL Trip_Detail Error:", err);
+                        return db.rollback(() => res.status(500).json({ error: err.message }));
+                    }
                     db.commit((err) => {
                         if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
                         recordLog(admin_id, 'Update', table, id, `กู้คืนข้อมูลทริปรหัส ${id} และรายละเอียดแผนทั้งหมดกลับมาจากถังขยะ`, null, { is_deleted: 0 });
@@ -826,7 +844,10 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
                 });
             } else {
                 db.commit((err) => {
-                    if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+                    if (err) {
+                        console.error("❌ Commit Error:", err);
+                        return db.rollback(() => res.status(500).json({ error: err.message }));
+                    }
                     recordLog(admin_id, 'Update', table, id, `กู้คืนข้อมูลรหัส ${id} ในตาราง ${table} กลับมาใช้งานปกติ`, null, { is_deleted: 0 });
                     res.json({ success: true });
                 });

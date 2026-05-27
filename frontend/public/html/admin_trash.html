@@ -211,6 +211,8 @@
                 });
 
                 if (result.isConfirmed) {
+                    const currentAdminId = localStorage.getItem('adminId') || 1;
+
                     const res = await fetch(`${API_BASE_URL}/api/trash/restore/${table}/${id}`, {
                         method: 'PUT',
                         headers: {
@@ -218,15 +220,16 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ 
-                            admin_id: 1 
+                            admin_id: parseInt(currentAdminId) 
                         })
                     });
 
                     if (res.ok) {
                         Swal.fire('เรียบร้อย!', 'ข้อมูลถูกกู้คืนแล้ว', 'success');
-                        fetchTrash(table);
+                        fetchTrash(table); 
                     } else {
-                        Swal.fire('Error', 'ไม่สามารถกู้คืนได้', 'error');
+                        const errData = await res.json().catch(() => ({}));
+                        Swal.fire('Error', errData.error || 'ไม่สามารถกู้คืนได้', 'error');
                     }
                 }
             }
