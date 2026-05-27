@@ -829,9 +829,9 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         
-        let sql = `UPDATE ?? SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE ?? = ?`;
+        let sql = `UPDATE ${table} SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE ${idCol} = ?`;
 
-        db.query(sql, [table, idCol, id], (err, result) => {
+        db.query(sql, [id], (err, result) => {
             if (err) {
                 console.error(`❌ SQL Execute Error ตาราง ${table}:`, err);
                 return db.rollback(() => res.status(500).json({ error: "เกิดข้อผิดพลาดในการรัน SQL: " + err.message }));
