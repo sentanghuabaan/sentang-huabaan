@@ -39,10 +39,16 @@ const getOldValue = (table, idColumn, idValue) => {
 
 // ฟังก์ชันกลางสำหรับบันทึก Activity Log
 const recordLog = (admin_id, action_type, table_name, target_id, description, old_value = null, new_value = null) => {
+    let safeAdminId = admin_id;
+    if (!safeAdminId || isNaN(parseInt(safeAdminId))) {
+        safeAdminId = 1; 
+    }
+
     const sql = `INSERT INTO Activity_Logs (admin_id, action_type, table_name, target_id, description, old_value, new_value) 
                  VALUES (?, ?, ?, ?, ?, ?, ?)`;
+                 
     db.query(sql, [
-        admin_id,
+        parseInt(safeAdminId),
         action_type,
         table_name,
         target_id,
@@ -50,7 +56,9 @@ const recordLog = (admin_id, action_type, table_name, target_id, description, ol
         old_value ? JSON.stringify(old_value) : null,
         new_value ? JSON.stringify(new_value) : null
     ], (err) => {
-        if (err) console.error("❌ Log Recording Error:", err);
+        if (err) {
+            console.error("❌ Log Recording Error (แต่ระบบหลักยังทำงานได้):", err);
+        }
     });
 };
 
