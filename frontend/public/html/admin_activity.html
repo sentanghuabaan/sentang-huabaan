@@ -182,13 +182,23 @@
                     const res = await fetch(`${API_BASE_URL}/api/activities/next-id`, {
                         headers: { 'Authorization': `Bearer ${adminToken}` }
                     });
-                    const result = await res.json();
-                    formData = {
-                        activity_id: result.next_id,
-                        activity_name: '', location_id: '', activity_details: '',
-                        start_time: '', end_time: '', activity_date: 'ทุกวัน',
-                        price_detail: '', activity_url: ''
-                    };
+                    
+                    if (res.ok) {
+                        const result = await res.json();
+                        formData = {
+                            activity_id: result.next_id,
+                            activity_name: '', location_id: '', activity_details: '',
+                            start_time: '', end_time: '', activity_date: 'ทุกวัน',
+                            price_detail: '', activity_url: ''
+                        };
+                    } else {
+                        formData = {
+                            activity_id: 'ACT-AUTO',
+                            activity_name: '', location_id: '', activity_details: '',
+                            start_time: '', end_time: '', activity_date: 'ทุกวัน',
+                            price_detail: '', activity_url: ''
+                        };
+                    }
                 }
 
                 let locOptions = `<option value="">-- ไม่ระบุสถานที่ --</option>`;

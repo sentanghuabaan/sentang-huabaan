@@ -214,6 +214,16 @@ router.get('/activities', (req, res) => {
     });
 });
 
+// ส่องดูรหัสไอดีถัดไปของกิจกรรม
+router.get('/activities/next-id', verifyAdminToken, (req, res) => {
+    db.query("SELECT MAX(CAST(SUBSTRING(activity_id, 5) AS UNSIGNED)) as max_id FROM Activity", (err, result) => {
+        if (err) return res.status(500).json(err);
+        const nextNum = (result[0].max_id || 0) + 1;
+        const nextId = `ACT-${nextNum.toString().padStart(2, '0')}`;
+        res.json({ next_id: nextId });
+    });
+});
+
 // ดึงข้อมูลกิจกรรมแต่ละ ID
 router.get('/activities/:id', (req, res) => {
     const activityId = req.params.id;
@@ -222,16 +232,6 @@ router.get('/activities/:id', (req, res) => {
         if (err) return res.status(500).json(err);
         if (result.length === 0) return res.status(404).json({ message: "Activity not found" });
         res.json(result[0]);
-    });
-});
-
-// ส่องดูรหัสไอดีถัดไปของกิจกรรม
-router.get('/activities/next-id', verifyAdminToken, (req, res) => {
-    db.query("SELECT MAX(CAST(SUBSTRING(activity_id, 5) AS UNSIGNED)) as max_id FROM Activity", (err, result) => {
-        if (err) return res.status(500).json(err);
-        const nextNum = (result[0].max_id || 0) + 1;
-        const nextId = `ACT-${nextNum.toString().padStart(2, '0')}`;
-        res.json({ next_id: nextId });
     });
 });
 
