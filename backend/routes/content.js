@@ -794,76 +794,62 @@ router.get('/trash/:table', verifyAdminToken, (req, res) => {
 
 // สั่งรันกู้คืนข้อมูลจากถังขยะกลับคืนระบบ
 router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
+    console.log("TABLE =", req.params.table);
+    console.log("ID =", req.params.id);
+
     const table = req.params.table;
     let id = req.params.id;
-    
-    let admin_id = req.body.admin_id;
-    if (!admin_id && req.admin && req.admin.user_id) {
-        admin_id = req.admin.user_id; 
-    }
-    if (!admin_id) {
-        admin_id = 1; 
-    }
 
     const idColumns = {
-        'Location': 'location_id', 'Location_Images': 'image_id', 'Activity': 'activity_id',
-        'Activity_Images': 'image_id', 'History': 'history_id', 'History_Gallery': 'gallery_id',
-        'VideoAR': 'video_id', 'Community_Gallery': 'image_id', 'Banners': 'banner_id',
-        'Review': 'review_id', 'Map': 'map_id', 'Travel_Route': 'travel_route_id',
-        'Trip': 'trip_id', 'Trip_Detail': 'detail_id'
+        'Location': 'location_id',
+        'Location_Images': 'image_id',
+        'Activity': 'activity_id',
+        'Activity_Images': 'image_id',
+        'History': 'history_id',
+        'History_Gallery': 'gallery_id',
+        'VideoAR': 'video_id',
+        'Community_Gallery': 'image_id',
+        'Banners': 'banner_id',
+        'Review': 'review_id',
+        'Map': 'map_id',
+        'Travel_Route': 'travel_route_id',
+        'Trip': 'trip_id',
+        'Trip_Detail': 'detail_id'
     };
-    
-    const idCol = idColumns[table];
-    if (!idCol) return res.status(400).json({ error: "ไม่พบตารางนี้ในระบบ" });
 
-    if (idCol === 'image_id' || idCol === 'video_id' || idCol === 'banner_id' || idCol === 'review_id' || idCol === 'map_id' || idCol === 'travel_route_id' || idCol === 'detail_id') {
-        id = parseInt(id);
-        if (isNaN(id)) {
-            return res.status(400).json({ error: "รูปแบบ ID ไม่ถูกต้องสำหรับตารางนี้" });
-        }
+    const idCol = idColumns[table];
+
+    if (!idCol) {
+        return res.status(400).json({
+            error: 'ไม่พบ table นี้'
+        });
     }
 
-    db.beginTransaction((err) => {
+    const sql = `
+        UPDATE ??
+        SET is_deleted = 0,
+            deleted_at = NULL,
+            deleted_by = NULL
+        WHERE ?? = ?
+    `;
+
+    db.query(sql, [table, idCol, id], (err, result) => {
+
+        console.log("SQL =", sql);
+        console.log("ID =", id);
+
         if (err) {
-            console.error("❌ Transaction Error:", err);
-            return res.status(500).json({ error: err.message });
+            console.error("RESTORE ERROR =", err);
+
+            return db.rollback(() =>
+                res.status(500).json({
+                    error: err.message
+                })
+            );
         }
-        
-        let sql = `UPDATE ${table} SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE ${idCol} = ?`;
 
-        db.query(sql, [id], (err, result) => {
-            if (err) {
-                console.error(`❌ SQL Execute Error ตาราง ${table}:`, err);
-                return db.rollback(() => res.status(500).json({ error: "เกิดข้อผิดพลาดในการรัน SQL: " + err.message }));
-            }
-
-            try {
-                recordLog(admin_id, 'Update', String(table), String(id), `กู้คืนข้อมูลรหัส ${id} ในตาราง ${table} กลับมาใช้งานปกติ`, null, { is_deleted: 0 });
-            } catch (logErr) {
-                console.error("❌ บันทึก Log ขัดข้องแต่ระบบจะทำการกู้คืนต่อ:", logErr);
-            }
-
-            if (table === 'Trip') {
-                const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE trip_id = ?";
-                db.query(sqlDetail, [id], (err) => {
-                    if (err) {
-                        console.error("❌ SQL Trip_Detail Error:", err);
-                        return db.rollback(() => res.status(500).json({ error: err.message }));
-                    }
-                    db.commit((err) => {
-                        if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
-                        res.json({ success: true });
-                    });
-                });
-            } else {
-                db.commit((err) => {
-                    if (err) {
-                        console.error("❌ Commit Error:", err);
-                        return db.rollback(() => res.status(500).json({ error: err.message }));
-                    }
-                    res.json({ success: true });
-                });
-            }
+        res.json({
+            success: true
         });
     });
 });
