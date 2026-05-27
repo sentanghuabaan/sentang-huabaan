@@ -216,7 +216,10 @@
                         headers: {
                             'Authorization': `Bearer ${adminToken}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        body: JSON.stringify({ 
+                            admin_id: 1 
+                        })
                     });
 
                     if (res.ok) {

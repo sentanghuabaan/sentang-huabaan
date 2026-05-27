@@ -788,7 +788,14 @@ router.get('/trash/:table', verifyAdminToken, (req, res) => {
 router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
     const table = req.params.table;
     const id = req.params.id;
-    const { admin_id } = req.body;
+    
+    let admin_id = req.body.admin_id;
+    if (!admin_id && req.admin && req.admin.user_id) {
+        admin_id = req.admin.user_id; 
+    }
+    if (!admin_id) {
+        admin_id = 1; 
+    }
 
     const idColumns = {
         'Location': 'location_id', 'Location_Images': 'image_id', 'Activity': 'activity_id',
