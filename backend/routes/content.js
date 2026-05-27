@@ -837,6 +837,12 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
                 return db.rollback(() => res.status(500).json({ error: "เกิดข้อผิดพลาดในการรัน SQL: " + err.message }));
             }
 
+            try {
+                recordLog(admin_id, 'Update', String(table), String(id), `กู้คืนข้อมูลรหัส ${id} ในตาราง ${table} กลับมาใช้งานปกติ`, null, { is_deleted: 0 });
+            } catch (logErr) {
+                console.error("❌ บันทึก Log ขัดข้องแต่ระบบจะทำการกู้คืนต่อ:", logErr);
+            }
+
             if (table === 'Trip') {
                 const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 0, deleted_at = NULL, deleted_by = NULL WHERE trip_id = ?";
                 db.query(sqlDetail, [id], (err) => {
@@ -846,7 +852,6 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
                     }
                     db.commit((err) => {
                         if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
-                        recordLog(admin_id, 'Update', table, id, `กู้คืนข้อมูลทริปรหัส ${id} และรายละเอียดแผนทั้งหมดกลับมาจากถังขยะ`, null, { is_deleted: 0 });
                         res.json({ success: true });
                     });
                 });
@@ -856,7 +861,6 @@ router.put('/trash/restore/:table/:id', verifyAdminToken, (req, res) => {
                         console.error("❌ Commit Error:", err);
                         return db.rollback(() => res.status(500).json({ error: err.message }));
                     }
-                    recordLog(admin_id, 'Update', table, id, `กู้คืนข้อมูลรหัส ${id} ในตาราง ${table} กลับมาใช้งานปกติ`, null, { is_deleted: 0 });
                     res.json({ success: true });
                 });
             }
