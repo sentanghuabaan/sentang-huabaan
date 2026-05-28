@@ -216,19 +216,49 @@ body {
 }
 
 .ar-style {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(40, 25, 15, 0.55); 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 20px;
     border-radius: 15px;
     margin: 0 20px;
-}
-
-.ar-style {
     text-align: left !important;
     align-items: flex-start !important;
     padding-left: 25px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ar-style h3 {
+    color: #FBEDD6 !important;
+    font-size: 24px;
+    margin-top: 5px;
+    margin-bottom: -5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ar-style p {
+    color: #FFFFFF !important;
+    font-size: 12px;
+    margin-bottom: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.ar-btn {
+    background-color: #BF7E46;
+    color: #FBEDD6;
+    border: 1px solid rgba(251, 237, 214, 0.3);
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .ar-tag {
