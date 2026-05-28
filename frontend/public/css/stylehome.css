@@ -62,7 +62,7 @@ body {
 /* Hero Banner */
 .hero-banner {
     position: relative;
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('../image/banner-bg.png');
+    background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)), url('../image/banner-bg.png');
     background-size: cover;
     background-position: center;
     height: 220px;
@@ -87,23 +87,27 @@ body {
     margin-top: 5px;
     margin-bottom: -5px;
     color: #FBEDD6;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .banner-content p {
     font-size: 12px;
     margin-bottom: 10px;
     font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .read-more {
     background-color: #BF7E46;
     color: #FBEDD6;
+    border: 1px solid rgba(251, 237, 214, 0.4);
     border: none;
     padding: 5px 15px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Floating Camera Icon */
@@ -251,6 +255,7 @@ body {
     height: 8px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .s-dot.active {
