@@ -172,44 +172,69 @@ router.delete('/:id', verifyAdminToken, async (req, res) => {
     }
 });
 
-// ผู้ใช้กดลบประวัติแผนการเดินทางของตัวเอง (Soft Delete)
+// ผู้ใช้กดลบประวัติแผนการเดินทางของตัวเอง 
 router.put('/my-trips/delete/:id', (req, res) => {
     const tripId = req.params.id;
-    const { user_id } = req.body; 
+    const { user_id } = req.body;
 
     if (!user_id) {
         return res.status(400).json({ error: "ข้อมูลสิทธิ์ผู้ใช้ไม่ครบถ้วน" });
     }
 
-    db.beginTransaction((err) => {
-        if (err) return res.status(500).json({ error: err.message });
+    db.getConnection((connErr, connection) => {
+        if (connErr) {
+            console.error("❌ [Pool Error] Cannot get connection from pool:", connErr);
+            return res.status(500).json({ error: "ไม่สามารถเชื่อมต่อฐานข้อมูลได้ในขณะนี้" });
+        }
 
-        const sqlTrip = "UPDATE Trip SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ? AND user_id = ?";
-        const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ?";
-
-        db.query(sqlTrip, [tripId, user_id], (err, result) => {
-            if (err) {
-                console.error("❌ [SQL Error] Trip table update failed:", err.message);
-                return db.rollback(() => res.status(500).json({ error: err.message }));
-            }
-            
-            if (result.affectedRows === 0) {
-                return db.rollback(() => res.status(404).json({ error: "ไม่พบข้อมูลแผนการเดินทาง หรือคุณไม่มีสิทธิ์เข้าถึง" }));
+        connection.beginTransaction((transactionErr) => {
+            if (transactionErr) {
+                console.error("❌ [Transaction Error] Init Failed:", transactionErr);
+                connection.release();
+                return res.status(500).json({ error: "ไม่สามารถเริ่มบันทึกธุรกรรมฐานข้อมูลได้" });
             }
 
-            db.query(sqlDetail, [Number(tripId)], (detailErr) => {
-                if (detailErr) {
-                    console.error("❌ [SQL Error] Trip_Detail table update failed:", detailErr.message);
-                    return db.rollback(() => res.status(500).json({ error: detailErr.message }));
+            const sqlTrip = "UPDATE Trip SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ? AND user_id = ?";
+            const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ?";
+
+            connection.query(sqlTrip, [tripId, user_id], (tripErr, result) => {
+                if (tripErr) {
+                    console.error("❌ [SQL Error] Trip table update failed:", tripErr.message);
+                    return connection.rollback(() => {
+                        connection.release();
+                        res.status(500).json({ error: "บันทึกข้อมูลหลักทริปไม่สำเร็จ", details: tripErr.message });
+                    });
                 }
 
-                db.commit((commitErr) => {
-                    if (commitErr) {
-                        console.error("❌ [Transaction Error] Commit failed:", commitErr.message);
-                        return db.rollback(() => res.status(500).json({ error: commitErr.message }));
+                if (result.affectedRows === 0) {
+                    return connection.rollback(() => {
+                        connection.release();
+                        res.status(404).json({ error: "ไม่พบข้อมูลแผนการเดินทาง หรือคุณไม่มีสิทธิ์เข้าถึง" });
+                    });
+                }
+
+                connection.query(sqlDetail, [Number(tripId)], (detailErr) => {
+                    if (detailErr) {
+                        console.error("❌ [SQL Error] Trip_Detail table update failed:", detailErr.message);
+                        return connection.rollback(() => {
+                            connection.release();
+                            res.status(500).json({ error: "รูปแบบข้อมูลรายละเอียดขัดแย้งกับฐานข้อมูล", details: detailErr.message });
+                        });
                     }
-                    console.log(`🎉 [Success] Soft delete trip id: ${tripId} successfully`);
-                    res.json({ success: true, message: "ลบประวัติการเดินทางเรียบร้อยแล้ว" });
+
+                    connection.commit((commitErr) => {
+                        if (commitErr) {
+                            console.error("❌ [Transaction Error] Commit failed:", commitErr.message);
+                            return connection.rollback(() => {
+                                connection.release();
+                                res.status(500).json({ error: "ยืนยันบันทึกข้อมูลธุรกรรมทริปล้มเหลว" });
+                            });
+                        }
+
+                        connection.release();
+                        console.log(`🎉 [Success] Soft delete trip id: ${tripId} completely.`);
+                        res.json({ success: true, message: "ลบประวัติการเดินทางเรียบร้อยแล้ว" });
+                    });
                 });
             });
         });
