@@ -451,6 +451,7 @@
 
             if (btnCreateTrip) {
                 btnCreateTrip.addEventListener('click', async () => {
+                    const user = getCurrentUser(); 
                     const userId = user.user_id || user.id;
 
                     if (!userId) {
@@ -458,24 +459,26 @@
                         return;
                     }
 
+                    const now = new Date();
+
+                    now.setMinutes(now.getMinutes() + 15);
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const currentTimeString = `${hours}:${minutes}`; 
+
+                    const todayString = now.toISOString().split('T')[0];
+                    const isToday = (tripDateInput.value === todayString);
+
                     btnCreateTrip.disabled = true;
                     btnCreateTrip.innerText = "กำลังสร้างแผนการเดินทาง...";
                     btnCreateTrip.style.backgroundColor = '#B1A396';
                     btnCreateTrip.style.cursor = 'not-allowed';
 
-                    now.setMinutes(now.getMinutes() + 15); 
-                    const hours = String(now.getHours()).padStart(2, '0');
-                    const minutes = String(now.getMinutes()).padStart(2, '0');
-                    const currentTimeString = `${hours}:${minutes}`;
-
-                    const todayString = now.toISOString().split('T')[0];
-                    const isToday = (tripDateInput.value === todayString);
-
                     const tripData = {
                         user_id: userId,
                         trip_name: tripNameInput.value.trim(),
                         trip_date: tripDateInput.value,
-                        start_time: isToday ? currentTimeString : "08:30", 
+                        start_time: isToday ? currentTimeString : null,
                         locations: selectedPlaces
                     };
 
@@ -519,7 +522,7 @@
                 });
             }
         }
-
+        
         window.addEventListener('click', function (event) {
             const modal = document.getElementById('custom-alert');
 
