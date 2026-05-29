@@ -188,17 +188,27 @@ router.put('/my-trips/delete/:id', (req, res) => {
         const sqlDetail = "UPDATE Trip_Detail SET is_deleted = 1, deleted_at = NOW() WHERE trip_id = ?";
 
         db.query(sqlTrip, [tripId, user_id], (err, result) => {
-            if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+            if (err) {
+                console.error("❌ [SQL Error] Trip table update failed:", err.message);
+                return db.rollback(() => res.status(500).json({ error: err.message }));
+            }
             
             if (result.affectedRows === 0) {
                 return db.rollback(() => res.status(404).json({ error: "ไม่พบข้อมูลแผนการเดินทาง หรือคุณไม่มีสิทธิ์เข้าถึง" }));
             }
 
-            db.query(sqlDetail, [tripId], (err) => {
-                if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+            db.query(sqlDetail, [Number(tripId)], (detailErr) => {
+                if (detailErr) {
+                    console.error("❌ [SQL Error] Trip_Detail table update failed:", detailErr.message);
+                    return db.rollback(() => res.status(500).json({ error: detailErr.message }));
+                }
 
-                db.commit((err) => {
-                    if (err) return db.rollback(() => res.status(500).json({ error: err.message }));
+                db.commit((commitErr) => {
+                    if (commitErr) {
+                        console.error("❌ [Transaction Error] Commit failed:", commitErr.message);
+                        return db.rollback(() => res.status(500).json({ error: commitErr.message }));
+                    }
+                    console.log(`🎉 [Success] Soft delete trip id: ${tripId} successfully`);
                     res.json({ success: true, message: "ลบประวัติการเดินทางเรียบร้อยแล้ว" });
                 });
             });
