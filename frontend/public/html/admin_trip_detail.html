@@ -136,7 +136,7 @@
 
         async function fetchTripDetails() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/my-trips/details`, {
+                const res = await fetch(`${API_BASE_URL}/api/details`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${adminToken}`,
@@ -174,7 +174,7 @@
         }
 
         async function loadDashboard() {
-            const res = await fetch(`${API_BASE_URL}/api/my-trips/stats`, {
+            const res = await fetch(`${API_BASE_URL}/api/stats`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${adminToken}`,
