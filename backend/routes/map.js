@@ -211,9 +211,9 @@ function timeToSeconds(time) {
 
 // Route สำหรับสร้างทริปใหม่่
 router.post('/create-trip', async (req, res) => {
-    const { user_id, trip_name, trip_date, locations } = req.body;
-    
-    console.log("📥 [Incoming Request] Data received:", { user_id, trip_name, trip_date, locations });
+    const { user_id, trip_name, trip_date, locations, start_time } = req.body;
+
+    console.log("📥 [Incoming Request] Data received:", { user_id, trip_name, trip_date, locations, start_time });
 
     if (!user_id) return res.status(400).json({ error: "ไม่พบรหัสผู้ใช้งาน (user_id)" });
     if (!locations || locations.length === 0) return res.status(400).json({ error: "กรุณาเลือกสถานที่อย่างน้อย 1 แห่ง" });
@@ -250,21 +250,28 @@ router.post('/create-trip', async (req, res) => {
                 const selectedDate = new Date(trip_date);
                 let startDateTime = new Date(trip_date);
 
-                const firstLocId = optimizedLocations[0].location_id;
-                const firstLoc = infoMap[firstLocId];
+                // คำนวณจุดเวลาเริ่มต้นของทริป
+                if (start_time) {
+                    const [startH, startM] = start_time.split(':');
+                    startDateTime.setHours(parseInt(startH), parseInt(startM), 0, 0);
+                } else {
+                    const firstLocId = optimizedLocations[0].location_id;
+                    const firstLoc = infoMap[firstLocId];
 
-                if (!firstLoc) {
-                    console.error("❌ [Data Error] First Location Data Missing in infoMap!");
-                    return res.status(500).json({ error: "ไม่พบข้อมูลรายละเอียดของสถานที่แห่งแรก" });
+                    if (!firstLoc) {
+                        console.error("❌ [Data Error] First Location Data Missing in infoMap!");
+                        return res.status(500).json({ error: "ไม่พบข้อมูลรายละเอียดของสถานที่แห่งแรก" });
+                    }
+
+                    const openingTimeStr = String(firstLoc.opening_time);
+                    const [openH, openM] = openingTimeStr.split(':');
+
+                    const hours = parseInt(openH) || 9;
+                    const minutes = parseInt(openM) || 0;
+                    startDateTime.setHours(hours, minutes + 30, 0);
                 }
 
-                const openingTimeStr = String(firstLoc.opening_time);
-                const [openH, openM] = openingTimeStr.split(':');
-
-                const hours = parseInt(openH) || 9;
-                const minutes = parseInt(openM) || 0;
-                startDateTime.setHours(hours, minutes + 30, 0);
-
+                // ตรวจสอบความปลอดภัย: หากเป็นแผนเดินทางวันนี้ แล้วจุดเวลาดันน้อยกว่าเวลาปัจจุบันจริง ให้ปรับมาใช้เวลาปัจจุบัน + 10 นาทีเพื่อความเหมาะสม
                 if (selectedDate.toDateString() === now.toDateString()) {
                     if (now > startDateTime) {
                         startDateTime = new Date(now.getTime() + 10 * 60000);
