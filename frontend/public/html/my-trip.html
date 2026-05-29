@@ -171,7 +171,7 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const response = await fetch(`${API_BASE_URL}/api/trips/my-trips/delete/${tripId}`, {
+                        const response = await fetch(`${API_BASE_URL}/api/my-trips/delete/${tripId}`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ user_id: userId })
