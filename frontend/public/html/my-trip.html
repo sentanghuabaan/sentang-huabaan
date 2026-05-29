@@ -103,14 +103,14 @@
 
                             <div class="timeline-container">
                                 ${trip.locations.map((loc, index) => {
-                                    let srcUrl = "";
-                                    if (loc.image) {
-                                        srcUrl = loc.image.trim().startsWith('http')
-                                            ? loc.image.trim()
-                                            : `${API_BASE_URL}/${loc.image.trim()}`;
-                                    }
+                        let srcUrl = "";
+                        if (loc.image) {
+                            srcUrl = loc.image.trim().startsWith('http')
+                                ? loc.image.trim()
+                                : `${API_BASE_URL}/${loc.image.trim()}`;
+                        }
 
-                                    return `
+                        return `
                                         <div class="timeline-item">
                                             <div class="time-column">
                                                 <span class="time-text">${loc.time ? loc.time.substring(0, 5) : '--:--'}</span>
@@ -128,7 +128,7 @@
                                             </div>
                                         </div>
                                     `;
-                                }).join('')}
+                    }).join('')}
                             </div>
 
                             <div class="trip-card-footer">
@@ -158,7 +158,7 @@
                 html: 'ประวัติแผนการเดินทางนี้จะถูกลบออกจากบัญชีของคุณ<small style="color: #888;"></small>',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#BF7E46', 
+                confirmButtonColor: '#BF7E46',
                 cancelButtonColor: '#7f8c8d',
                 confirmButtonText: 'ตกลง',
                 cancelButtonText: 'ยกเลิก',
@@ -177,7 +177,16 @@
                             body: JSON.stringify({ user_id: userId })
                         });
 
-                        const resData = await response.json();
+                        let resData = {};
+                        const contentType = response.headers.get("content-type");
+
+                        if (contentType && contentType.includes("application/json")) {
+                            resData = await response.json();
+                        } else {
+                            const textError = await response.text();
+                            console.error("❌ Backend Response non-JSON:", textError);
+                            throw new Error(textError || "เซิร์ฟเวอร์ตอบกลับมาด้วยรูปแบบข้อมูลที่ไม่ถูกต้อง");
+                        }
 
                         if (response.ok) {
                             Swal.fire({
@@ -197,7 +206,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'เกิดข้อผิดพลาด',
-                                text: resData.message || 'ไม่สามารถทำรายการลบทริปได้ในขณะนี้',
+                                text: resData.message || resData.error || 'ไม่สามารถทำรายการลบทริปได้ในขณะนี้',
                                 confirmButtonColor: '#d9534f',
                                 background: '#FBEDD6',
                                 color: '#5C4033'
@@ -208,7 +217,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'เชื่อมต่อล้มเหลว',
-                            text: 'เกิดปัญหาติดต่อประสานงานทางเทคนิคกับตัวเซิร์ฟเวอร์ฐานข้อมูลหลังบ้าน',
+                            text: err.message || 'เกิดปัญหาติดต่อประสานงานทางเทคนิคกับตัวเซิร์ฟเวอร์ฐานข้อมูลหลังบ้าน',
                             confirmButtonColor: '#d9534f',
                             background: '#FBEDD6',
                             color: '#5C4033'
