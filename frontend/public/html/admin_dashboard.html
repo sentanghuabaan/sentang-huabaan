@@ -615,6 +615,7 @@
             window.arChartInst = null;
         }
 
+
         async function renderARChart(queryParams = '') {
             try {
                 const res = await fetch(`${API_BASE_URL}/api/ar-engagement${queryParams}`, {
@@ -626,7 +627,6 @@
                 const totalViews = values.reduce((a, b) => a + b, 0);
                 const insightText = document.getElementById('ar-insight-text');
 
-                // หากกลุ่มที่เลือกไม่มีสถานที่ไหนทำ AR ไว้เลย ให้เคลียร์กราฟและแสดงข้อความแจ้งเตือน
                 if (!data || values.length === 0 || totalViews === 0) {
                     insightText.innerText = "ยังไม่มีข้อมูลการเข้าชมคอนเทนต์ AR ในหมวดหมู่นี้";
                     if (window.arChartInst) {
@@ -644,39 +644,60 @@
                 const topViews = values[0] || 0;
                 const percentage = ((topViews / totalViews) * 100).toFixed(1);
 
-                // แสดงข้อความสรุปตามกลุ่มที่เลือก
                 insightText.innerHTML = `ในหมวดหมู่นี้ สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของกลุ่มนี้)`;
 
-                // ทำลายกราฟวงกลมตัวเก่าก่อนวาดใหม่
                 if (window.arChartInst) {
                     window.arChartInst.destroy();
                 }
 
-                const locationColors = {
-                    "Grandma's House": '#9966FF', 'Rest & Roll Cafe': '#AC92EC',
-                    'Thursday Espresso Prachuab': '#5D9CEC', 'ก๋วยเตี๋ยว 9 บาท': '#87ceeb',
-                    'คำโฮม': '#4BC0C0', 'ผัดไทยหัวบ้าน': '#49d87b',
-                    'พิพิธภัณฑ์บ้านอาจารย์ไก่': '#FF9F40', 'ศรีเสนาะคาเฟ่': '#FFCE56',
-                    'ศาลเจ้าพ่อหลักเมือง': '#f2ffb1', 'ศาลเล่าปุงเท้ากงม่า': '#FF6384',
-                    'สุดา คาเฟ่': '#EC87C0', 'หน้าหม้อ Coffee': '#B1A396'
-                };
+                const barColors = [
+                    '#4BC0C0', '#FF6384', '#FFCE56', '#f67bb2', '#2b87c4',
+                    '#f68c21', '#AC92EC', '#71afff', '#49d87b', '#B1A396'
+                ];
 
                 window.arChartInst = new Chart(ctx, {
-                    type: 'pie',
+                    type: 'bar',
                     data: {
                         labels: data.labels,
                         datasets: [{
+                            label: 'ยอดการเข้าชม AR (ครั้ง)',
                             data: values,
-                            backgroundColor: data.labels.map(label => locationColors[label] || '#CCCCCC'),
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
+                            backgroundColor: barColors.slice(0, data.labels.length),
+                            borderWidth: 1,
+                            borderRadius: 4
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: {
+                                left: 25,
+                                right: 25,
+                                top: 10,
+                                bottom: 0
+                            }
+                        },
                         plugins: {
-                            legend: { position: 'bottom', labels: { font: { family: 'Noto Serif Thai' } } }
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { precision: 0 }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { family: 'Noto Serif Thai', size: 11 },
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
                         }
                     }
                 });

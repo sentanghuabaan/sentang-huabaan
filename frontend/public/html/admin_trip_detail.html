@@ -189,6 +189,14 @@
 
             const totalLocationsInCommunity = 17;
 
+            const tripColorsPalette = [
+                '#BF7E46',
+                '#D4A373', 
+                '#E9D8A6', 
+                '#BB9457', 
+                '#9A7B56' 
+            ];
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -196,31 +204,40 @@
                     datasets: [{
                         label: 'ยอดฮิต',
                         data: data.map(d => d.usage_count),
-                        backgroundColor: '#D4A373',
+                        backgroundColor: data.map((_, index) => tripColorsPalette[index % tripColorsPalette.length]),
                         borderRadius: 10,
                         barThickness: 40
                     }]
                 },
                 options: {
                     responsive: true,
+                    layout: {
+                        padding: {
+                            left: 30,
+                            right: 30,
+                            top: 10,
+                            bottom: 10
+                        }
+                    },
                     plugins: {
                         title: {
                             display: true,
                             text: '🏆 5 สถานที่ท่องเที่ยวที่ได้รับความนิยมสูงสุดในทริปผู้ใช้งาน',
                             color: '#BF7E46',
-                            font: { size: 16, family: "'Noto Serif Thai', serif" },
+                            font: { size: 16, family: "'Noto Serif Thai', serif", weight: 'bold' },
                             padding: { bottom: 20 }
                         },
                         legend: { display: false }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'ชื่อสถานที่ท่องเที่ยว', font: { weight: 'bold' }, color: '#50AEE3' }
+                            title: { display: true, text: 'ชื่อสถานที่ท่องเที่ยว', font: { family: "'Noto Serif Thai', serif", weight: 'bold' }, color: '#50AEE3' },
+                            ticks: { font: { family: "'Noto Serif Thai', serif" } }
                         },
                         y: {
-                            title: { display: true, text: 'จำนวนครั้งที่ถูกเลือกในทริป', font: { weight: 'bold' }, color: '#50AEE3' },
+                            title: { display: true, text: 'จำนวนครั้งที่ถูกเลือกในทริป', font: { family: "'Noto Serif Thai', serif", weight: 'bold' }, color: '#50AEE3' },
                             beginAtZero: true,
-                            ticks: { stepSize: 1 }
+                            ticks: { stepSize: 1, font: { family: "'Noto Serif Thai', serif" } }
                         }
                     }
                 }
