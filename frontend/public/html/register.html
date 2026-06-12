@@ -29,15 +29,15 @@
 
         <form id="registerForm" class="login-form" autocomplete="off">
             <div class="input-group">
-                <input type="text" id="username" placeholder="ชื่อบัญชี" required>
+                <input type="email" id="email" placeholder="อีเมลของคุณ" required>
             </div>
 
             <div class="input-group">
-                <input type="email" id="email" placeholder="อีเมล" required>
+                <input type="text" id="username" placeholder="ชื่อบัญชี (Username)" required>
             </div>
 
             <div class="input-group password-group">
-                <input type="password" id="password" placeholder="รหัสผ่าน" required>
+                <input type="password" id="password" placeholder="ตั้งรหัสผ่านสำหรับบัญชีนี้" required>
                 <button type="button" class="toggle-password" onclick="togglePassword()">
                     <iconify-icon icon="el:eye-close" id="eyeIcon"></iconify-icon>
                 </button>
