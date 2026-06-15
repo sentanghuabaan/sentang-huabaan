@@ -223,7 +223,10 @@
 
                         <div class="chart-box">
                             <div class="chart-header">
-                                <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
+                                <div class="chart-header-title-group">
+                                    <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
+                                    <span class="ar-accumulated-notice">*แสดงยอดเข้าชมสะสมรวมทั้งหมด (ไม่ขึ้นกับตัวกรองวันที่)</span>
+                                </div>
                                 <select id="ar-category" class="month-dropdown" onchange="onCategoryOrFilterChange()">
                                     <option value="all" selected>ทั้งหมดทุกประเภท</option>
                                     <option value="ร้านอาหาร">กลุ่มร้านอาหาร</option>
@@ -515,7 +518,7 @@
                 const topViews = values[0] || 0;
                 const percentage = ((topViews / totalViews) * 100).toFixed(1);
 
-                insightText.innerHTML = `ในหมวดหมู่นี้ สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของกลุ่มนี้)`;
+                insightText.innerHTML = `ภาพรวมสะสม: ในหมวดหมู่นี้ สถานที่ที่มีการเข้าชม AR สูงสุดคือ <strong>${topLocation}</strong> จำนวน <strong>${topViews.toLocaleString()}</strong> ครั้ง (คิดเป็น ${percentage}% ของกลุ่มนี้)`;
 
                 if (window.arChartInst) { window.arChartInst.destroy(); }
 
