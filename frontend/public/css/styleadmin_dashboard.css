@@ -61,6 +61,110 @@
     color: #333;
 }
 
+/* กล่องกรองข้อมูลวันที่อิงตามช่วงเวลา */
+
+.date-filter-row {
+    background: #FDFBF7; 
+    border: 2px solid #BF7E46; 
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(191, 126, 70, 0.08);
+}
+
+.filter-inputs-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-label {
+    font-weight: bold;
+    color: #5D4037;
+    font-family: 'Noto Serif Thai', serif;
+}
+
+.date-filter-row input[type="date"] {
+    border: 1px solid #BF7E46;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-family: 'Noto Serif Thai', serif;
+    color: #5D4037;
+    outline: none;
+    background-color: #fff;
+    transition: all 0.3s;
+}
+
+.date-filter-row input[type="date"]:focus {
+    box-shadow: 0 0 0 3px rgba(191, 126, 70, 0.2);
+    border-color: #A06533;
+}
+
+.filter-action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-submit-btn {
+    background: #BF7E46;
+    color: white;
+    border: none;
+    padding: 7px 20px;
+    border-radius: 8px;
+    font-family: 'Noto Serif Thai', serif;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-submit-btn:hover {
+    background: #A06533;
+    transform: translateY(-1px);
+}
+
+.filter-reset-btn {
+    background: #e0dcd5;
+    color: #5D4037;
+    border: none;
+    padding: 7px 15px;
+    border-radius: 8px;
+    font-family: 'Noto Serif Thai', serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-reset-btn:hover {
+    background: #d2cbc2;
+}
+
+#filter-status-badge {
+    background: rgba(191, 126, 70, 0.1);
+    color: #BF7E46;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    font-family: 'Noto Serif Thai', serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+}
+
+.accumulated-hint {
+    display: block;
+    color: #a19a93;
+    font-size: 11px;
+    margin-top: 2px;
+    font-style: italic;
+}
+
 /* Stats Cards */
 .stats-grid {
     display: grid;

@@ -86,18 +86,31 @@
                             <p>ยินดีต้อนรับ, แอดมิน</p>
                         </div>
                         <div class="quick-actions">
-                            <div class="date-filter-box">
-                                <input type="date" id="start-date-input">
-                                <span>ถึง</span>
-                                <input type="date" id="end-date-input">
-                                <button class="filter-submit-btn" onclick="triggerFilter()">กรอง</button>
-                            </div>
                             <button onclick="window.location.href='admin_location.html'" class="btn-quick add-loc">
                                 <iconify-icon icon="ic:baseline-add-location"></iconify-icon> เพิ่มสถานที่
                             </button>
                             <button onclick="window.location.href='admin_activity.html'" class="btn-quick add-act">
                                 <iconify-icon icon="fluent:calendar-add-24-filled"></iconify-icon> เพิ่มกิจกรรม
                             </button>
+                        </div>
+                    </div>
+
+                    <div class="date-filter-row">
+                        <div class="filter-inputs-group">
+                            <iconify-icon icon="solar:calendar-date-bold" style="font-size: 24px; color: #BF7E46; vertical-align: middle;"></iconify-icon>
+                            <span class="filter-label">เรียกดูรายงานตามช่วงเวลา:</span>
+                            <input type="date" id="start-date-input">
+                            <span class="filter-label">ถึง</span>
+                            <input type="date" id="end-date-input">
+                            <div class="filter-action-btns">
+                                <button class="filter-submit-btn" onclick="triggerFilter()">เรียกดูข้อมูล</button>
+                                <button class="filter-reset-btn" onclick="clearDateFilter()">รีเซ็ต</button>
+                            </div>
+                        </div>
+                        
+                        <div id="filter-status-badge">
+                            <iconify-icon icon="mdi:eye"></iconify-icon>
+                            <span id="badge-text">ข้อมูลปัจจุบัน: สรุปภาพรวมสะสมทั้งหมด</span>
                         </div>
                     </div>
 
@@ -114,35 +127,63 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon user"><iconify-icon icon="basil:user-solid"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-users">0</h3><p>ผู้ใช้งานทั้งหมด</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-users">0</h3>
+                            <p>ผู้ใช้งานทั้งหมด</p>
+                            <small class="accumulated-hint">*ยอดสะสมทั้งหมด</small>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon location"><iconify-icon icon="ion:location-sharp"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-locations">0</h3><p>สถานที่ทั้งหมดในชุมชน</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-locations">0</h3>
+                            <p>สถานที่ทั้งหมดในชุมชน</p>
+                            <small class="accumulated-hint">*ยอดสะสมทั้งหมด</small>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon activity"><iconify-icon icon="lets-icons:date-fill"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-activities">0</h3><p>กิจกรรมชุมชน</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-activities">0</h3>
+                            <p>กิจกรรมชุมชน</p>
+                            <small class="accumulated-hint">*ยอดสะสมทั้งหมด</small>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon trip"><iconify-icon icon="mdi:map-marker-path"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-trips">0</h3><p>ทริปที่ถูกสร้าง</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-trips">0</h3>
+                            <p>ทริปที่ถูกสร้าง</p>
+                            </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon review"><iconify-icon icon="material-symbols:rate-review"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-reviews">0</h3><p>รีวิวจากนักท่องเที่ยว</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-reviews">0</h3>
+                            <p>รีวิวจากนักท่องเที่ยว</p>
+                            </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon ar-view"><iconify-icon icon="tdesign:view-in-ar-filled"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="count-ar-views">0</h3><p>ยอดเข้าชม AR รวม</p></div>
+                        <div class="stat-details">
+                            <h3 id="count-ar-views">0</h3>
+                            <p>ยอดเข้าชม AR รวม</p>
+                            <small class="accumulated-hint">*ยอดสะสมทั้งหมด</small>
+                        </div>
                     </div>
                     <div class="stat-card ad-clickable" onclick="window.location.href='admin_banners.html'">
                         <div class="stat-icon banner-pending"><iconify-icon icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="stat-pending-ads">0</h3><p>โฆษณาที่รออนุมัติ <small class="click-hint">คลิกเพื่อไปตรวจสอบ ↗</small></p></div>
+                        <div class="stat-details">
+                            <h3 id="stat-pending-ads">0</h3>
+                            <p>โฆษณาที่รออนุมัติ <small class="click-hint">คลิกเพื่อไปตรวจสอบ ↗</small></p>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon user-banned"><iconify-icon icon="mdi:account-cancel"></iconify-icon></div>
-                        <div class="stat-details"><h3 id="stat-banned-users">0</h3><p>ผู้ใช้ที่ถูกแบนทั้งหมด</p></div>
+                        <div class="stat-details">
+                            <h3 id="stat-banned-users">0</h3>
+                            <p>ผู้ใช้ที่ถูกแบนทั้งหมด</p>
+                        </div>
                     </div>
                 </div>
 
@@ -265,19 +306,44 @@
         function triggerFilter() {
             const start = document.getElementById('start-date-input').value;
             const end = document.getElementById('end-date-input').value;
+            const statusBadge = document.getElementById('filter-status-badge');
+            const badgeText = document.getElementById('badge-text');
 
             if ((start && !end) || (!start && end)) {
                 Swal.fire('แจ้งเตือน', 'กรุณาระบุข้อมูลช่วงวันที่ให้ครบถ้วนทั้งสองช่อง', 'warning');
                 return;
             }
 
-            // จัดการส่ง String ในรูปแบบ Query Parameter สำเร็จรูป
             if (start && end) {
                 dateParams = `?startDate=${start}&endDate=${end}`;
+                
+                const startFormatted = formatDateThai(start);
+                const endFormatted = formatDateThai(end);
+                
+                badgeText.innerText = `กำลังกรองช่วงเวลา: ${startFormatted} - ${endFormatted}`;
+                statusBadge.style.background = "#E8F5E9";
+                statusBadge.style.color = "#2E7D32";
             } else {
                 dateParams = "";
+                badgeText.innerText = "ข้อมูลปัจจุบัน: สรุปภาพรวมสะสมทั้งหมด";
+                statusBadge.style.background = "rgba(191, 126, 70, 0.1)";
+                statusBadge.style.color = "#BF7E46";
             }
             loadAllDashboardData();
+        }
+
+        // ฟังก์ชันเมื่อแอดมินกดรีเซ็ตตัวกรองเวลา
+        function clearDateFilter() {
+            document.getElementById('start-date-input').value = "";
+            document.getElementById('end-date-input').value = "";
+            triggerFilter();
+        }
+
+        // ฟังก์ชันจัดรูปแบบการแสดงผลวันที่
+        function formatDateThai(dateString) {
+            const parts = dateString.split('-');
+            if(parts.length !== 3) return dateString;
+            return `${parts[2]}/${parts[1]}/${parseInt(parts[0])}`;
         }
 
         function onCategoryOrFilterChange() {
