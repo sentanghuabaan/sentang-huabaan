@@ -86,9 +86,12 @@
             </div>
 
             <div class="stats-container">
-                <canvas id="tripChart" height="100"></canvas>
+                <div style="position: relative; width: 100%; height: 260px;">
+                    <canvas id="tripChart"></canvas>
+                </div>
+
                 <div id="dashboard-summary" class="summary-box"
-                    style="margin-top: 20px; padding: 20px; background: #fdfaf6; border-left: 5px solid #BF7E46; border-radius: 8px;">
+                    style="margin-top: 0px; padding: 20px; background: #fdfaf6; border-left: 5px solid #BF7E46; border-radius: 8px;">
                     <h3 style="color: #BF7E46; margin-top: 0;">สรุปภาพรวมสถานที่ท่องเที่ยว</h3>
                     <p id="summary-text">กำลังโหลดข้อมูลสรุป...</p>
                 </div>
@@ -190,11 +193,11 @@
             const totalLocationsInCommunity = 17;
 
             const tripColorsPalette = [
-                '#BF7E46',
-                '#D4A373', 
-                '#E9D8A6', 
-                '#BB9457', 
-                '#9A7B56' 
+                '#C96F43',
+                '#D4A373',
+                '#3E5F7A',
+                '#4CA1A3',
+                '#A3B18A'
             ];
 
             new Chart(ctx, {
@@ -211,11 +214,12 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     layout: {
                         padding: {
                             left: 30,
                             right: 30,
-                            top: 10,
+                            top: 20,
                             bottom: 10
                         }
                     },
@@ -227,21 +231,36 @@
                             font: { size: 16, family: "'Noto Serif Thai', serif", weight: 'bold' },
                             padding: { bottom: 20 }
                         },
+                        subtitle: {
+                            display: true,
+                            text: 'หน่วย: จำนวนครั้งที่ถูกเลือกในทริป (ครั้ง)',
+                            color: '#50AEE3',
+                            font: { family: "'Noto Serif Thai', serif", size: 12, weight: 'bold' },
+                            align: 'start',
+                            padding: { bottom: 10 }
+                        },
                         legend: { display: false }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'ชื่อสถานที่ท่องเที่ยว', font: { family: "'Noto Serif Thai', serif", weight: 'bold' }, color: '#50AEE3' },
+                            title: {
+                                display: true,
+                                text: 'ชื่อสถานที่ท่องเที่ยว',
+                                font: { family: "'Noto Serif Thai', serif", weight: 'bold', size: 12 },
+                                color: '#50AEE3',
+                                padding: { top: 15 }
+                            },
                             ticks: { font: { family: "'Noto Serif Thai', serif" } }
                         },
                         y: {
-                            title: { display: true, text: 'จำนวนครั้งที่ถูกเลือกในทริป', font: { family: "'Noto Serif Thai', serif", weight: 'bold' }, color: '#50AEE3' },
+                            title: { display: false },
                             beginAtZero: true,
                             ticks: { stepSize: 1, font: { family: "'Noto Serif Thai', serif" } }
                         }
                     }
                 }
             });
+
             const topLocation = data[0];
             const summaryText = document.getElementById('summary-text');
 

@@ -22,6 +22,7 @@
             border: 1px solid #e0dcd5;
             margin-right: 10px;
         }
+
         .date-filter-box input[type="date"] {
             border: 1px solid #ccc;
             border-radius: 6px;
@@ -29,6 +30,7 @@
             font-family: 'Noto Serif Thai', serif;
             font-size: 13px;
         }
+
         .filter-submit-btn {
             background: #BF7E46;
             color: #fff;
@@ -39,7 +41,10 @@
             font-family: 'Noto Serif Thai', serif;
             font-size: 13px;
         }
-        .filter-submit-btn:hover { background: #A06533; }
+
+        .filter-submit-btn:hover {
+            background: #A06533;
+        }
     </style>
 </head>
 
@@ -48,26 +53,46 @@
         <aside class="sidebar">
             <div class="logo-section"><img src="../image/logohuabaan2.png" class="admin-logo"></div>
             <nav class="menu">
-                <a href="admin_dashboard.html" class="menu-item active"><iconify-icon icon="mage:dashboard-fill" class="menu-icon"></iconify-icon> Dashboard</a>
-                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid" class="menu-icon"></iconify-icon> User</a>
-                <a href="admin_otp.html" class="menu-item"><iconify-icon icon="teenyicons:otp-solid" class="menu-icon"></iconify-icon> OTP</a>
-                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp" class="menu-icon"></iconify-icon> Location</a>
-                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location" class="menu-icon"></iconify-icon> Location Images</a>
-                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill" class="menu-icon"></iconify-icon> Activity</a>
-                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode" class="menu-icon"></iconify-icon> Activity Images</a>
-                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history" class="menu-icon"></iconify-icon> History</a>
-                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic" class="menu-icon"></iconify-icon> History Gallery</a>
-                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled" class="menu-icon"></iconify-icon> AR Content</a>
-                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
-                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units" class="menu-icon"></iconify-icon> Banner Ads</a>
-                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review" class="menu-icon"></iconify-icon> Review</a>
-                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius" class="menu-icon"></iconify-icon> Map</a>
-                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline" class="menu-icon"></iconify-icon> Travel Route</a>
-                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path" class="menu-icon"></iconify-icon> Trips</a>
-                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
-                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report" class="menu-icon"></iconify-icon> Report</a>
-                <a href="admin_activity_logs.html" class="menu-item"><iconify-icon icon="mdi:note-edit" class="menu-icon"></iconify-icon> Activity Logs</a>
-                <a href="admin_trash.html" class="menu-item trash-menu"><iconify-icon icon="mdi:trash-can" class="menu-icon"></iconify-icon> Trash</a>
+                <a href="admin_dashboard.html" class="menu-item active"><iconify-icon icon="mage:dashboard-fill"
+                        class="menu-icon"></iconify-icon> Dashboard</a>
+                <a href="admin_user.html" class="menu-item"><iconify-icon icon="basil:user-solid"
+                        class="menu-icon"></iconify-icon> User</a>
+                <a href="admin_otp.html" class="menu-item"><iconify-icon icon="teenyicons:otp-solid"
+                        class="menu-icon"></iconify-icon> OTP</a>
+                <a href="admin_location.html" class="menu-item"><iconify-icon icon="ion:location-sharp"
+                        class="menu-icon"></iconify-icon> Location</a>
+                <a href="admin_location_images.html" class="menu-item"><iconify-icon icon="mdi:image-location"
+                        class="menu-icon"></iconify-icon> Location Images</a>
+                <a href="admin_activity.html" class="menu-item"><iconify-icon icon="lets-icons:date-fill"
+                        class="menu-icon"></iconify-icon> Activity</a>
+                <a href="admin_activity_images.html" class="menu-item"><iconify-icon icon="material-symbols:imagesmode"
+                        class="menu-icon"></iconify-icon> Activity Images</a>
+                <a href="admin_history.html" class="menu-item"><iconify-icon icon="mdi:history"
+                        class="menu-icon"></iconify-icon> History</a>
+                <a href="admin_history_gallery.html" class="menu-item"><iconify-icon icon="material-symbols:topic"
+                        class="menu-icon"></iconify-icon> History Gallery</a>
+                <a href="admin_videoar.html" class="menu-item"><iconify-icon icon="tdesign:view-in-ar-filled"
+                        class="menu-icon"></iconify-icon> AR Content</a>
+                <a href="admin_community_gallery.html" class="menu-item"><iconify-icon
+                        icon="fluent:image-copy-28-filled" class="menu-icon"></iconify-icon> Community Gallery</a>
+                <a href="admin_banners.html" class="menu-item"><iconify-icon icon="material-symbols:ad-units"
+                        class="menu-icon"></iconify-icon> Banner Ads</a>
+                <a href="admin_review.html" class="menu-item"><iconify-icon icon="material-symbols:rate-review"
+                        class="menu-icon"></iconify-icon> Review</a>
+                <a href="admin_map.html" class="menu-item"><iconify-icon icon="mdi:map-marker-radius"
+                        class="menu-icon"></iconify-icon> Map</a>
+                <a href="admin_travel_route.html" class="menu-item"><iconify-icon icon="mdi:map-outline"
+                        class="menu-icon"></iconify-icon> Travel Route</a>
+                <a href="admin_trip.html" class="menu-item"><iconify-icon icon="mdi:map-marker-path"
+                        class="menu-icon"></iconify-icon> Trips</a>
+                <a href="admin_trip_detail.html" class="menu-item"><iconify-icon
+                        icon="streamline-ultimate:trip-road-bold" class="menu-icon"></iconify-icon> Trips Details</a>
+                <a href="admin_report.html" class="menu-item"><iconify-icon icon="mdi:report"
+                        class="menu-icon"></iconify-icon> Report</a>
+                <a href="admin_activity_logs.html" class="menu-item"><iconify-icon icon="mdi:note-edit"
+                        class="menu-icon"></iconify-icon> Activity Logs</a>
+                <a href="admin_trash.html" class="menu-item trash-menu"><iconify-icon icon="mdi:trash-can"
+                        class="menu-icon"></iconify-icon> Trash</a>
             </nav>
             <div class="sidebar-footer">
                 <div class="divider"></div>
@@ -97,7 +122,8 @@
 
                     <div class="date-filter-row">
                         <div class="filter-inputs-group">
-                            <iconify-icon icon="solar:calendar-date-bold" style="font-size: 24px; color: #BF7E46; vertical-align: middle;"></iconify-icon>
+                            <iconify-icon icon="solar:calendar-date-bold"
+                                style="font-size: 24px; color: #BF7E46; vertical-align: middle;"></iconify-icon>
                             <span class="filter-label">เรียกดูรายงานตามช่วงเวลา:</span>
                             <input type="date" id="start-date-input">
                             <span class="filter-label">ถึง</span>
@@ -107,7 +133,7 @@
                                 <button class="filter-reset-btn" onclick="clearDateFilter()">รีเซ็ต</button>
                             </div>
                         </div>
-                        
+
                         <div id="filter-status-badge">
                             <iconify-icon icon="mdi:eye"></iconify-icon>
                             <span id="badge-text">ข้อมูลปัจจุบัน: สรุปภาพรวมสะสมทั้งหมด</span>
@@ -118,7 +144,8 @@
                         <iconify-icon icon="mdi:trash-can-alert" style="font-size: 24px;"></iconify-icon>
                         <div class="trash-text">
                             <p><strong>ระบบตรวจพบข้อมูลค้างในถังขยะ!</strong></p>
-                            <span>ขณะนี้มีรายการที่ถูกลบรวมทั้งหมด <strong id="trash-num">0</strong> รายการ จากทุกส่วนของระบบ</span>
+                            <span>ขณะนี้มีรายการที่ถูกลบรวมทั้งหมด <strong id="trash-num">0</strong> รายการ
+                                จากทุกส่วนของระบบ</span>
                         </div>
                         <a href="admin_trash.html" class="btn-go-trash">จัดการถังขยะ</a>
                     </div>
@@ -154,17 +181,19 @@
                         <div class="stat-details">
                             <h3 id="count-trips">0</h3>
                             <p>ทริปที่ถูกสร้าง</p>
-                            </div>
+                        </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon review"><iconify-icon icon="material-symbols:rate-review"></iconify-icon></div>
+                        <div class="stat-icon review"><iconify-icon icon="material-symbols:rate-review"></iconify-icon>
+                        </div>
                         <div class="stat-details">
                             <h3 id="count-reviews">0</h3>
                             <p>รีวิวจากนักท่องเที่ยว</p>
-                            </div>
+                        </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon ar-view"><iconify-icon icon="tdesign:view-in-ar-filled"></iconify-icon></div>
+                        <div class="stat-icon ar-view"><iconify-icon icon="tdesign:view-in-ar-filled"></iconify-icon>
+                        </div>
                         <div class="stat-details">
                             <h3 id="count-ar-views">0</h3>
                             <p>ยอดเข้าชม AR รวม</p>
@@ -172,7 +201,9 @@
                         </div>
                     </div>
                     <div class="stat-card ad-clickable" onclick="window.location.href='admin_banners.html'">
-                        <div class="stat-icon banner-pending"><iconify-icon icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon></div>
+                        <div class="stat-icon banner-pending"><iconify-icon
+                                icon="streamline-ultimate:shopping-broadcast-advertising-monitor-megaphone-bold"></iconify-icon>
+                        </div>
                         <div class="stat-details">
                             <h3 id="stat-pending-ads">0</h3>
                             <p>โฆษณาที่รออนุมัติ <small class="click-hint">คลิกเพื่อไปตรวจสอบ ↗</small></p>
@@ -192,7 +223,8 @@
                         <div class="chart-box">
                             <div class="chart-header">
                                 <h3>สถิติการเข้าชม (Monthly Visitors) - ปี 2026</h3>
-                                <select id="visitor-range" class="month-dropdown" onchange="changeVisitorRange(this.value)">
+                                <select id="visitor-range" class="month-dropdown"
+                                    onchange="changeVisitorRange(this.value)">
                                     <option value="all" selected>ดูทุกเดือน (ม.ค. - ธ.ค.)</option>
                                     <option value="h1">ครึ่งปีแรก (ม.ค. - มิ.ย.)</option>
                                     <option value="q1">ไตรมาส 1 (ม.ค. - มี.ค.)</option>
@@ -201,15 +233,18 @@
                             </div>
                             <div class="chart-container visitor-chart-size"><canvas id="visitorChart"></canvas></div>
                             <div class="chart-summary">
-                                <select id="month-selector" onchange="updateMonthlySummary()" class="month-dropdown"></select>
-                                <p class="summary-text"><span id="summary-label">รวมการเข้าชม</span>: <strong id="total-view-display">0</strong> คน</p>
+                                <select id="month-selector" onchange="updateMonthlySummary()"
+                                    class="month-dropdown"></select>
+                                <p class="summary-text"><span id="summary-label">รวมการเข้าชม</span>: <strong
+                                        id="total-view-display">0</strong> คน</p>
                             </div>
                         </div>
 
                         <div class="chart-box">
                             <div class="chart-header">
                                 <h3>5 อันดับสถานที่ยอดนิยมจากคะแนนรีวิว</h3>
-                                <select id="popular-category" class="month-dropdown" onchange="onCategoryOrFilterChange()">
+                                <select id="popular-category" class="month-dropdown"
+                                    onchange="onCategoryOrFilterChange()">
                                     <option value="all" selected>ทั้งหมดทุกประเภท</option>
                                     <option value="ร้านอาหาร">กลุ่มร้านอาหาร</option>
                                     <option value="คาเฟ่">กลุ่มคาเฟ่</option>
@@ -218,14 +253,16 @@
                                     <option value="ประวัติศาสตร์">กลุ่มประวัติศาสตร์</option>
                                 </select>
                             </div>
-                            <div class="chart-container popular-chart-size"><canvas id="popularLocationChart"></canvas></div>
+                            <div class="chart-container popular-chart-size"><canvas id="popularLocationChart"></canvas>
+                            </div>
                         </div>
 
                         <div class="chart-box">
                             <div class="chart-header">
                                 <div class="chart-header-title-group">
                                     <h3>สถิติ AR Content Engagement (ยอดเข้าดู)</h3>
-                                    <span class="ar-accumulated-notice">*แสดงยอดเข้าชมสะสมรวมทั้งหมด (ไม่ขึ้นกับตัวกรองวันที่)</span>
+                                    <span class="ar-accumulated-notice">*แสดงยอดเข้าชมสะสมรวมทั้งหมด
+                                        (ไม่ขึ้นกับตัวกรองวันที่)</span>
                                 </div>
                                 <select id="ar-category" class="month-dropdown" onchange="onCategoryOrFilterChange()">
                                     <option value="all" selected>ทั้งหมดทุกประเภท</option>
@@ -243,33 +280,47 @@
                     </div>
 
                     <div class="side-info-section">
-                        <div class="info-card trip-preview-card" onclick="window.location.href='admin_trip_detail.html'">
+                        <div class="info-card trip-preview-card"
+                            onclick="window.location.href='admin_trip_detail.html'">
                             <div class="chart-header trip-preview-header">
-                                <h3><iconify-icon icon="streamline-ultimate:trip-road-bold"></iconify-icon> สถานที่ฮิตในทริป</h3>
+                                <h3><iconify-icon icon="streamline-ultimate:trip-road-bold"></iconify-icon>
+                                    สถานที่ฮิตในทริป</h3>
                                 <span class="badge-hot">HOT</span>
                             </div>
                             <ol id="top-trip-list" class="trip-mini-list">
                                 <li class="trip-loading-text">กำลังโหลดอันดับสถานที่...</li>
                             </ol>
-                            <a href="admin_trip_detail.html" class="view-all trip-view-all">ดูสถิติกราฟและตารางทริปทั้งหมด <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon></a>
+                            <a href="admin_trip_detail.html"
+                                class="view-all trip-view-all">ดูสถิติกราฟและตารางทริปทั้งหมด <iconify-icon
+                                    icon="mingcute:arrow-right-line"></iconify-icon></a>
                         </div>
 
                         <div class="info-card banner-request-card" onclick="window.location.href='admin_banners.html'">
-                            <div class="chart-header"><h3><iconify-icon icon="material-symbols:ad-units"></iconify-icon> คำขอโฆษณาล่าสุด (Recent Banners)</h3></div>
-                            <ul id="recent-banner-list" class="activity-list banner-req"><li class="banner-loading-text">กำลังโหลดคำขอโฆษณา...</li></ul>
+                            <div class="chart-header">
+                                <h3><iconify-icon icon="material-symbols:ad-units"></iconify-icon> คำขอโฆษณาล่าสุด
+                                    (Recent Banners)</h3>
+                            </div>
+                            <ul id="recent-banner-list" class="activity-list banner-req">
+                                <li class="banner-loading-text">กำลังโหลดคำขอโฆษณา...</li>
+                            </ul>
                             <a href="admin_banners.html" class="view-all">จัดการโฆษณา ทั้งหมด</a>
                         </div>
 
                         <div class="info-card">
-                            <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)</h3>
+                            <h3><iconify-icon icon="mdi:alert-circle"></iconify-icon> รายงานปัญหาล่าสุด (Recent Reports)
+                            </h3>
                             <ul id="recent-report-list" class="activity-list"></ul>
                             <a href="admin_report.html" class="view-all">ดูรายงานทั้งหมด</a>
                         </div>
 
                         <div class="info-card">
-                            <div class="chart-header" style="margin-bottom: 10px;"><h3><iconify-icon icon="mdi:history"></iconify-icon> กิจกรรมล่าสุด</h3></div>
+                            <div class="chart-header" style="margin-bottom: 10px;">
+                                <h3><iconify-icon icon="mdi:history"></iconify-icon> กิจกรรมล่าสุด</h3>
+                            </div>
                             <ul class="activity-list log"></ul>
-                            <a href="admin_activity_logs.html" class="view-all" style="display: block; text-align: center; margin-top: 15px; color: #BF7E46; font-weight: bold; text-decoration: none;">ดูประวัติกิจกรรมทั้งหมด <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon></a>
+                            <a href="admin_activity_logs.html" class="view-all"
+                                style="display: block; text-align: center; margin-top: 15px; color: #BF7E46; font-weight: bold; text-decoration: none;">ดูประวัติกิจกรรมทั้งหมด
+                                <iconify-icon icon="mingcute:arrow-right-line"></iconify-icon></a>
                         </div>
                     </div>
                 </div>
@@ -296,13 +347,13 @@
         function loadAllDashboardData() {
             fetchStats(dateParams);
             renderVisitorChart(dateParams);
-            
+
             const selectedPopularCat = document.getElementById('popular-category').value;
             renderPopularChart(selectedPopularCat, dateParams);
-            
+
             const selectedArCat = document.getElementById('ar-category').value;
             renderARChart(selectedArCat, dateParams);
-            
+
             fetchTopTripPreview(dateParams);
         }
 
@@ -319,10 +370,10 @@
 
             if (start && end) {
                 dateParams = `?startDate=${start}&endDate=${end}`;
-                
+
                 const startFormatted = formatDateThai(start);
                 const endFormatted = formatDateThai(end);
-                
+
                 badgeText.innerText = `กำลังกรองช่วงเวลา: ${startFormatted} - ${endFormatted}`;
                 statusBadge.style.background = "#E8F5E9";
                 statusBadge.style.color = "#2E7D32";
@@ -345,7 +396,7 @@
         // ฟังก์ชันจัดรูปแบบการแสดงผลวันที่
         function formatDateThai(dateString) {
             const parts = dateString.split('-');
-            if(parts.length !== 3) return dateString;
+            if (parts.length !== 3) return dateString;
             return `${parts[2]}/${parts[1]}/${parseInt(parts[0])}`;
         }
 
@@ -448,7 +499,45 @@
                         fill: true
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { maxBarThickness: 100 } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: { top: 20, bottom: 10, left: 10, right: 10 }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        subtitle: {
+                            display: true,
+                            text: 'หน่วย: จำนวนผู้เข้าชมระบบ (คน)',
+                            color: '#50AEE3',
+                            font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                            align: 'start',
+                            padding: { bottom: 15 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                font: { family: 'Noto Serif Thai' }
+                            },
+                            title: { display: false }
+                        },
+                        x: {
+                            maxBarThickness: 100,
+                            ticks: { font: { family: 'Noto Serif Thai' } },
+                            title: {
+                                display: true,
+                                text: 'เดือนในปี 2026',
+                                color: '#50AEE3',
+                                font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                                padding: { top: 10 }
+                            }
+                        }
+                    }
+                }
             });
         }
 
@@ -478,12 +567,62 @@
                         datasets: [{
                             label: 'จำนวนรีวิว (ครั้ง)',
                             data: data.values || [],
-                            backgroundColor: ['rgba(255, 159, 64, 0.8)', 'rgba(255, 205, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(153, 102, 255, 0.8)'],
+                            backgroundColor: [
+                                'rgba(255, 159, 64, 0.8)',
+                                'rgba(255, 205, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(153, 102, 255, 0.8)'
+                            ],
                             borderWidth: 1,
                             borderRadius: 5
                         }]
                     },
-                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: { top: 25, bottom: 10, left: 10, right: 30 }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            subtitle: {
+                                display: true,
+                                text: 'รายชื่อสถานที่ท่องเที่ยวในชุมชน',
+                                color: '#50AEE3',
+                                font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                                align: 'start',
+                                padding: { bottom: 15 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                    font: { family: 'Noto Serif Thai', size: 11 }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'จำนวนการรีวิวจากนักท่องเที่ยว (ครั้ง)',
+                                    color: '#50AEE3',
+                                    font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                                    padding: { top: 10 }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: { family: 'Noto Serif Thai', size: 11 }
+                                },
+                                title: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
                 });
             } catch (error) { console.error("Popular chart error:", error); }
         }
@@ -528,13 +667,58 @@
                     type: 'bar',
                     data: {
                         labels: data.labels,
-                        datasets: [{ label: 'ยอดการเข้าชม AR (ครั้ง)', data: values, backgroundColor: barColors.slice(0, data.labels.length), borderWidth: 1, borderRadius: 4 }]
+                        datasets: [{
+                            label: 'ยอดการเข้าชม AR (ครั้ง)',
+                            data: values,
+                            backgroundColor: barColors.slice(0, data.labels.length),
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
                     },
                     options: {
-                        responsive: true, maintainAspectRatio: false,
-                        layout: { padding: { left: 25, right: 25, top: 10, bottom: 0 } },
-                        plugins: { legend: { display: false }, tooltip: { enabled: true } },
-                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { ticks: { font: { family: 'Noto Serif Thai', size: 11 }, maxRotation: 45, minRotation: 45 } } }
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                            padding: { left: 25, right: 25, top: 20, bottom: 0 }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: true },
+                            subtitle: {
+                                display: true,
+                                text: 'หน่วย: จำนวนการเข้าชมคอนเทนต์ (ครั้ง)',
+                                color: '#50AEE3',
+                                font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                                align: 'start',
+                                padding: { bottom: 15 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                    font: { family: 'Noto Serif Thai', size: 11 }
+                                },
+                                title: {
+                                    display: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { family: 'Noto Serif Thai', size: 11 },
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'รายชื่อสถานที่ท่องเที่ยว',
+                                    color: '#50AEE3',
+                                    font: { family: 'Noto Serif Thai', size: 12, weight: 'bold' },
+                                    padding: { top: 25 }
+                                }
+                            }
+                        }
                     }
                 });
             } catch (e) { console.error("AR Chart Error:", e); }
