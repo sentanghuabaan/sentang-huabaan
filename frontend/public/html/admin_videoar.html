@@ -200,8 +200,14 @@
                         <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;"><label>Location</label><select id="swal-loc" class="cute-edit-input">${locOptions}</select></div>
                         <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;"><label>Video Name</label><input type="text" id="swal-name" class="cute-edit-input" value="${data.video_name || ''}"></div>
                         
+                        <!-- เพิ่มช่องวาง URL วิดีโอตรงนี้ -->
                         <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;">
-                            <label>Upload Video (.mp4 เท่านั้น)</label>
+                            <label>วางลิงก์วิดีโอเดิม (ระบุ URL คลาวด์ที่มีอยู่แล้วเพื่อประหยัดพื้นที่)</label>
+                            <input type="text" id="swal-url" class="cute-edit-input" placeholder="https://res.cloudinary.com/.../video.mp4" value="${data.video_url || ''}">
+                        </div>
+
+                        <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;">
+                            <label>หรือ อัปโหลดวิดีโอใหม่ (.mp4 เท่านั้น)</label>
                             <input type="file" id="swal-file" class="cute-edit-input" accept="video/mp4" style="padding: 8px;">
                             ${isEdit && data.video_url ? `<p style="font-size:12px; color:#8C6F5E; margin-top:5px; word-break:break-all;">ไฟล์ปัจจุบัน: ${data.video_url.substring(0, 50)}...</p>` : ''}
                         </div>
@@ -235,6 +241,7 @@
                         video_id: document.getElementById('swal-vid').value,
                         location_id: document.getElementById('swal-loc').value,
                         video_name: document.getElementById('swal-name').value,
+                        video_url: document.getElementById('swal-url').value, // ดึงค่าจากช่อง URL
                         target_index: document.getElementById('swal-index').value,
                         status: document.getElementById('swal-status').checked ? 'active' : 'inactive',
                         video_file: fileInput && fileInput.files.length > 0 ? fileInput.files[0] : null
@@ -249,6 +256,7 @@
                     formDataToSend.append('video_id', result.value.video_id);
                     formDataToSend.append('location_id', result.value.location_id);
                     formDataToSend.append('video_name', result.value.video_name);
+                    formDataToSend.append('video_url', result.value.video_url); // ส่งลิงก์ URL ไปยัง API
                     formDataToSend.append('target_index', result.value.target_index);
                     formDataToSend.append('status', result.value.status);
 

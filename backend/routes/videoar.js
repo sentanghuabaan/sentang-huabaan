@@ -67,6 +67,10 @@ router.post('/', verifyAdminToken, upload.single('video'), (req, res) => {
 
     const finalVideoUrl = req.file ? req.file.path : video_url;
 
+    if (!finalVideoUrl) {
+        return res.status(400).json({ error: "กรุณาอัปโหลดไฟล์วิดีโอ หรือระบุลิงก์ URL วิดีโอ" });
+    }
+
     const sql = "INSERT INTO VideoAR (video_id, location_id, video_name, video_url, target_index, status, updated_by) VALUES (?, ?, ?, ?, ?, ?, ?)";
     db.query(sql, [video_id, location_id, video_name, finalVideoUrl, target_index, status, admin_id], (err) => {
         if (err) return res.status(500).json({ error: err.message });
