@@ -58,7 +58,7 @@ app.use('/api', contentRoutes);
 app.use('/api', reviewRoutes);
 app.use('/api/videoar', videoarRoutes);
 app.use('/api/map', mapRoutes);
-app.use('/api', tripRouter);
+app.use('/api/trips', tripRouter);
 app.use('/api', dashboardRoutes);
 app.use('/api', reportRoutes);
 app.use('/api', logsRoutes);
