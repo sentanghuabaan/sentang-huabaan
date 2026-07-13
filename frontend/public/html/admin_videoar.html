@@ -195,7 +195,7 @@
                 html: `
                     <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; padding: 20px;">
                         <div class="form-group" style="display: flex; flex-direction: column;"><label>Video ID</label><input type="text" id="swal-vid" class="cute-edit-input" value="${data.video_id || ''}" readonly></div>
-                        <div class="form-group" style="display: flex; flex-direction: column;"><label>Target Index</label><input type="number" id="swal-index" class="cute-edit-input" value="${data.target_index || ''}"></div>
+                        <div class="form-group" style="display: flex; flex-direction: column;"><label>Target Index</label><input type="number" id="swal-index" class="cute-edit-input" value="${data.target_index !== undefined && data.target_index !== null ? data.target_index : ''}"></div>
                         
                         <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;"><label>Location</label><select id="swal-loc" class="cute-edit-input">${locOptions}</select></div>
                         <div class="form-group" style="display: flex; flex-direction: column; grid-column: span 2;"><label>Video Name</label><input type="text" id="swal-name" class="cute-edit-input" value="${data.video_name || ''}"></div>

@@ -98,6 +98,7 @@ router.get('/:id', verifyAdminToken, (req, res) => {
 // แอดมินแก้ไขวิดีโอเดิม
 router.put('/:id', verifyAdminToken, upload.single('video'), async (req, res) => {
     const { location_id, video_name, video_url, target_index, status, admin_id } = req.body;
+    const finalIndex = (target_index === '' || target_index === undefined) ? 0 : Number(target_index);
     const vidId = req.params.id;
 
     try {
@@ -107,7 +108,7 @@ router.put('/:id', verifyAdminToken, upload.single('video'), async (req, res) =>
         const finalVideoUrl = req.file ? req.file.path : (video_url || oldValue.video_url);
 
         const sql = "UPDATE VideoAR SET location_id=?, video_name=?, video_url=?, target_index=?, status=?, updated_by=?, updated_at=NOW() WHERE video_id=?";
-        db.query(sql, [location_id, video_name, finalVideoUrl, target_index, status, admin_id, vidId], (err) => {
+        db.query(sql, [location_id, video_name, finalVideoUrl, finalIndex, status, admin_id, vidId], (err) => {
             if (err) return res.status(500).json(err);
             res.json({ message: "Updated" });
         });
