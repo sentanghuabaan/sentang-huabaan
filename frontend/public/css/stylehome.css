@@ -216,7 +216,7 @@ body {
 }
 
 .ar-style {
-    background: rgba(40, 25, 15, 0.55); 
+    background: rgba(40, 25, 15, 0.55);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -585,27 +585,27 @@ body {
 }
 
 .swal2-popup {
-    width: 85% !important;   
-    max-width: 340px !important;  
-    padding: 25px 20px !important;  
+    width: 85% !important;
+    max-width: 340px !important;
+    padding: 25px 20px !important;
     border-radius: 16px !important;
 }
 
 .swal2-icon {
-    transform: scale(0.85) !important; 
+    transform: scale(0.85) !important;
     margin-top: 10px !important;
     margin-bottom: 5px !important;
 }
 
 .swal2-title {
-    font-size: 20px !important;   
+    font-size: 20px !important;
     font-weight: bold !important;
     margin-top: 10px !important;
     padding: 0 !important;
 }
 
 .swal2-html-container {
-    font-size: 15px !important;  
+    font-size: 15px !important;
     line-height: 1.5 !important;
     margin-top: 8px !important;
     padding: 0 5px !important;
@@ -617,7 +617,7 @@ body {
 
 .swal2-confirm {
     font-size: 16px !important;
-    padding: 8px 35px !important; 
+    padding: 8px 35px !important;
     border-radius: 8px !important;
 }
 
@@ -663,6 +663,161 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+}
+
+/* Trip Planner Hero Slide */
+.trip-banner-slide {
+    background: linear-gradient(rgba(80, 54, 32, 0.5), rgba(80, 54, 32, 0.5)),
+        url('../image/bannerplan.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* ดันการ์ดชิดขวาเพื่อเป็นตัวเชื่อมโครงสร้าง */
+    position: relative;
+}
+
+.planner-split-card {
+    background: linear-gradient(135deg, rgba(35, 20, 10, 0.85) 0%, rgba(20, 12, 5, 0.95) 100%) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-left: 3px solid #BF7E46 !important;
+    width: 75%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+
+    padding: 20px 20px 20px 35px;
+    box-sizing: border-box;
+}
+
+.planner-card-inner {
+    width: 100%;
+    text-align: right !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end !important;
+}
+
+.planner-card-inner h3 {
+    color: #FBEDD6 !important;
+    font-size: 19px;
+    margin-top: 6px;
+    margin-bottom: 3px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.planner-card-inner p {
+    color: #E2D7C5 !important;
+    font-size: 11px;
+    margin-bottom: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.planner-tag {
+    background: #ff6d6d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.planner-btn {
+    background-color: #ff6d6d;
+    color: #FBEDD6;
+    border: 1px solid rgba(251, 237, 214, 0.4);
+    padding: 7px 15px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.planner-btn:active {
+    transform: scale(0.96);
+}
+
+/* Recommend Map Hero */
+.recommend-map-slide {
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.6) 55%, rgba(0, 0, 0, 0) 100%),
+        url('../image/bannerreccommend.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.recommend-map-style {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+
+    width: 100%;
+    padding: 15px 25px 15px 45px;
+    margin: 0;
+    text-align: right !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end !important;
+}
+
+.recommend-map-style h3 {
+    color: #FBEDD6 !important;
+    font-size: 22px;
+    margin-top: 5px;
+    margin-bottom: 2px;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.recommend-map-style p {
+    color: #FFFFFF !important;
+    font-size: 11px;
+    margin-bottom: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.recommend-map-tag {
+    background: #97C6E0;
+    color: black;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.recommend-map-btn {
+    background-color: #97C6E0;
+    color: #000;
+    border: 1px solid rgba(251, 237, 214, 0.4);
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
 @media (min-width: 768px) {
@@ -752,14 +907,14 @@ body {
     /* Popup ของ SweetAlert2 */
     .swal2-popup {
         max-width: 450px !important;
-        padding: 30px !important;    
-        border-radius: 20px !important; 
+        padding: 30px !important;
+        border-radius: 20px !important;
     }
 
     .swal2-title {
         font-size: 26px !important;
         font-weight: bold !important;
-        color: #5C4033 !important;  
+        color: #5C4033 !important;
         margin-top: 15px !important;
     }
 
@@ -833,5 +988,105 @@ body {
 
     .gallery-item.focused {
         transform: scale(1.05);
+    }
+
+    .slide-item.trip-banner-slide {
+        height: 330px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 60px;
+    }
+
+    .banner-content.planner-style {
+        width: 100%;
+        max-width: 700px;
+        height: 260px;
+        padding: 20px;
+        margin-left: 0;
+        margin-right: auto;
+        border-radius: 25px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    /* banner plantrip */
+    .slide-item.trip-banner-slide {
+        height: 330px;
+    }
+
+    .planner-split-card {
+        position: absolute !important;
+        right: 0px;
+        width: 500px;
+        height: 100%;
+        top: 0;
+        clip-path: polygon(15% 0%, 100% 0%, 100% 100%, 0% 100%);
+        padding: 40px 45px 40px 60px;
+    }
+
+    .planner-card-inner h3 {
+        font-size: 32px;
+        margin-top: 10px;
+        margin-bottom: 8px;
+    }
+
+    .planner-card-inner p {
+        font-size: 14px;
+        margin-bottom: 22px;
+        line-height: 1.6;
+    }
+
+    .planner-btn {
+        font-size: 14px;
+        padding: 10px 22px;
+        border-radius: 8px;
+    }
+
+    .planner-tag {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+
+    /* Recommend Map Hero */
+    .slide-item.recommend-map-slide {
+        height: 330px;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0.75) 65%, rgba(0, 0, 0, 0.85) 100%),
+            url('../image/bannerreccommend.jpg');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .recommend-map-style {
+        position: absolute;
+        right: 45px;
+        width: 480px;
+        padding: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .recommend-map-style span.recommend-map-tag {
+        font-size: 14px;
+        padding: 4px 12px;
+    }
+
+    .recommend-map-style h3 {
+        font-size: 34px;
+        margin-top: 10px;
+        margin-bottom: 8px;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.95);
+    }
+
+    .recommend-map-style p {
+        font-size: 15px;
+        margin-bottom: 22px;
+        line-height: 1.6;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+    }
+
+    .recommend-map-btn {
+        font-size: 15px;
+        padding: 10px 22px;
+        border-radius: 9px;
     }
 }
