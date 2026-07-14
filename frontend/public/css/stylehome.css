@@ -1015,7 +1015,7 @@ body {
     }
 
     .planner-split-card {
-        background: linear-gradient(135deg, rgba(35, 20, 10, 0.55) 0%, rgba(20, 12, 5, 0.7) 100%) !important;
+        background: linear-gradient(135deg, rgba(35, 20, 10, 0.6) 0%, rgba(20, 12, 5, 0.5) 100%) !important;
         position: absolute !important;
         right: 0px;
         width: 500px;
