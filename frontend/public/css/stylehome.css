@@ -302,6 +302,7 @@ body {
 
 .section-title {
     font-size: 20px;
+    margin-top: 35px;
     margin-bottom: 15px;
     color: #503620;
 }
@@ -905,6 +906,8 @@ body {
 
     .section-title {
         font-size: 22px;
+        margin-top: 45px !important;
+        margin-bottom: 20px;
     }
 
 
