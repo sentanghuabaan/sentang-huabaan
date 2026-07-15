@@ -63,7 +63,7 @@
                 const userId = userData.user_id || userData.id;
                 console.log("เรากำลังส่ง ID นี้ไปหา DB:", userId);
 
-                const response = await fetch(`${API_BASE_URL}/api/my-trips/${userId}?sort=${sortBy}`);
+                const response = await fetch(`${API_BASE_URL}/api/trips/my-trips/${userId}?sort=${sortBy}`);
                 const data = await response.json();
 
                 if (!Array.isArray(data) || data.length === 0) {
