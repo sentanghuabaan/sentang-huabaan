@@ -337,16 +337,57 @@
                 if (!listContainer) return;
                 listContainer.innerHTML = '';
 
-                filteredLocations.forEach(loc => {
-                    const fullImgPath = loc.location_url.startsWith('http') ? loc.location_url : `${API_BASE_URL}/${loc.location_url}`;
+                // ดึงเวลาปัจจุบันของเครื่องผู้ใช้เพื่อเช็ควันและเวลา
+                const now = new Date();
+                const dayOfWeek = now.getDay();
+                const dayNames = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+                const todayThai = dayNames[dayOfWeek];
+                const currentTotalMinutes = (now.getHours() * 60) + now.getMinutes();
 
-                    // เปลี่ยนหน้าไปที่ locationdetail.html
+                filteredLocations.forEach(item => {
+                    const fullImgPath = item.location_url.startsWith('http') ? item.location_url : `${API_BASE_URL}/${item.location_url}`;
+
+                    // --- เช็ควันเปิด-ปิดประจำสัปดาห์ 
+                    let isDayOpen = false;
+                    const opDays = item.operating_days || "";
+                    if (opDays === "ทุกวัน") {
+                        isDayOpen = true;
+                    } else if (opDays.includes("ยกเว้น")) {
+                        const exceptDay = opDays.replace("ยกเว้น", "").trim();
+                        isDayOpen = (todayThai !== exceptDay);
+                    } else if (opDays.includes("ทุกวัน")) {
+                        const targetDay = opDays.replace("ทุก", "").trim();
+                        isDayOpen = (todayThai === targetDay);
+                    } else {
+                        isDayOpen = opDays.includes(todayThai);
+                    }
+
+                    // --- แปลงและเช็คเวลาเปิด-ปิด
+                    const timeToMinutes = (t) => {
+                        if (!t) return null;
+                        const p = t.split(':');
+                        return (parseInt(p[0]) * 60) + parseInt(p[1]);
+                    };
+                    const openMin = timeToMinutes(item.opening_time);
+                    const closeMin = timeToMinutes(item.closing_time);
+
+                    let isTimeOpen = false;
+                    if (openMin !== null && closeMin !== null) {
+                        isTimeOpen = (currentTotalMinutes >= openMin && currentTotalMinutes < closeMin);
+                    }
+
+                    // สรุปสถานะตามลอจิกหน้าสถานที่
+                    const isOpen = isDayOpen && isTimeOpen;
+                    const statusClass = isOpen ? 'open' : 'closed';
+                    const statusText = isOpen ? 'เปิด' : 'ปิด';
+
                     const card = `
                 <div class="place-card" style="cursor: pointer;" 
-                     onclick="location.href='html/locationdetail.html?id=${loc.location_id}'">
-                    <img src="${fullImgPath}" alt="${loc.location_name}" 
+                     onclick="location.href='html/locationdetail.html?id=${item.location_id}'">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <img src="${fullImgPath}" alt="${item.location_name}" 
                          onerror="this.src='image/logohuabaan.png'"> 
-                    <div class="place-label">${loc.location_name}</div>
+                    <div class="place-label">${item.location_name}</div>
                 </div>
             `;
                     listContainer.innerHTML += card;
@@ -365,16 +406,56 @@
                 if (!activityContainer) return;
                 activityContainer.innerHTML = '';
 
-                activities.forEach(act => {
-                    const fullImgPath = act.activity_url.startsWith('http') ? act.activity_url : `${API_BASE_URL}/${act.activity_url}`;
+                const now = new Date();
+                const dayOfWeek = now.getDay();
+                const dayNames = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+                const todayThai = dayNames[dayOfWeek];
+                const currentTotalMinutes = (now.getHours() * 60) + now.getMinutes();
 
-                    //เปลี่ยนหน้าไปที่ activitydetail.html
+                activities.forEach(item => {
+                    const fullImgPath = item.activity_url.startsWith('http') ? item.activity_url : `${API_BASE_URL}/${item.activity_url}`;
+
+                    // --- เช็ควันเปิดกิจกรรม
+                    const opDays = item.operating_days || "";
+                    if (opDays === "ทุกวัน" || opDays === "") {
+                        isDayOpen = true;
+                    } else if (opDays.includes("ยกเว้น")) {
+                        const exceptDay = opDays.replace("ยกเว้น", "").trim();
+                        isDayOpen = (todayThai !== exceptDay);
+                    } else {
+                        isDayOpen = opDays.includes(todayThai);
+                    }
+
+                    // --- ฟังก์ชันแปลงเวลา
+                    const timeToMinutes = (t) => {
+                        if (!t) return null;
+                        const p = t.split(':');
+                        return (parseInt(p[0]) * 60) + parseInt(p[1]);
+                    };
+
+                    const openMin = timeToMinutes(item.start_time);
+                    const closeMin = timeToMinutes(item.end_time);
+
+                    let isTimeOpen = false;
+                    if (openMin !== null && closeMin !== null) {
+                        isTimeOpen = (currentTotalMinutes >= openMin && currentTotalMinutes < closeMin);
+                    } else {
+                        const defOpen = timeToMinutes("09:00");
+                        const defClose = timeToMinutes("17:00");
+                        isTimeOpen = (currentTotalMinutes >= defOpen && currentTotalMinutes < defClose);
+                    }
+
+                    const isOpen = isDayOpen && isTimeOpen;
+                    const statusClass = isOpen ? 'open' : 'closed';
+                    const statusText = isOpen ? 'เปิด' : 'ปิด';
+
                     const card = `
                 <div class="place-card" style="cursor: pointer;" 
-                     onclick="location.href='html/activitydetail.html?id=${act.activity_id}'">
-                    <img src="${fullImgPath}" alt="${act.activity_name}" 
+                     onclick="location.href='html/activitydetail.html?id=${item.activity_id}'">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <img src="${fullImgPath}" alt="${item.activity_name}" 
                          onerror="this.src='logohuabaan.png'"> 
-                    <div class="place-label">${act.activity_name}</div>
+                    <div class="place-label">${item.activity_name}</div>
                 </div>
             `;
                     activityContainer.innerHTML += card;
