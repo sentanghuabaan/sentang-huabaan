@@ -128,7 +128,7 @@ body {
 
 /* ส่วนของกล่องข้อความ */
 .camera-icon-wrapper::before {
-    content: "แสกนดูเรื่องราวที่นี่";
+    content: "สแกนดูเรื่องราวที่นี่";
     position: absolute;
     right: 85px;
     top: 50%;
